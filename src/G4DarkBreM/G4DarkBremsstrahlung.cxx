@@ -7,7 +7,6 @@
 
 #include "G4DarkBreM/G4DarkBremsstrahlung.h"
 
-#include "Framework/RunHeader.h"
 #include "G4Electron.hh"      //for electron definition
 #include "G4MuonMinus.hh"     //for muon definition
 #include "G4MuonPlus.hh"      //for muon definition
@@ -15,47 +14,12 @@
 #include "G4ProcessTable.hh"  //for deactivating dark brem process
 #include "G4ProcessType.hh"   //for type of process
 #include "G4RunManager.hh"    //for VerboseLevel
+
 #include "G4DarkBreM/G4DarkBreMModel.h"
-#include "G4DarkBreM/DMG4Model.h"
 #include "G4DarkBreM/G4APrime.h"
 
 namespace simcore {
 namespace darkbrem {
-
-G4double ElementXsecCache::get(G4double energy, G4double A, G4double Z) {
-  key_t key = computeKey(energy, A, Z);
-  if (the_cache_.find(key) == the_cache_.end()) {
-    if (model_.get() == nullptr) {
-      EXCEPTION_RAISE("BadCache",
-                      "ElementXsecCache not given a model to calculate cross "
-                      "sections with.");
-    }
-    the_cache_[key] = model_->ComputeCrossSectionPerAtom(energy, A, Z);
-  }
-  return the_cache_.at(key);
-}
-
-void ElementXsecCache::stream(std::ostream& o) const {
-  o << "A [au],Z [protons],Energy [MeV],Xsec [pb]\n"
-    << std::setprecision(std::numeric_limits<double>::digits10 +
-                         1);  // maximum precision
-  for (auto const& [key, xsec] : the_cache_) {
-    key_t E = key % MAX_E;
-    key_t A = ((key - E) / MAX_E) % MAX_A;
-    key_t Z = ((key - E) / MAX_E - A) / MAX_A;
-    o << A << "," << Z << "," << E << "," << xsec / picobarn << "\n";
-  }
-  o << std::endl;
-}
-
-ElementXsecCache::key_t ElementXsecCache::computeKey(G4double energy,
-                                                     G4double A,
-                                                     G4double Z) const {
-  key_t energyKey = energy;
-  key_t AKey = A;
-  key_t ZKey = Z;
-  return (ZKey * MAX_A + AKey) * MAX_E + energyKey;
-}
 
 const std::string G4DarkBremsstrahlung::PROCESS_NAME = "eDarkBrem";
 G4DarkBremsstrahlung* G4DarkBremsstrahlung::the_process_ = nullptr;
@@ -79,10 +43,8 @@ G4DarkBremsstrahlung::G4DarkBremsstrahlung(
   auto model_name{model.getParameter<std::string>("name")};
   if (model_name == "vertex_library") {
     model_ = std::make_shared<G4DarkBreMModel>(model, muons_);
-  } else if (model_name == "dmg4") {
-    model_ = std::make_shared<DMG4Model>(model, muons_);
   } else {
-    EXCEPTION_RAISE("DarkBremModel",
+    throw std::runtime_error(
                     "Model named '" + model_name + "' is not known.");
   }
 
@@ -107,36 +69,30 @@ void G4DarkBremsstrahlung::PrintInfo() {
   model_->PrintInfo();
 }
 
-void G4DarkBremsstrahlung::RecordConfig(ldmx::RunHeader& h) const {
-  h.setIntParameter("Only One DB Per Event", only_one_per_event_);
-  h.setFloatParameter("A' Mass [MeV]", ap_mass_);
-  model_->RecordConfig(h);
-}
-
 G4VParticleChange* G4DarkBremsstrahlung::PostStepDoIt(const G4Track& track,
                                                        const G4Step& step) {
   // Debugging Purposes: Check if track we get is an electron
   if (not IsApplicable(*track.GetParticleDefinition()))
-    EXCEPTION_RAISE(
-        "DBBadTrack",
-        "Dark brem process receieved a track that isn't applicable.");
+    throw std::runtime_error("Dark brem process received a track that isn't applicable."); 
 
   /*
    * Geant4 has decided that it is our time to interact,
    * so we are going to change the particle
+  std::cout << "A dark brem occurred!" << std::endl;
    */
-  ldmx_log(debug) << "A dark brem occurred!";
 
   if (only_one_per_event_) {
-    // Deactivate the process after one dark brem if we restrict ourselves to
-    // only one per event. If this is in the stepping action instead, more than
-    // one brem can occur within each step. Reactivated in
-    // RunManager::TerminateOneEvent Both biased and unbiased process could be
-    // in the run (but not at the same time),
-    //  so we turn off both while silencing the warnings from the process table.
+    /**
+     * Deactivate the process after one dark brem if we restrict ourselves to 
+     * only one per event. If this is in the stepping action instead, more than 
+     * one brem can occur within each step. Reactivated in RunManager::TerminateOneEvent 
+     *
+     * Both biased and unbiased process could be in the run (but not at the same time),
+     * so we turn off both while silencing the warnings from the process table.
+    std::cout << "Deactivating dark brem process" << std::endl;
+     */
     std::vector<G4String> db_process_name_options = {
         "biasWrapper(" + PROCESS_NAME + ")", PROCESS_NAME};
-    ldmx_log(debug) << "Deactivating dark brem process";
     G4ProcessManager* pman = track.GetDefinition()->GetProcessManager();
     for (std::size_t i_proc{0}; i_proc < pman->GetProcessList()->size(); i_proc++) {
       G4VProcess* p{(*(pman->GetProcessList()))[i_proc]};
@@ -147,18 +103,22 @@ G4VParticleChange* G4DarkBremsstrahlung::PostStepDoIt(const G4Track& track,
     }
   }
 
-  ldmx_log(debug) << "Initializing track";
+  /**
+  std::cout << "Initializing track" << std::endl;
+   */
   aParticleChange.Initialize(track);
 
-  ldmx_log(debug) << "Calling model's generate change";
+  /**
+  std::cout << "Calling model's GenerateChange" << std::endl;
+   */
   model_->GenerateChange(aParticleChange, track, step);
 
   /*
    * Parent class has some internal counters that need to be reset,
    * so we call it before returning. It will return our shared
    * protected member variable aParticleChange that we have been modifying
+  std::cout << "Calling parent's PostStepDoIt" << std::endl;
    */
-  ldmx_log(debug) << "Calling parent's poststepdoit";
   return G4VDiscreteProcess::PostStepDoIt(track, step);
 }
 

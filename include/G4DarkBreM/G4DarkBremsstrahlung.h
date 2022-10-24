@@ -8,9 +8,7 @@
 #ifndef SIMCORE_DARKBREM_G4DARKBREMSSTRAHLUNG_H_
 #define SIMCORE_DARKBREM_G4DARKBREMSSTRAHLUNG_H_
 
-#include "Framework/Configure/Parameters.h"
-#include "Framework/Logger.h"
-#include "Framework/RunHeader.h"
+#include "G4DarkBreM/Parameters.h"
 
 // Geant
 #include "G4VDiscreteProcess.hh"
@@ -18,178 +16,7 @@
 class G4String;
 class G4ParticleDefinition;
 
-namespace simcore {
-namespace darkbrem {
-
-/**
- * @class G4DarkBremmsstrahlungModel
- * Abstract class representing a model for dark brem.
- *
- * The model is what actually determines two important things:
- *  1. How the cross section is calculated
- *  2. What the particle change is when the process happens
- *
- * This class is the base class that shows what is necessary
- * for the model to function properly.
- */
-class G4DarkBremsstrahlungModel {
- public:
-  /**
-   * Constructor
-   *
-   * Configures the model based on the passed parameters
-   *
-   * Names the logger after the name for this model.
-   */
-  G4DarkBremsstrahlungModel(const framework::config::Parameters& p, bool muons) {
-    theLog_ =
-        framework::logging::makeLogger(p.getParameter<std::string>("name"));
-    muons_ = muons;
-  }
-
-  /// Destructor, nothing on purpose
-  virtual ~G4DarkBremsstrahlungModel() = default;
-
-  /**
-   * Print the configuration of this model
-   *
-   * Helpful for debugging and keeping the process compliant
-   * with the other Geant4 processes.
-   */
-  virtual void PrintInfo() const = 0;
-
-  /**
-   * Record the configuration of this model to the RunHeader
-   *
-   * Helpful for persisting run data for later viewing.
-   */
-  virtual void RecordConfig(ldmx::RunHeader& h) const = 0;
-
-  /**
-   * Calculate the cross section given the input parameters
-   *
-   * @see G4DarkBremmstrahlung::GetMeanFreePath
-   * @param[in] electronKE current electron kinetic energy
-   * @param[in] atomicA atomic-mass number for the element the electron is in
-   * @param[in] atomicZ atomic-number for the element the electron is in
-   * @returns cross section with units incorporated as a G4double
-   */
-  virtual G4double ComputeCrossSectionPerAtom(G4double electronKE,
-                                              G4double atomicA,
-                                              G4double atomicZ) = 0;
-
-  /**
-   * Generate the change in the particle now that we can assume the interaction
-   * is occuring
-   *
-   * @note The input particleChange has already been cleared and then
-   * initialized, so there is no need for the model to do those steps.
-   *
-   * @see G4DarkBremmstrahlung::PostStepDoIt
-   * @param[in,out] particleChange particle change class that stores information
-   * @param[in] track current track that needs the change
-   * @param[in] step current step of the track
-   */
-  virtual void GenerateChange(G4ParticleChange& particleChange,
-                              const G4Track& track, const G4Step& step) = 0;
-
- protected:
-  /// The logging apparatus for this model
-  framework::logging::logger theLog_;
-  /// whether muons (true) or electrons (false) are dark bremming
-  bool muons_;
-};  // G4DarkBremsstrahlungModel
-
-/**
- * The cache of already computed cross sections
- *
- * We make a specific class for the cache in order
- * to keep the key encoding/decoding process in a central
- * location.
- */
-class ElementXsecCache {
- public:
-  /**
-   * Default constructor
-   *
-   * Does nothing interesting, but no model for calculating cross section has
-   * been set.
-   */
-  ElementXsecCache() = default;
-
-  /**
-   * Constructor with a model to calculate the cross section.
-   */
-  ElementXsecCache(std::shared_ptr<G4DarkBremsstrahlungModel> model)
-      : model_{model} {}
-
-  /**
-   * Get the value of the cross section for the input variables
-   * and calculate the cross section if it wasn't calculated before.
-   *
-   * @raises Exception if no model is available for calculating cross sections
-   * @param[in] energy Energy of incident electron [MeV]
-   * @param[in] A atomic mass of element [atomic mass units]
-   * @param[in] Z atomic number of element [num protons]
-   * @returns cross section corresponding to the input parameters (including
-   * units Geant4 style)
-   */
-  G4double get(G4double energy, G4double A, G4double Z);
-
-  /**
-   * Stream the entire table into the output stream.
-   *
-   * @param[in,out] o ostream to write to
-   */
-  void stream(std::ostream& o) const;
-
-  /**
-   * Overload the streaming operator for ease
-   *
-   * @param[in] o ostream to write to
-   * @param[in] c cache to write out
-   * @returns modified ostream
-   */
-  friend std::ostream& operator<<(std::ostream& o, const ElementXsecCache c) {
-    c.stream(o);
-    return o;
-  }
-
- private:
-  /// The type for the key we use in the cache
-  typedef unsigned long int key_t;
-
-  /// The maximum value of A
-  static const key_t MAX_A{1000};
-
-  /// The maximum value for energy [MeV]
-  static const key_t MAX_E{1500000};
-
-  /**
-   * Compute a key for the cache map
-   * Generating a unique key _after_ making the energy [MeV] an integer.
-   * The atomic mass (A) and charge (Z) are given by Geant4 as doubles as well,
-   * so I cast them to integers before computing the key.
-   *
-   * This is what you would edit if you want a more/less find-grained cache
-   * of Xsecs. Right now, since the internal unit of energy in Geant4 is MeV,
-   * the cache is binned at the 1MeV scale.
-   *
-   * @param[in] energy Energy of incident electron [MeV]
-   * @param[in] A atomic mass of element [atomic mass units]
-   * @param[in] Z atomic number of element [num protons]
-   * @returns unsigned integer cache key for these three inputs
-   */
-  key_t computeKey(G4double energy, G4double A, G4double Z) const;
-
- private:
-  /// the actual map from cache keys to calculated cross sections
-  std::map<key_t, G4double> the_cache_;
-
-  /// shared pointer to the model for calculating cross sections
-  std::shared_ptr<G4DarkBremsstrahlungModel> model_;
-
-};  // ElementXsecCache
+namespace g4db {
 
 /**
  * @class G4DarkBremsstrahlung
@@ -256,14 +83,6 @@ class G4DarkBremsstrahlung : public G4VDiscreteProcess {
    * @see G4DarkBremsstrahlungModel::PrintInfo
    */
   virtual void PrintInfo();
-
-  /**
-   * Records the configuration of this process into the RunHeader
-   *
-   * @see G4DarkBremsstrahlungModel::RecordConfig
-   * @param[in,out] h RunHeader to write to
-   */
-  void RecordConfig(ldmx::RunHeader& h) const;
 
   /**
    * This is the function actually called by Geant4 that does the dark brem
@@ -374,10 +193,6 @@ class G4DarkBremsstrahlung : public G4VDiscreteProcess {
 
   /// Our instance of a cross section cache
   ElementXsecCache element_xsec_cache_;
-
-  /// Enable logging for this process
-  framework::logging::logger theLog_ =
-      framework::logging::makeLogger("DarkBremProcess");
 
   /// the created process
   static G4DarkBremsstrahlung* the_process_;
