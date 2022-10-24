@@ -68,7 +68,7 @@ G4DarkBremsstrahlung::G4DarkBremsstrahlung(bool muons, bool only_one_per_event,
 }
 
 void G4DarkBremsstrahlung::SetModel(std::shared_ptr<g4db::PrototypeModel> the_model) {
-  if (!model_) {
+  if (model_) {
     throw std::runtime_error("BadConf: G4DarkBremmstrahlung Model already set.");
   }
   model_ = the_model;
