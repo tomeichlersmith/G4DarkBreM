@@ -65,9 +65,8 @@ void APrimePhysics::ConstructProcess() {
     G4int ret = particle_def->GetProcessManager()->AddDiscreteProcess(proc);
     //G4int ret = particle_def->GetProcessManager()->AddProcess(proc,-1,1,1);
     if (ret < 0) {
-      EXCEPTION_RAISE("DarkBremReg","Particle process manager returned non-zero status "
-          +std::to_string(ret)
-          + " when attempting to register dark brem to it.");
+      throw std::runtime_error("Particle process manager returned a non-zero status "
+          + std::to_string(ret) + " when attempting to register dark brem to it.");
     } else {
       std::cout << "[ APrimePhysics ] : successfully put dark brem in index " 
         << ret << " of process table." << std::endl;
