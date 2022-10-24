@@ -1,14 +1,12 @@
-#ifndef SIMCORE_DARKBREM_G4DARKBREMMODEL_H_
-#define SIMCORE_DARKBREM_G4DARKBREMMODEL_H_
+#ifndef G4DARKBREM_G4DARKBREMMODEL_H
+#define G4DARKBREM_G4DARKBREMMODEL_H
 
-#include "Framework/Configure/Parameters.h"
-#include "G4DarkBreM/G4DarkBremsstrahlung.h"
+#include "G4DarkBreM/Parameters.h"
+#include "G4DarkBreM/PrototypeModel.h"
 
-// ROOT
-#include "TLorentzVector.h"
+#include "CLHEP/Vector/LorentzVector.h"
 
-namespace simcore {
-namespace darkbrem {
+namespace g4db {
 
 /**
  * @class G4DarkBreMModel
@@ -34,7 +32,9 @@ namespace darkbrem {
  * model's behavior. An example library for each of the major mass points is
  * installed with SimCore and is compressed as stored in the data directory.
  */
-class G4DarkBreMModel : public G4DarkBremsstrahlungModel {
+class G4DarkBreMModel : public PrototypeModel {
+  /// the class we use to store four vectors
+  using LorentzVector = CLHEP::HepLorentzVector;
  public:
   /**
    * Constructor
@@ -176,9 +176,9 @@ class G4DarkBreMModel : public G4DarkBremsstrahlungModel {
   struct OutgoingKinematics {
     /// 4-momentum of electron in center of momentum frame for electron-A'
     /// system
-    TLorentzVector electron;
+    LorentzVector electron;
     /// 4-vector pointing to center of momentum frame
-    TLorentzVector centerMomentum;
+    LorentzVector centerMomentum;
     /// energy of electron before brem (used as key in mad graph data map)
     G4double E;
   };
@@ -306,7 +306,6 @@ class G4DarkBreMModel : public G4DarkBremsstrahlungModel {
   std::map<double, unsigned int> currentDataPoints_;
 };
 
-}  // namespace darkbrem
-}  // namespace simcore
+}  // namespace g4db
 
-#endif  // SIMCORE_DARKBREM_G4DARKBREMMODEL_H_
+#endif  // G4DARKBREM_G4DARKBREMMODEL_H

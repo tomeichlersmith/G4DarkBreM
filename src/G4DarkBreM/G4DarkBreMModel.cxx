@@ -1,8 +1,5 @@
 
 #include "G4DarkBreM/G4DarkBreMModel.h"
-
-#include "Framework/Exception/Exception.h"
-#include "Framework/Logger.h"
 #include "G4DarkBreM/G4APrime.h"
 
 // Geant4
@@ -22,8 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-namespace simcore {
-namespace darkbrem {
+namespace g4db {
 
 /**
  * The integration method we will be using for our numerical integrals
@@ -119,8 +115,7 @@ G4DarkBreMModel::G4DarkBreMModel(framework::config::Parameters &params, bool muo
   } else if (method_name_ == "undefined") {
     method_ = DarkBremMethod::Undefined;
   } else {
-    EXCEPTION_RAISE("InvalidMethod", "Invalid dark brem simulation method '" +
-                                         method_name_ + "'.");
+    throw std::runtime_error("Invalid dark brem interpretaion/scaling method '"+method_name_+"'.");
   }
 
   threshold_ = std::max(
@@ -358,28 +353,29 @@ G4ThreeVector G4DarkBreMModel::scample(double incident_energy, double lepton_mas
       PhiAcc = data.electron.Phi();
 
       if (i > maxIterations_) {
-        ldmx_log(warn)
+        std::cerr
             << "Could not produce a realistic vertex with library energy "
             << data.electron.E() << " GeV.\n"
             << "Consider expanding your libary of A' vertices to include a "
                "beam energy closer to "
-            << incident_energy << " GeV.";
+            << incident_energy << " GeV."
+            << std::endl;
         break;
       }
     }
   } else if (method_ == DarkBremMethod::CMScaling) {
-    TLorentzVector el(data.electron.X(), data.electron.Y(), data.electron.Z(),
+    LorentzVector el(data.electron.X(), data.electron.Y(), data.electron.Z(),
                       data.electron.E());
     double ediff = data.E - incident_energy;
-    TLorentzVector newcm(data.centerMomentum.X(), data.centerMomentum.Y(),
+    LorentzVector newcm(data.centerMomentum.X(), data.centerMomentum.Y(),
                          data.centerMomentum.Z() - ediff,
                          data.centerMomentum.E() - ediff);
-    el.Boost(-1. * data.centerMomentum.BoostVector());
-    el.Boost(newcm.BoostVector());
+    el.boost(-1. * data.centerMomentum.boostVector());
+    el.boost(newcm.boostVector());
     double newE = (data.electron.E() - lepton_mass) *
                       ((incident_energy - lepton_mass - MA) / (data.E - lepton_mass - MA)) +
                   lepton_mass;
-    el.SetE(newE);
+    el.setE(newE);
     EAcc = el.E();
     Pt = el.Pt();
     P = el.P();
@@ -467,18 +463,21 @@ void G4DarkBreMModel::SetMadGraphDataLibrary(std::string path) {
   }
 
   if (not foundOneFile) {
-    EXCEPTION_RAISE("DirDNE", "Directory '" + path +
-                                  "' was unable to be opened or no '.lhe' "
-                                  "files were found inside of it.");
+    throw std::runtime_error("Directory '" + path +
+        "' was unable to be opened or no '.lhe' files were found inside it.");
   }
 
   MakePlaceholders();  // Setup the placeholder offsets for getting data.
 
-  ldmx_log(info) << "MadGraph Library of Dark Brem Vertices:\n";
+  /**
+   * Print out loaded MG library
+  std::cout << "MadGraph Library of Dark Brem Events:\n";
   for (const auto &kV : madGraphData_) {
-    ldmx_log(info) << "\t" << std::setw(8) << kV.first << " GeV Beam -> "
-                   << std::setw(6) << kV.second.size() << " Events";
+    std::cout << "\t" << std::setw(8) << kV.first << " GeV Beam -> "
+              << std::setw(6) << kV.second.size() << " Events\n"
   }
+  std::cout << std::flush;
+   */
 
   return;
 }
@@ -487,13 +486,10 @@ void G4DarkBreMModel::ParseLHE(std::string fname) {
   static const double MA =
       G4APrime::APrime()->GetPDGMass() / CLHEP::GeV;  // mass A' in GeV
 
-  // TODO: use already written LHE parser?
-  ldmx_log(info) << "Parsing LHE file '" << fname << "'... ";
-
   std::ifstream ifile;
   ifile.open(fname.c_str());
   if (!ifile) {
-    EXCEPTION_RAISE("LHEFile", "Unable to open LHE file '" + fname + "'.");
+    throw std::runtime_error("Unable to open LHE file '"+fname+"'.");
   }
 
   std::string line;
@@ -521,7 +517,7 @@ void G4DarkBreMModel::ParseLHE(std::string fname) {
               a_py >> a_pz >> a_E >> a_M;
           if (ptype == 622 and state == 1) {
             if (abs(1. - a_M / MA) > 1e-3) {
-              EXCEPTION_RAISE("BadMGEvnt",
+              throw std::runtime_error(
                               "A MadGraph imported event has a different "
                               "APrime mass than the model has (MadGraph = " +
                                   std::to_string(a_M) + "GeV; Model = " +
@@ -544,7 +540,6 @@ void G4DarkBreMModel::ParseLHE(std::string fname) {
   // Add the energy to the list, with a random offset between 0 and the total
   // number of entries.
   ifile.close();
-  ldmx_log(info) << "done parsing.";
 }
 
 void G4DarkBreMModel::MakePlaceholders() {
@@ -590,5 +585,8 @@ G4DarkBreMModel::GetMadgraphData(double E0) {
   return cmdata;
 }
 
-}  // namespace darkbrem
-}  // namespace simcore
+}  // namespace g4db
+
+namespace {
+auto v = g4db::PrototypeModel::Factory::get().declare<g4db::G4DarkBreMModel>("g4db");
+}
