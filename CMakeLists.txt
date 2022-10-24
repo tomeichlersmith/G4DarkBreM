@@ -42,13 +42,13 @@ target_include_directories(G4DarkBreM PUBLIC include)
 
 find_package(Boost COMPONENTS program_options)
 
-add_executable(test-xsec-calc app/test_xsec_calc.cxx)
-target_link_libraries(test-xsec-calc PRIVATE G4DarkBreM Boost::program_options)
-install(TARGETS test-xsec-calc DESTINATION bin)
+add_executable(g4db-xsec-calc app/xsec_calc.cxx)
+target_link_libraries(g4db-xsec-calc PRIVATE G4DarkBreM Boost::program_options)
+install(TARGETS g4db-xsec-calc DESTINATION bin)
 
-add_executable(test-scample app/test_scample.cxx)
-target_link_libraries(test-scample PRIVATE G4DarkBreM Boost::program_options)
-install(TARGETS test-scample DESTINATION bin)
+add_executable(g4db-scample app/scample.cxx)
+target_link_libraries(g4db-scample PRIVATE G4DarkBreM Boost::program_options)
+install(TARGETS g4db-scample DESTINATION bin)
 
 #add_executable(simulate-dark-brem app/simulate_dark_brem.cxx)
 #target_link_libraries(simulate-dark-brem PRIVATE G4DarkBreM Boost::program_options)

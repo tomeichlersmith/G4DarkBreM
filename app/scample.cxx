@@ -1,13 +1,13 @@
 
+#include <iostream>
+#include <fstream>
+
 #include <boost/program_options.hpp>
 
-#include "TFile.h"
-#include "TTree.h"
 
 #include "G4Electron.hh"
 #include "G4MuonMinus.hh"
 
-#include "Framework/Configure/Parameters.h"
 #include "G4DarkBreM/G4DarkBreMModel.h"
 #include "G4DarkBreM/G4APrime.h"
 
@@ -80,44 +80,34 @@ int main(int argc, char* argv[]) try {
     lepton_mass = G4Electron::Electron()->GetPDGMass() / GeV;
   }
 
-  framework::config::Parameters model;
-  model.addParameter<std::string>("name", "vertex_library");
-  model.addParameter("epsilon", 1.);
-  model.addParameter("library_path", vm["db-lib"].as<std::string>());
-  model.addParameter<std::string>("method", "forward_only");
-  model.addParameter("threshold", 0.0);
-
   // the process accesses the A' mass from the G4 particle
-  simcore::darkbrem::G4APrime::APrime(ap_mass/MeV);
+  G4APrime::APrime(ap_mass/MeV);
   // create the model, this is where the LHE file is parsed
   //    into an in-memory library to sample and scale from
-  simcore::darkbrem::G4DarkBreMModel db_model(model, muons);
+  g4db::G4DarkBreMModel db_model("forward_only", 0.0, 1.0, 
+      vm["db-lib"].as<std::string>(), muons);
   db_model.PrintInfo();
   printf("   %-16s %f\n", "Lepton Mass [MeV]:", lepton_mass);
   printf("   %-16s %f\n", "A' Mass [MeV]:", ap_mass/MeV);
 
-  TFile f{vm["output"].as<std::string>().c_str(), "recreate"};
-  TTree t("dbint","dbint");
-  double recoil_energy, recoil_px, recoil_py, recoil_pz;
-  t.Branch("recoil_energy", &recoil_energy);
-  t.Branch("recoil_px", &recoil_px);
-  t.Branch("recoil_py", &recoil_py);
-  t.Branch("recoil_pz", &recoil_pz);
+  std::ofstream f{vm["output"].as<std::string>()};
+  if (not f.is_open()) {
+    std::cerr << "Unable to open output file for writing." << std::endl;
+    return -1;
+  }
+  f << "recoil_energy,recoil_px,recoil_py,recoil_pz\n";
 
   for (int i_event{0}; i_event < n_events; ++i_event) {
     G4ThreeVector recoil = db_model.scample(incident_energy, lepton_mass);
+    double recoil_energy = sqrt(recoil.mag2() + lepton_mass*lepton_mass);
 
-    recoil_energy = sqrt(recoil.mag2() + lepton_mass*lepton_mass);
-    recoil_px = recoil.x();
-    recoil_py = recoil.y();
-    recoil_pz = recoil.z();
-
-    t.Fill();
+    f << recoil_energy << ','
+      << recoil.x() << ','
+      << recoil.y() << ','
+      << recoil.z() << '\n';
   }
 
-  t.Write();
-  f.Close();
-
+  f.close();
   return 0;
 } catch (const std::exception& e) {
   std::cerr << "ERROR: " << e.what() << std::endl;

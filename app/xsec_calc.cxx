@@ -10,8 +10,8 @@
 //----------//
 //   LDMX   //
 //----------//
-#include "Framework/Configure/Parameters.h"
 #include "G4DarkBreM/G4DarkBremsstrahlung.h"
+#include "G4DarkBreM/G4DarkBreMModel.h"
 #include "G4DarkBreM/G4APrime.h"
 
 template<typename T>
@@ -33,9 +33,6 @@ int main(int argc, char* argv[]) try {
     ("output,o", 
       boost::program_options::value<std::string>()->default_value("xsec.csv"), 
       "output file to write xsec to")
-    ("model,m", 
-      boost::program_options::value<std::string>()->default_value("g4db"), 
-      "model to use for calculating")
     ("ap-mass",
       boost::program_options::value<double>(),
       "mass of A' in MeV (defaults to 100 for electrons and 200 for muons)")
@@ -72,14 +69,6 @@ int main(int argc, char* argv[]) try {
     return 0;
   }
 
-  std::string model_name{vm["model"].as<std::string>()};
-  if (model_name == "g4db") {
-    model_name = "vertex_library";
-  } else if (model_name != "dmg4") {
-    std::cerr << "Model '" << model_name << "' is not 'g4db' or 'dmg4'." << std::endl;
-    return -1;
-  }
-
   std::ofstream table_file(vm["output"].as<std::string>());
   if (!table_file.is_open()) {
     std::cerr << "File '" << vm["output"].as<std::string>() << "' was not able to be opened."
@@ -106,39 +95,17 @@ int main(int argc, char* argv[]) try {
     target_A    = get(vm, "target-A"  , 183.84 );
   }
 
-  framework::config::Parameters model;
-  model.addParameter<std::string>("name", model_name);
-  model.addParameter("epsilon", 1.);
-  if (model_name == "vertex_library") {
-    model.addParameter<std::string>("library_path", "NOTNEEDED");
-    model.addParameter<std::string>("method", "forward_only");
-    model.addParameter("threshold", 0.0);
-    model.addParameter("load_library", false);
-  } else {
-    // DMG4 requires target-material at construction time
-    model.addParameter("density", density);
-    model.addParameter("targetA", target_A);
-    model.addParameter<double>("targetZ", target_Z);
-  }
-
-  framework::config::Parameters process;
-  process.addParameter("model", model);
-  process.addParameter("ap_mass", ap_mass/MeV);
-  process.addParameter("enable", true);
-  process.addParameter("only_one_per_event", false);
-  process.addParameter("cache_xsec", true);
-  process.addParameter("global_bias", 1.);
-  process.addParameter("muons", muons);
-  process.addParameter("calc_common",false);
-
   G4double current_energy = get(vm, "min-energy", 2 * ap_mass / GeV) * GeV;
   G4double energy_step = vm["energy-step"].as<double>() * MeV;
 
   // the process accesses the A' mass from the G4 particle
-  simcore::darkbrem::G4APrime::APrime(process.getParameter<double>("ap_mass"));
+  G4APrime::APrime(ap_mass/MeV);
   // create the process to do proper initializations
-  //    this calculates "common" cross sections as well
-  simcore::darkbrem::G4DarkBremsstrahlung db_process(process);
+  //    this holds the xsec cache as well so we don't have to
+  //    repeat all that code
+  G4DarkBremsstrahlung db_process(muons, false, 1.0, true);
+  db_process.SetModel(std::make_shared<g4db::G4DarkBreMModel>("forward_only",
+      0.0, 1.0, "NOT NEEDED", muons, false));
 
   int bar_width = 80;
   int pos = 0;
