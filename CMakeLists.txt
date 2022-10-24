@@ -39,6 +39,7 @@ add_library(G4DarkBreM SHARED
   src/G4DarkBreM/G4DarkBremsstrahlung.cxx)
 target_link_libraries(G4DarkBreM PUBLIC Geant4::Interface)
 target_include_directories(G4DarkBreM PUBLIC include)
+install(TARGETS G4DarkBreM DESTINATION lib)
 
 find_package(Boost COMPONENTS program_options)
 
