@@ -109,7 +109,7 @@ static double flux_factor_chi_analytic(G4double A, G4double Z, double tmin, doub
 G4DarkBreMModel::G4DarkBreMModel(const std::string& method_name, double threshold,
     double epsilon, const std::string& library_path, bool muons, bool load_library)
     : PrototypeModel(muons), method_(DarkBremMethod::Undefined),
-      method_name_{method_name}, epsilon_{epsilon}, library_path_{library_path_} {
+      method_name_{method_name}, epsilon_{epsilon}, library_path_{library_path} {
   if (method_name_ == "forward_only") {
     method_ = DarkBremMethod::ForwardOnly;
   } else if (method_name_ == "cm_scaling") {
