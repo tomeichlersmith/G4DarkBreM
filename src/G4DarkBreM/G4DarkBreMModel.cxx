@@ -3,6 +3,7 @@
 #include "G4DarkBreM/G4APrime.h"
 
 // Geant4
+#include "Randomize.hh"
 #include "G4Electron.hh"
 #include "G4MuonMinus.hh"
 #include "G4EventManager.hh"  //for EventID number
@@ -105,9 +106,10 @@ static double flux_factor_chi_analytic(G4double A, G4double Z, double tmin, doub
              ))/((ta-td)*(ta-td)*(ta-td)));
 }
 
-G4DarkBreMModel::G4DarkBreMModel(framework::config::Parameters &params, bool muons)
-    : G4DarkBremsstrahlungModel(params, muons), method_(DarkBremMethod::Undefined) {
-  method_name_ = params.getParameter<std::string>("method");
+G4DarkBreMModel::G4DarkBreMModel(const std::string& method_name, double threshold,
+    double epsilon, const std::string& library_path, bool muons, bool load_library)
+    : PrototypeModel(muons), method_(DarkBremMethod::Undefined),
+      method_name_{method_name}, epsilon_{epsilon}, library_path_{library_path_} {
   if (method_name_ == "forward_only") {
     method_ = DarkBremMethod::ForwardOnly;
   } else if (method_name_ == "cm_scaling") {
@@ -118,16 +120,11 @@ G4DarkBreMModel::G4DarkBreMModel(framework::config::Parameters &params, bool muo
     throw std::runtime_error("Invalid dark brem interpretaion/scaling method '"+method_name_+"'.");
   }
 
-  threshold_ = std::max(
-      params.getParameter<double>("threshold"),
+  threshold_ = std::max(threshold,
       2. * G4APrime::APrime()->GetPDGMass() / CLHEP::GeV  // mass A' in GeV
   );
 
-  epsilon_ = params.getParameter<double>("epsilon");
-
-  library_path_ = params.getParameter<std::string>("library_path");
-  if (params.getParameter("load_library",true))
-    SetMadGraphDataLibrary(library_path_);
+  if (load_library) SetMadGraphDataLibrary(library_path_);
 }
 
 void G4DarkBreMModel::PrintInfo() const {
@@ -136,13 +133,6 @@ void G4DarkBreMModel::PrintInfo() const {
   G4cout << "   Epsilon:         " << epsilon_ << G4endl;
   G4cout << "   Scaling Method:  " << method_name_ << G4endl;
   G4cout << "   Vertex Library:  " << library_path_ << G4endl;
-}
-
-void G4DarkBreMModel::RecordConfig(ldmx::RunHeader &h) const {
-  h.setFloatParameter("Minimum Threshold to DB [GeV]", threshold_);
-  h.setFloatParameter("DB Xsec Epsilon", epsilon_);
-  h.setStringParameter("Vertex Scaling Method", method_name_);
-  h.setStringParameter("Vertex Library", library_path_);
 }
 
 G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
@@ -322,7 +312,7 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
    * The integrated_xsec should be the correct value, we are just
    * converting it to Geant4's pb units here
    */
-  G4double cross = integrated_xsec * GeVtoPb * picobarn;
+  G4double cross = integrated_xsec * GeVtoPb * CLHEP::picobarn;
 
   if (cross < 0.) return 0.;  // safety check all the math
 
@@ -333,29 +323,27 @@ G4ThreeVector G4DarkBreMModel::scample(double incident_energy, double lepton_mas
   // mass A' in GeV
   static const double MA = G4APrime::APrime()->GetPDGMass() / CLHEP::GeV;
   OutgoingKinematics data = GetMadgraphData(incident_energy);
-  double EAcc = (data.electron.E() - lepton_mass) *
+  double EAcc = (data.electron.e() - lepton_mass) *
                     ((incident_energy - lepton_mass - MA) / (data.E - lepton_mass - MA))
                 + lepton_mass;
-  double Pt = data.electron.Pt();
+  double Pt = data.electron.perp();
   double P = sqrt(EAcc * EAcc - lepton_mass * lepton_mass);
-  double PhiAcc = data.electron.Phi();
   if (method_ == DarkBremMethod::ForwardOnly) {
     unsigned int i = 0;
     while (Pt * Pt + lepton_mass * lepton_mass > EAcc * EAcc) {
       // Skip events until the transverse energy is less than the total energy.
       i++;
       data = GetMadgraphData(incident_energy);
-      EAcc = (data.electron.E() - lepton_mass) *
+      EAcc = (data.electron.e() - lepton_mass) *
                  ((incident_energy - lepton_mass - MA) / (data.E - lepton_mass - MA))
              + lepton_mass;
-      Pt = data.electron.Pt();
+      Pt = data.electron.perp();
       P = sqrt(EAcc * EAcc - lepton_mass * lepton_mass);
-      PhiAcc = data.electron.Phi();
 
       if (i > maxIterations_) {
         std::cerr
             << "Could not produce a realistic vertex with library energy "
-            << data.electron.E() << " GeV.\n"
+            << data.electron.e() << " GeV.\n"
             << "Consider expanding your libary of A' vertices to include a "
                "beam energy closer to "
             << incident_energy << " GeV."
@@ -364,28 +352,29 @@ G4ThreeVector G4DarkBreMModel::scample(double incident_energy, double lepton_mas
       }
     }
   } else if (method_ == DarkBremMethod::CMScaling) {
-    LorentzVector el(data.electron.X(), data.electron.Y(), data.electron.Z(),
-                      data.electron.E());
+    LorentzVector el(data.electron.px(), data.electron.py(), data.electron.pz(),
+                      data.electron.e());
     double ediff = data.E - incident_energy;
-    LorentzVector newcm(data.centerMomentum.X(), data.centerMomentum.Y(),
-                         data.centerMomentum.Z() - ediff,
-                         data.centerMomentum.E() - ediff);
+    LorentzVector newcm(data.centerMomentum.px(), data.centerMomentum.py(),
+                         data.centerMomentum.pz() - ediff,
+                         data.centerMomentum.e() - ediff);
     el.boost(-1. * data.centerMomentum.boostVector());
     el.boost(newcm.boostVector());
-    double newE = (data.electron.E() - lepton_mass) *
+    double newE = (data.electron.e() - lepton_mass) *
                       ((incident_energy - lepton_mass - MA) / (data.E - lepton_mass - MA)) +
                   lepton_mass;
     el.setE(newE);
-    EAcc = el.E();
-    Pt = el.Pt();
-    P = el.P();
+    EAcc = el.e();
+    Pt = el.perp();
+    P = el.vect().mag();
   } else if (method_ == DarkBremMethod::Undefined) {
-    EAcc = data.electron.E();
+    EAcc = data.electron.e();
     P = sqrt(EAcc * EAcc - lepton_mass * lepton_mass);
-    Pt = data.electron.Pt();
+    Pt = data.electron.perp();
   }
 
   // outgoing lepton momentum
+  G4double PhiAcc = G4UniformRand()*2*pi;
   G4double recoilMag = sqrt(EAcc * EAcc - lepton_mass*lepton_mass)*GeV;
   G4ThreeVector recoil;
   double ThetaAcc = std::asin(Pt / P);
@@ -528,8 +517,8 @@ void G4DarkBreMModel::ParseLHE(std::string fname) {
             double cmpy = a_py + e_py;
             double cmpz = a_pz + e_pz;
             double cmE = a_E + e_E;
-            evnt.electron = TLorentzVector(e_px, e_py, e_pz, e_E);
-            evnt.centerMomentum = TLorentzVector(cmpx, cmpy, cmpz, cmE);
+            evnt.electron = LorentzVector(e_px, e_py, e_pz, e_E);
+            evnt.centerMomentum = LorentzVector(cmpx, cmpy, cmpz, cmE);
             evnt.E = ebeam;
             madGraphData_[ebeam].push_back(evnt);
           }  // get a prime kinematics
@@ -587,6 +576,3 @@ G4DarkBreMModel::GetMadgraphData(double E0) {
 
 }  // namespace g4db
 
-namespace {
-auto v = g4db::PrototypeModel::Factory::get().declare<g4db::G4DarkBreMModel>("g4db");
-}

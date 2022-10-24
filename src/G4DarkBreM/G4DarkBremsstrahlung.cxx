@@ -15,45 +15,65 @@
 #include "G4ProcessType.hh"   //for type of process
 #include "G4RunManager.hh"    //for VerboseLevel
 
-#include "G4DarkBreM/G4DarkBreMModel.h"
 #include "G4DarkBreM/G4APrime.h"
 
-namespace simcore {
-namespace darkbrem {
+const std::string G4DarkBremsstrahlung::PROCESS_NAME = "DarkBrem";
 
-const std::string G4DarkBremsstrahlung::PROCESS_NAME = "eDarkBrem";
-G4DarkBremsstrahlung* G4DarkBremsstrahlung::the_process_ = nullptr;
-
-G4DarkBremsstrahlung::G4DarkBremsstrahlung(
-    const framework::config::Parameters& params)
+G4DarkBremsstrahlung::G4DarkBremsstrahlung(bool muons, bool only_one_per_event,
+    double global_bias, bool cache_xsec)
     : G4VDiscreteProcess(G4DarkBremsstrahlung::PROCESS_NAME,
-                         fElectromagnetic) {
-  // we need to pretend to be an EM process so the biasing framework recognizes
-  // us
-  the_process_ = this;
+                         fElectromagnetic),
+      muons_{muons}, only_one_per_event_{only_one_per_event},
+      global_bias_{global_bias}, cache_xsec_{cache_xsec} {
+  // we need to pretend to be an EM process so 
+  // the biasing framework recognizes us
   SetProcessSubType(63);  // needs to be different from the other Em Subtypes
 
-  global_bias_ = params.getParameter<double>("global_bias");
-  only_one_per_event_ = params.getParameter<bool>("only_one_per_event");
-  cache_xsec_ = params.getParameter<bool>("cache_xsec");
-  ap_mass_ = params.getParameter<double>("ap_mass");
-  muons_ = params.getParameter<bool>("muons");
-
-  auto model{params.getParameter<framework::config::Parameters>("model")};
-  auto model_name{model.getParameter<std::string>("name")};
-  if (model_name == "vertex_library") {
-    model_ = std::make_shared<G4DarkBreMModel>(model, muons_);
-  } else {
-    throw std::runtime_error(
-                    "Model named '" + model_name + "' is not known.");
+  /*
+   * In G4 speak, a "discrete" process is one that only happens at the end of
+   * steps. we want the DB to be discrete because it is not a "slow braking"
+   * like ionization, the electron suddenly has the interaction and loses a
+   * lot of its energy.
+   *
+   * The first argument to this function is the process we are adding.
+   *      The process manager handles cleaning up the processes,
+   *      so we just give it a new pointer.
+   * The second argument is the "ordering" index.
+   *      This index determines when the process is called w.r.t. the other
+   * processes that could be called at the end of the step. Not providing the
+   * second argument means that the ordering index is given a default value of
+   * 1000 which seems to be safely above all the internal/default processes.
+   */
+  G4ParticleDefinition* particle_def{G4Electron::ElectronDefinition()};
+  if (muons_) {
+    particle_def = G4MuonMinus::Definition();
   }
+  std::cout << "[ G4DarkBremsstrahlung ] : Connecting dark brem to " 
+    << particle_def->GetParticleName() << " "
+    << particle_def->GetPDGEncoding() << std::endl;
+  G4int ret = particle_def->GetProcessManager()->AddDiscreteProcess(this);
+  if (ret < 0) {
+    throw std::runtime_error("Particle process manager returned a non-zero status "
+        + std::to_string(ret) + " when attempting to register dark brem to it.");
+  } else {
+    std::cout << "[ G4DarkBremsstrahlung ] : successfully put dark brem in index " 
+      << ret << " of process table." << std::endl;
+  }
+  /**
+   * have our custom dark brem process go first in any process ordering
+   */
+  particle_def->GetProcessManager()->SetProcessOrderingToFirst(this,
+      G4ProcessVectorDoItIndex::idxAll);
+  std::cout << "[ G4DarkBremsstrahlung ] : set dark brem process ordering to first" << std::endl;
+}
 
-  // now that the model is set, calculate common xsec and put them into the
-  // cache
+void G4DarkBremsstrahlung::SetModel(std::shared_ptr<g4db::PrototypeModel> the_model) {
+  if (!model_) {
+    throw std::runtime_error("BadConf: G4DarkBremmstrahlung Model already set.");
+  }
+  model_ = the_model;
   if (cache_xsec_) {
-    element_xsec_cache_ =
-        ElementXsecCache(model_);  // remake cache with model attached
-    if (params.getParameter<bool>("calc_common", true)) CalculateCommonXsec();
+    element_xsec_cache_ = g4db::ElementXsecCache(model_);
   }
 }
 
@@ -63,9 +83,12 @@ G4bool G4DarkBremsstrahlung::IsApplicable(const G4ParticleDefinition& p) {
 }
 
 void G4DarkBremsstrahlung::PrintInfo() {
-  G4cout << " Only One Per Event               : " << only_one_per_event_
-         << G4endl;
-  G4cout << " A' Mass [MeV]                    : " << ap_mass_ << G4endl;
+  G4cout 
+    << " Muons              : " << muons_ << "\n"
+    << " Only One Per Event : " << only_one_per_event_ << "\n"
+    << " Global Bias        : " << global_bias_ << "\n"
+    << " Cache Xsec         : " << cache_xsec_
+    << G4endl;
   model_->PrintInfo();
 }
 
@@ -122,24 +145,6 @@ G4VParticleChange* G4DarkBremsstrahlung::PostStepDoIt(const G4Track& track,
   return G4VDiscreteProcess::PostStepDoIt(track, step);
 }
 
-void G4DarkBremsstrahlung::CalculateCommonXsec() {
-  // first in pair is A, second is Z
-  std::vector<std::pair<G4double, G4double>> elements = {
-      std::make_pair(183.84, 74),  // tungsten
-      std::make_pair(28.085, 14)   // silicon
-  };
-
-  G4double current_energy = 1.0 * MeV;
-  G4double maximum_energy = 100.0 * GeV;
-  if (muons_) maximum_energy *= 10;
-  G4double energy_step = 1.0 * MeV;
-  while (current_energy <= maximum_energy) {
-    for (auto const& [A, Z] : elements)
-      element_xsec_cache_.get(current_energy, A, Z);
-    current_energy += energy_step;
-  }
-}
-
 G4double G4DarkBremsstrahlung::GetMeanFreePath(const G4Track& track, G4double,
                                                 G4ForceCondition*) {
   // won't happen if it isn't applicable
@@ -173,5 +178,3 @@ G4double G4DarkBremsstrahlung::GetMeanFreePath(const G4Track& track, G4double,
     */
   return SIGMA > DBL_MIN ? 1. / SIGMA : DBL_MAX;
 }
-}  // namespace darkbrem
-}  // namespace simcore

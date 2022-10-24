@@ -1,7 +1,9 @@
 #ifndef G4DARKBREM_G4DARKBREMMODEL_H
 #define G4DARKBREM_G4DARKBREMMODEL_H
 
-#include "G4DarkBreM/Parameters.h"
+#include <memory>
+#include <map>
+
 #include "G4DarkBreM/PrototypeModel.h"
 
 #include "CLHEP/Vector/LorentzVector.h"
@@ -48,22 +50,19 @@ class G4DarkBreMModel : public PrototypeModel {
    *
    * The library path is immediately passed to SetMadGraphDataLibrary.
    */
-  G4DarkBreMModel(framework::config::Parameters& params, bool muons);
+  G4DarkBreMModel(const std::string& method_name, double threshold, 
+      double epsilon, const std::string& library_path, bool muons, 
+      bool load_library = true);
 
   /**
    * Destructor
    */
-  virtual ~G4DarkBreMModel() {}
+  virtual ~G4DarkBreMModel() = default;
 
   /**
    * Print the configuration of this model
    */
   virtual void PrintInfo() const;
-
-  /**
-   * Record the configuration of this model into the RunHeader
-   */
-  virtual void RecordConfig(ldmx::RunHeader& h) const;
 
   /**
    * Calculates the cross section per atom in GEANT4 internal units.

@@ -1,7 +1,7 @@
 #ifndef G4DarkBREM_ELEMENTXSECCACHE_H
 #define G4DarkBREM_ELEMENTXSECCACHE_H
 
-#include "G4DarkBreM/G4DarkBremsstrahlungModel.h"
+#include "G4DarkBreM/PrototypeModel.h"
 
 namespace g4db {
 
@@ -25,7 +25,7 @@ class ElementXsecCache {
   /**
    * Constructor with a model to calculate the cross section.
    */
-  ElementXsecCache(std::shared_ptr<G4DarkBremsstrahlungModel> model)
+  ElementXsecCache(std::shared_ptr<PrototypeModel> model)
       : model_{model} {}
 
   /**
@@ -92,7 +92,7 @@ class ElementXsecCache {
   std::map<key_t, G4double> the_cache_;
 
   /// shared pointer to the model for calculating cross sections
-  std::shared_ptr<G4DarkBremsstrahlungModel> model_;
+  std::shared_ptr<PrototypeModel> model_;
 
 };  // ElementXsecCache
 

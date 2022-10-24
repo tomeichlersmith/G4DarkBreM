@@ -14,9 +14,6 @@
 class G4String;
 class G4DecayTable;
 
-namespace simcore {
-namespace darkbrem {
-
 class G4APrime : public G4ParticleDefinition {
  private:
   /** Reference to single particle definition of A' */
@@ -58,8 +55,5 @@ class G4APrime : public G4ParticleDefinition {
    */
   static G4APrime* APrime(G4double theMass = -1 * MeV);
 };
-
-}  // namespace darkbrem
-}  // namespace simcore
 
 #endif  // SIMCORE_DARKBREM_G4APRIME_H_

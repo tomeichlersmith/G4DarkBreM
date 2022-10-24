@@ -23,7 +23,7 @@ void ElementXsecCache::stream(std::ostream& o) const {
     key_t E = key % MAX_E;
     key_t A = ((key - E) / MAX_E) % MAX_A;
     key_t Z = ((key - E) / MAX_E - A) / MAX_A;
-    o << A << "," << Z << "," << E << "," << xsec / picobarn << "\n";
+    o << A << "," << Z << "," << E << "," << xsec / CLHEP::picobarn << "\n";
   }
   o << std::endl;
 }

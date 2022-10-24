@@ -5,47 +5,30 @@
  * @author Tom Eichlersmith, University of Minnesota
  */
 
-#ifndef SIMCORE_DARKBREM_G4DARKBREMSSTRAHLUNG_H_
-#define SIMCORE_DARKBREM_G4DARKBREMSSTRAHLUNG_H_
-
-#include "G4DarkBreM/Parameters.h"
+#ifndef G4DARKBREM_G4DARKBREMSSTRAHLUNG_H_
+#define G4DARKBREM_G4DARKBREMSSTRAHLUNG_H_
 
 // Geant
 #include "G4VDiscreteProcess.hh"
 
+#include "G4DarkBreM/PrototypeModel.h"
+#include "G4DarkBreM/ElementXsecCache.h"
+
 class G4String;
 class G4ParticleDefinition;
-
-namespace g4db {
 
 /**
  * @class G4DarkBremsstrahlung
  *
  * Class that represents the dark brem process.
- * An electron is allowed to brem a dark photon
- *
- * @TODO allow positrons to dark brem as well
+ * A muon or electron is allowed to brem a dark photon
  */
 class G4DarkBremsstrahlung : public G4VDiscreteProcess {
  public:
   /**
    * The name of this process in Geant4
-   *
-   * @note This process name should be used in all places that
-   * can depend on this file. (For example RunManager and DetectorConstruction).
-   * There are other places that _can't_ use this constant
-   * directly, so if this name is changed you also need to change
-   * the following places.
-   *  - Python: Biasing.filters.TrackProcessFilter.dark_brem
-   *  - C++: Event/SimParticle::createProcessMap
    */
   static const std::string PROCESS_NAME;
-
-  /**
-   * The created instance. This will exist if dark brem has been enabled and _after_
-   * run initialization where the physics lists are constructred
-   */
-  static G4DarkBremsstrahlung* Get() { return the_process_; }
 
   /**
    * Constructor
@@ -56,14 +39,34 @@ class G4DarkBremsstrahlung : public G4VDiscreteProcess {
    * "bias-able"
    *  2. Defines the EM subtype as one different from all other EM processes
    *     - Needed so we don't replace another EM process
-   *  3. Configures the process and passes the model parameters to the model
+   *  3. Configures the process
    *
-   * If caching the cross section is enabled, we calculate several
-   * common cross sections immediately to help even out the time
-   * it takes to simulate events.
-   * @see CalculateCommonXsec
+   * We add ourselves to the process table for muons (or electrons),
+   * so the caller **does not** need to do this. Normally, this is done
+   * in a physics constructor, but we have chosen to do this differently
+   * to avoid mistakenly adding the dark brem process configured for muons
+   * to the electron table (and vis-versa).
+   *
+   * @note Make sure to call SetModel immediately after constructing
+   * the process.
+   *
+   * @param[in] muons true if muons are dark bremming, false for electrons
+   * @param[in] only_one_per_event true if de-activating process after first dark brem
+   * @param[in] global_bias bias xsec globally by this factor
+   * @param[in] cache_xsec true if we should cache xsecs at the MeV level of precision
    */
-  G4DarkBremsstrahlung(const framework::config::Parameters& params);
+  G4DarkBremsstrahlung(bool muons, bool only_one_per_event = false, 
+      double global_bias = 1., bool cache_xsec = true);
+
+  /**
+   * Decide on the model for dark bremming
+   *
+   * This can only be called once per run and must be called **immediately**
+   * after construction so that the process is configured properly.
+   *
+   * @param[in] the_model model to use for dark brem simulation
+   */
+  void SetModel(std::shared_ptr<g4db::PrototypeModel> the_model);
 
   /**
    * Destructor
@@ -105,22 +108,13 @@ class G4DarkBremsstrahlung : public G4VDiscreteProcess {
                                           const G4Step& step);
 
   /**
-   * Calculate common cross sections for the cache using the already-created
-   * model.
-   *
-   * This method is public so that we can access it for writing a short
-   * executable to print the cache to a file.
-   */
-  void CalculateCommonXsec();
-
-  /**
    * Get a reference to the cross section cache.
    *
    * Again, this method is public only to be available to the executable
    * that generates a cross section table and testing.
    * Do not use this unless you really know what you are doing.
    */
-  ElementXsecCache& getCache() { return element_xsec_cache_; }
+  g4db::ElementXsecCache& getCache() { return element_xsec_cache_; }
 
  protected:
   /**
@@ -133,7 +127,7 @@ class G4DarkBremsstrahlung : public G4VDiscreteProcess {
    * repetition of the same, deterministic calculations.
    *
    * If you want to turn off the cache-ing behavior, set 'cache_xsec' to false
-   * in the python configuratin for the dark brem process.
+   * in the constructor.
    *
    * @see G4DarkBremsstrahlungModel::ComputeCrossSectionPerAtom
    * @param[in] track G4Track that is being stepped
@@ -158,9 +152,9 @@ class G4DarkBremsstrahlung : public G4VDiscreteProcess {
    * This allows for the dark brem process to be de-activated when
    * SampleSecondaries is called.
    *
-   * The dark brem process is _always_ re-activated in the
-   * RunManager::TerminateOneEvent method. This reactivation has no effect when
-   * the process is already active.
+   * @note If a user wants to use this option, the dark brem process
+   * should be _always_ re-activated in the RunManager::TerminateOneEvent 
+   * method. This reactivation has no effect when the process is already active.
    */
   bool only_one_per_event_;
 
@@ -168,11 +162,6 @@ class G4DarkBremsstrahlung : public G4VDiscreteProcess {
    * Bias the dark brem cross section GLOBALLY
    */
   double global_bias_;
-
-  /**
-   * The mass of the A' during this run [MeV]
-   */
-  double ap_mass_;
 
   /**
    * Should we have a cache for the computed cross sections?
@@ -189,17 +178,11 @@ class G4DarkBremsstrahlung : public G4VDiscreteProcess {
    *
    * Shared with the chaching class.
    */
-  std::shared_ptr<G4DarkBremsstrahlungModel> model_;
+  std::shared_ptr<g4db::PrototypeModel> model_;
 
   /// Our instance of a cross section cache
-  ElementXsecCache element_xsec_cache_;
-
-  /// the created process
-  static G4DarkBremsstrahlung* the_process_;
+  g4db::ElementXsecCache element_xsec_cache_;
 };  // G4DarkBremsstrahlung
 
-}  // namespace darkbrem
-}  // namespace simcore
-
-#endif  // SIMCORE_DARKBREM_G4DARKBREMSSTRAHLUNG_H_
+#endif
 
