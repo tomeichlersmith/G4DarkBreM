@@ -1,0 +1,7 @@
+<map id="G4DarkBremsstrahlung" name="G4DarkBremsstrahlung">
+<area shape="rect" id="node1" title="Class that represents the dark brem process." alt="" coords="139,185,313,212"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,96,159,123"/>
+<area shape="rect" id="node3" title=" " alt="" coords="183,96,269,123"/>
+<area shape="rect" id="node4" title=" " alt="" coords="157,5,295,47"/>
+<area shape="rect" id="node5" href="$classg4db_1_1ElementXsecCache.html" title="The cache of already computed cross sections." alt="" coords="294,96,481,123"/>
+</map>
