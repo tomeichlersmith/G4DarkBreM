@@ -2,23 +2,16 @@
 #include <iostream>
 #include <fstream>
 
-#include <boost/program_options.hpp>
-
-
 #include "G4Electron.hh"
 #include "G4MuonMinus.hh"
 
 #include "G4DarkBreM/G4DarkBreMModel.h"
 #include "G4DarkBreM/G4APrime.h"
 
-template<typename T>
-const T& get(boost::program_options::variables_map& vm, const std::string& name, const T& def) {
-  if (vm.count(name)) return vm[name].as<T>();
-  else return def;
-}
-
-int main(int argc, char* argv[]) try {
-  boost::program_options::options_description desc(
+void usage() {
+  std::cout << 
+      "USAGE:\n"
+      "  g4db-scample [options] db-lib\n"
       "\n"
       "Run the scaling procedure for the input incident energy and madgraph file\n"
       "\n"
@@ -32,72 +25,94 @@ int main(int argc, char* argv[]) try {
       "   lepton is traveling along the z-axis. The user is expected to rotate to the actual incident\n"
       "   frame and calculate the outgoing dark photon kinematics assuming conservation of momentum.\n"
       "\n"
-      "OPTIONS"
-      );
-  desc.add_options()
-    ("help,h", "produce this help and exit")
-    ("output,o", boost::program_options::value<std::string>()->default_value("scaled.root"),
-     "output file to write scaled outgoing kinematics to")
-    ("incident-energy,E", boost::program_options::value<double>(),
-     "incident energy in GeV (defaults to 4 for electrons and 100 for muons)")
-    ("num-events,N", boost::program_options::value<int>()->default_value(100),
-     "number of dark brems to simulate")
-    ("db-lib,L", boost::program_options::value<std::string>(),
-     "DB event library to load")
-    ("ap-mass",
-      boost::program_options::value<double>(),
-      "mass of A' in MeV (defaults to 100 for electrons and 1000 for muons)")
-    ("muons",
-      "use muons as incident lepton rather than electrons")
-  ;
+      "ARGUMENTS\n"
+      "  db-lib : dark brem event library to load and sample\n"
+      "\n"
+      "OPTIONS\n"
+      "  -h,--help             : produce this help and exit\n"
+      "  -o,--output           : output file to write scaled events to\n"
+      "  -E,--incident-energy  : energy of incident lepton in GeV\n"
+      "  -N,--num-events       : number of events to sample and scale\n"
+      "  -M,--ap-mass          : mass of dark photon in GeV\n"
+      "  --muons               : pass to set lepton to muons (otherwise electrons)\n"
+      << std::flush;
+}
 
-  boost::program_options::variables_map vm;
-  boost::program_options::store(
-      boost::program_options::command_line_parser(argc, argv)
-      .options(desc).run(), vm);
-  boost::program_options::notify(vm);
-
-  if (vm.count("help")) {
-    std::cout << desc;
-    return 0;
+int main(int argc, char* argv[]) try {
+  std::string output_filename{"scaled.csv"};
+  double incident_energy{4};
+  int num_events{10};
+  std::string db_lib;
+  double ap_mass{0.1};
+  bool muons{false};
+  for (int i_arg{1}; i_arg < argc; i_arg++) {
+    std::string arg{argv[i_arg]};
+    if (arg == "-h" or arg == "--help") {
+      usage();
+      return 0;
+    } else if (arg == "--muons") {
+      muons = true;
+    } else if (arg == "-o" or arg == "--output") {
+      if (i_arg+1 >= argc) {
+        std::cerr << arg << " requires an argument after it" << std::endl;
+        return 1;
+      }
+      output_filename = argv[++i_arg];
+    } else if (arg == "-E" or arg == "--incident-energy") {
+      if (i_arg+1 >= argc) {
+        std::cerr << arg << " requires an argument after it" << std::endl;
+        return 1;
+      }
+      incident_energy = std::stod(argv[++i_arg]);
+    } else if (arg == "-M" or arg == "--ap-mass") {
+      if (i_arg+1 >= argc) {
+        std::cerr << arg << " requires an argument after it" << std::endl;
+        return 1;
+      }
+      ap_mass = std::stod(argv[++i_arg]);
+    } else if (arg == "-N" or arg == "--num-events") {
+      if (i_arg+1 >= argc) {
+        std::cerr << arg << " requires an argument after it" << std::endl;
+        return 1;
+      }
+      num_events = std::stoi(argv[++i_arg]);
+    } else if (not arg.empty() and arg[0] == '-') {
+      std::cerr << arg << " is not a recognized option" << std::endl;
+      return 1;
+    } else {
+      db_lib = arg;
+    }
   }
 
-  if (vm.count("db-lib") == 0) {
+  if (db_lib.empty()) {
     std::cerr << "ERROR: DB event library not provided." << std::endl;
     return 1;
   }
 
-  int n_events = vm["num-events"].as<int>();
-  bool muons = vm.count("muons") > 0;
-  double ap_mass, incident_energy, lepton_mass;
+  double lepton_mass;
   if (muons) {
-    ap_mass     = get(vm, "ap-mass"    , 1000. ) * MeV;
-    incident_energy = get(vm, "incident-energy", 100. );
     lepton_mass = G4MuonMinus::MuonMinus()->GetPDGMass() / GeV;
   } else {
-    ap_mass     = get(vm, "ap-mass"    , 100. ) * MeV;
-    incident_energy = get(vm, "incident-energy", 4.   );
     lepton_mass = G4Electron::Electron()->GetPDGMass() / GeV;
   }
 
   // the process accesses the A' mass from the G4 particle
-  G4APrime::APrime(ap_mass/MeV);
+  G4APrime::APrime(ap_mass/GeV);
   // create the model, this is where the LHE file is parsed
   //    into an in-memory library to sample and scale from
-  g4db::G4DarkBreMModel db_model("forward_only", 0.0, 1.0, 
-      vm["db-lib"].as<std::string>(), muons);
+  g4db::G4DarkBreMModel db_model("forward_only", 0.0, 1.0, db_lib, muons);
   db_model.PrintInfo();
   printf("   %-16s %f\n", "Lepton Mass [MeV]:", lepton_mass);
   printf("   %-16s %f\n", "A' Mass [MeV]:", ap_mass/MeV);
 
-  std::ofstream f{vm["output"].as<std::string>()};
+  std::ofstream f{output_filename};
   if (not f.is_open()) {
     std::cerr << "Unable to open output file for writing." << std::endl;
     return -1;
   }
   f << "recoil_energy,recoil_px,recoil_py,recoil_pz\n";
 
-  for (int i_event{0}; i_event < n_events; ++i_event) {
+  for (int i_event{0}; i_event < num_events; ++i_event) {
     G4ThreeVector recoil = db_model.scample(incident_energy, lepton_mass);
     double recoil_energy = sqrt(recoil.mag2() + lepton_mass*lepton_mass);
 

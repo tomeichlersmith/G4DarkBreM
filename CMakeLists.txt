@@ -19,14 +19,12 @@ target_link_libraries(G4DarkBreM PUBLIC ${Geant4_LIBRARIES})
 target_include_directories(G4DarkBreM PUBLIC include)
 install(TARGETS G4DarkBreM DESTINATION lib)
 
-find_package(Boost COMPONENTS program_options)
-
 add_executable(g4db-xsec-calc app/xsec_calc.cxx)
-target_link_libraries(g4db-xsec-calc PRIVATE G4DarkBreM Boost::program_options)
+target_link_libraries(g4db-xsec-calc PRIVATE G4DarkBreM)
 install(TARGETS g4db-xsec-calc DESTINATION bin)
 
 add_executable(g4db-scample app/scample.cxx)
-target_link_libraries(g4db-scample PRIVATE G4DarkBreM Boost::program_options)
+target_link_libraries(g4db-scample PRIVATE G4DarkBreM)
 install(TARGETS g4db-scample DESTINATION bin)
 
 add_executable(g4db-simulate app/simulate.cxx)

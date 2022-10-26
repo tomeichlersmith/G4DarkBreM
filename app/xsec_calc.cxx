@@ -1,105 +1,108 @@
-
-//----------------//
-//   C++ StdLib   //
-//----------------//
 #include <fstream>
 #include <iostream>
 
-#include <boost/program_options.hpp>
-
-//----------//
-//   LDMX   //
-//----------//
 #include "G4DarkBreM/G4DarkBremsstrahlung.h"
 #include "G4DarkBreM/G4DarkBreMModel.h"
 #include "G4DarkBreM/G4APrime.h"
 
-template<typename T>
-const T& get(boost::program_options::variables_map& vm, const std::string& name, const T& def) {
-  if (vm.count(name)) return vm[name].as<T>();
-  else return def;
+void usage() {
+  std::cout <<
+    "USAGE:\n"
+    "  g4db-xsec-calc [options]\n"
+    "\n"
+    "Calculate dark brem cross sections and write them out to a CSV table\n"
+    "\n"
+    "OPTIONS\n"
+    "  -h,--help    : produce this help and exit\n"
+    "  -o,--output  : output file to write scaled events to\n"
+    "  -M,--ap-mass : mass of dark photon in GeV\n"
+    "  --muons      : pass to set lepton to muons (otherwise electrons)\n"
+    "  --energy     : python-like arange for input energies in GeV (stop, start stop, start stop step)\n"
+    "                 default start is 0 and default step is 0.1 GeV\n"
+    "  --target     : define target material with three parameters DENSITY, Z, A\n"
+    << std::flush;
 }
 
 /**
  * The executable main for printing out the table.
  */
 int main(int argc, char* argv[]) try {
-  boost::program_options::options_description desc(
-      "Calculate dark brem cross sections and write them out to a CSV table"
-      );
-  desc.add_options()
-    ("help,h", 
-      "produce this help and exit")
-    ("output,o", 
-      boost::program_options::value<std::string>()->default_value("xsec.csv"), 
-      "output file to write xsec to")
-    ("ap-mass",
-      boost::program_options::value<double>(),
-      "mass of A' in MeV (defaults to 100 for electrons and 200 for muons)")
-    ("muons",
-      "use muons as incident lepton rather than electrons")
-    ("min-energy",
-      boost::program_options::value<double>(),
-      "minimum energy [GeV] to start xsec calculation from (defaults to 2*ap-mass)")
-    ("max-energy",
-      boost::program_options::value<double>(),
-      "maximum energy [GeV] to calculate xsec to (defaults to 100GeV for electrons and 1000GeV for muons)")
-    ("energy-step",
-      boost::program_options::value<double>()->default_value(1000.),
-      "difference between adjacent steps in energy [MeV]")
-    ("target-density",
-      boost::program_options::value<double>(),
-      "Density of target nucleus (defaults to 19.3 for electrons and 8.96 for muons)")
-    ("target-Z",
-      boost::program_options::value<int>(),
-      "Z of target nucleus (defaults to 74 for electrons and 29 for muons)")
-    ("target-A",
-      boost::program_options::value<double>(),
-      "A of target nucleus (defaults to 183.84 for electrons and 64.0 for muons)")
-  ;
-
-  boost::program_options::variables_map vm;
-  boost::program_options::store(
-      boost::program_options::command_line_parser(argc, argv)
-      .options(desc).run(), vm);
-  boost::program_options::notify(vm);
-
-  if (vm.count("help")) {
-    std::cout << desc;
-    return 0;
+  std::string output_filename{"xsec.csv"};
+  double ap_mass{0.1};
+  double min_energy{0.};
+  double max_energy{4.};
+  double energy_step{0.1};
+  double target_density{19.30};
+  double target_Z{74.};
+  double target_A{183.84};
+  bool muons{false};
+  for (int i_arg{1}; i_arg < argc; ++i_arg) {
+    std::string arg{argv[i_arg]};
+    if (arg == "-h" or arg == "--help") {
+      usage();
+      return 0;
+    } else if (arg == "--muons") {
+      muons = true;
+    } else if (arg == "-o" or arg == "--output") {
+      if (i_arg+1 >= argc) {
+        std::cerr << arg << " requires an argument after it" << std::endl;
+        return 1;
+      }
+      output_filename = argv[++i_arg];
+    } else if (arg == "-M" or arg == "--ap-mass") {
+      if (i_arg+1 >= argc) {
+        std::cerr << arg << " requires an argument after it" << std::endl;
+        return 1;
+      }
+      ap_mass = std::stod(argv[++i_arg]);
+    } else if (arg == "--energy") {
+      std::vector<std::string> args;
+      while (i_arg < argc and argv[i_arg][0] != '-') {
+        args.push_back(argv[++i_arg]);
+      }
+      if (args.size() == 0) {
+        std::cerr << arg << " requires arguments after it" << std::endl;
+        return 1;
+      } else if (args.size() == 1) {
+        max_energy = std::stod(args[0]);
+      } else if (args.size() == 2) {
+        min_energy = std::stod(args[0]);
+        max_energy = std::stod(args[1]);
+      } else if (args.size() == 2) {
+        min_energy = std::stod(args[0]);
+        max_energy = std::stod(args[1]);
+        energy_step = std::stod(args[2]);
+      }
+    } else if (arg == "--target") {
+      std::vector<std::string> args;
+      while (i_arg < argc and argv[i_arg][0] != '-') {
+        args.push_back(argv[++i_arg]);
+      }
+      if (args.size() != 3) {
+        std::cerr << arg << " requires three arguments: DENSITY Z A" << std::endl;
+        return 1;
+      }
+      target_density = std::stod(args[0]);
+      target_Z       = std::stod(args[1]);
+      target_A       = std::stod(args[2]);
+    } else {
+      std::cout << arg << " is an unrecognized option" << std::endl;
+      return 1;
+    }
   }
 
-  std::ofstream table_file(vm["output"].as<std::string>());
+  std::ofstream table_file(output_filename);
   if (!table_file.is_open()) {
-    std::cerr << "File '" << vm["output"].as<std::string>() << "' was not able to be opened."
-              << std::endl;
+    std::cerr << "File '" << output_filename << "' was not able to be opened." << std::endl;
     return 2;
   }
 
-  bool muons = vm.count("muons") > 0;
-
-  G4double ap_mass, max_energy;
-  double target_A, density;
-  int target_Z;
-  if (muons) {
-    ap_mass     = get(vm, "ap-mass"   , 200. ) * MeV;
-    max_energy  = get(vm, "max-energy", 1000.) * GeV;
-    density     = get(vm, "density"   , 8.96 );
-    target_Z    = get(vm, "target-Z"  , 29   );
-    target_A    = get(vm, "target-A"  , 64.0 );
-  } else {
-    ap_mass     = get(vm, "ap-mass"   , 100.   ) * MeV;
-    max_energy  = get(vm, "max-energy", 100.   ) * GeV;
-    density     = get(vm, "density"   , 19.30  );
-    target_Z    = get(vm, "target-Z"  , 74     );
-    target_A    = get(vm, "target-A"  , 183.84 );
-  }
-
-  G4double current_energy = get(vm, "min-energy", 2 * ap_mass / GeV) * GeV;
-  G4double energy_step = vm["energy-step"].as<double>() * MeV;
+  G4double current_energy = min_energy * GeV;
+  energy_step *= GeV;
+  max_energy *= GeV;
 
   // the process accesses the A' mass from the G4 particle
-  G4APrime::APrime(ap_mass/MeV);
+  G4APrime::APrime(ap_mass/GeV);
   // create the process to do proper initializations
   //    this holds the xsec cache as well so we don't have to
   //    repeat all that code
@@ -109,7 +112,6 @@ int main(int argc, char* argv[]) try {
 
   int bar_width = 80;
   int pos = 0;
-  bool is_redirected = (isatty(STDOUT_FILENO) == 0);
   while (current_energy < max_energy + energy_step) {
     db_process.getCache().get(current_energy, target_A, target_Z);
     current_energy += energy_step;
@@ -122,10 +124,7 @@ int main(int argc, char* argv[]) try {
         else if (i == pos) std::cout << ">";
         else std::cout << " ";
       }
-      std::cout << "] " << int(current_energy / max_energy * 100.0) << " %";
-      if (is_redirected) std::cout << "\n";
-      else std::cout << "\r";
-      std::cout.flush();
+      std::cout << "] " << int(current_energy / max_energy * 100.0) << " %" << std::endl;
     }
   }
   std::cout << std::endl;
