@@ -6,7 +6,7 @@ project(G4DarkBreM
   LANGUAGES CXX)
 
 # Search for Geant4 and load its settings
-find_package(Geant4 REQUIRED gdml ui_all vis_all)
+find_package(Geant4 REQUIRED ui_all)
 
 # Create an imported Geant4 target if it hasn't been done yet.
 if(NOT TARGET Geant4::Interface)
@@ -51,7 +51,7 @@ add_executable(g4db-scample app/scample.cxx)
 target_link_libraries(g4db-scample PRIVATE G4DarkBreM Boost::program_options)
 install(TARGETS g4db-scample DESTINATION bin)
 
-#add_executable(simulate-dark-brem app/simulate_dark_brem.cxx)
-#target_link_libraries(simulate-dark-brem PRIVATE G4DarkBreM Boost::program_options)
-#install(TARGETS simulate-dark-brem DESTINATION bin)
+add_executable(g4db-simulate app/simulate.cxx)
+target_link_libraries(g4db-simulate PRIVATE G4DarkBreM)
+install(TARGETS g4db-simulate DESTINATION bin)
 
