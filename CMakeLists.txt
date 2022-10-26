@@ -6,38 +6,16 @@ project(G4DarkBreM
   LANGUAGES CXX)
 
 # Search for Geant4 and load its settings
-find_package(Geant4 REQUIRED ui_all)
+find_package(Geant4 REQUIRED)
 
-# Create an imported Geant4 target if it hasn't been done yet.
-if(NOT TARGET Geant4::Interface)
-  # Geant4_DEFINITIONS already include -D, this leads to the error
-  # <command-line>:0:1: error: macro names must be identifiers if not removed.
-  set(Geant4_COMPILE_DEFINITIONS "")
-  foreach(def ${Geant4_DEFINITIONS})
-    string(REPLACE "-D" "" def ${def})
-    list(APPEND Geant4_COMPILE_DEFINITIONS ${def})
-  endforeach()
-
-  # Create the Geant4 target
-  add_library(Geant4::Interface INTERFACE IMPORTED GLOBAL)
-
-  # Set the target properties
-  set_target_properties(
-    Geant4::Interface
-    PROPERTIES INTERFACE_LINK_LIBRARIES "${Geant4_LIBRARIES}"
-               INTERFACE_COMPILE_OPTIONS "${Geant4_Flags}"
-               INTERFACE_COMPILE_DEFINITIONS "${Geant4_COMPILE_DEFINITIONS}"
-               INTERFACE_INCLUDE_DIRECTORIES "${Geant4_INCLUDE_DIRS}")
-
-  message(STATUS "Found Geant4 version ${Geant4_VERSION}")
-endif()
+include(${Geant4_USE_FILE})
 
 add_library(G4DarkBreM SHARED
   src/G4DarkBreM/ElementXsecCache.cxx
   src/G4DarkBreM/G4APrime.cxx
   src/G4DarkBreM/G4DarkBreMModel.cxx
   src/G4DarkBreM/G4DarkBremsstrahlung.cxx)
-target_link_libraries(G4DarkBreM PUBLIC Geant4::Interface)
+target_link_libraries(G4DarkBreM PUBLIC ${Geant4_LIBRARIES})
 target_include_directories(G4DarkBreM PUBLIC include)
 install(TARGETS G4DarkBreM DESTINATION lib)
 
@@ -52,6 +30,6 @@ target_link_libraries(g4db-scample PRIVATE G4DarkBreM Boost::program_options)
 install(TARGETS g4db-scample DESTINATION bin)
 
 add_executable(g4db-simulate app/simulate.cxx)
-target_link_libraries(g4db-simulate PRIVATE G4DarkBreM)
+target_link_libraries(g4db-simulate PRIVATE G4DarkBreM ${Geant4_LIBRARIES})
 install(TARGETS g4db-simulate DESTINATION bin)
 

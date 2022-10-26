@@ -3,8 +3,8 @@
 #include <memory>
 #include <array>
 
+#include "QBBC.hh"
 #include "G4PhysListFactory.hh"
-#include "FTFP_BERT.hh"
 #include "G4VPhysicsConstructor.hh"
 #include "G4VUserDetectorConstruction.hh"
 #include "G4VUserPrimaryGeneratorAction.hh"
@@ -61,16 +61,17 @@ class APrimePhysics : public G4VPhysicsConstructor {
    * their situation.
    */
   void ConstructProcess() final override {
-    the_process_ = std::make_unique<G4DarkBremsstrahlung>(muons_,
+    the_process_ = std::unique_ptr<G4DarkBremsstrahlung>(new G4DarkBremsstrahlung(
+        muons_,
         false, /* only one per event */
         bias_, /* global bias */
-        true /* cache xsec */);
+        true /* cache xsec */));
     the_process_->SetModel(
-        std::make_shared<g4db::G4DarkBreMModel>(
+        std::shared_ptr<g4db::G4DarkBreMModel>(new g4db::G4DarkBreMModel(
           "forward_only", /* scaling method */
           0.0, /* minimum energy threshold to dark brem [GeV] */
           1.0, /* epsilon */
-          library_path_, muons_));
+          library_path_, muons_)));
   }
 };  // APrimePhysics
 
@@ -99,12 +100,12 @@ class Hunk : public G4VUserDetectorConstruction {
       throw std::runtime_error("Material '"+material_+"' unknown to G4NistManager.");
     }
 
-    G4Material* world_mat = nist->FindOrBuildMaterial("G4_Air");
+    G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
     if (not world_mat) {
       throw std::runtime_error("Material 'G4_Air' unknown to G4NistManager.");
     }
 
-    G4double world_half_z = box_half_z+1.5;
+    G4double world_half_z = 2*box_half_z+2;
     G4Box* solidWorld =
       new G4Box("World", 1.1*box_half_x, 1.1*box_half_y, world_half_z);
 
@@ -115,7 +116,7 @@ class Hunk : public G4VUserDetectorConstruction {
 
     G4VPhysicalVolume* physWorld =
       new G4PVPlacement(0, //no rotation
-          G4ThreeVector(0.,0.,world_half_z-1), // center nudged upstream a bit
+          G4ThreeVector(), // center nudged upstream a bit
           logicWorld,      //its logical volume
           "World",         //its name
           0,               //its mother  volume
@@ -223,11 +224,12 @@ class PersistDarkBremProducts : public G4UserTrackingAction, public G4UserEventA
  * The executable main for printing out the table.
  */
 int main(int argc, char* argv[]) try {
-  auto run = std::make_unique<G4RunManager>();
+  auto run = std::unique_ptr<G4RunManager>(new G4RunManager);
 
   run->SetUserInitialization(new Hunk(18.,"G4_W"));
 
-  G4VModularPhysicsList* physics = G4PhysListFactory().GetReferencePhysList("FTFP_BERT");
+  //G4PhysListFactory factory;
+  G4VModularPhysicsList* physics = new QBBC; //factory.GetReferencePhysList("FTFP_BERT");
   physics->RegisterPhysics(new APrimePhysics(argv[1], 100., false, 1.));
   run->SetUserInitialization(physics);
 
@@ -236,6 +238,7 @@ int main(int argc, char* argv[]) try {
   auto* persist = new PersistDarkBremProducts("events.csv");
   run->SetUserAction(dynamic_cast<G4UserTrackingAction*>(persist));
   run->SetUserAction(dynamic_cast<G4UserEventAction*>(persist));
+  run->SetUserAction(new LeptonBeam(4.0, false));
 
   run->BeamOn(10);
 
