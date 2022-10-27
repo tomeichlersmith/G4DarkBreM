@@ -1,3 +1,8 @@
+/**
+ * @file simulate.cxx
+ * definition of g4db-simulate executable
+ */
+
 #include <fstream>
 #include <iostream>
 #include <memory>

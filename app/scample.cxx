@@ -1,3 +1,7 @@
+/** 
+ * @file scample.cxx
+ * definition of g4db-scample executable
+ */
 
 #include <iostream>
 #include <fstream>

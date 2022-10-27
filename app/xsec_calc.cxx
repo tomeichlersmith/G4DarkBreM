@@ -1,3 +1,8 @@
+/**
+ * @file xsec_calc.cxx
+ * definition of g4db-xsec-calc executable
+ */
+
 #include <fstream>
 #include <iostream>
 
