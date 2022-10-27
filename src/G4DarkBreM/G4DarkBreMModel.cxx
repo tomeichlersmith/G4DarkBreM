@@ -435,6 +435,11 @@ void G4DarkBreMModel::SetMadGraphDataLibrary(std::string path) {
   //  - LHE files are events generated with the correct mass point
   // TODO automatically select LHE files of the correct mass point?
 
+  /**
+   * print status to user so they know what's happening
+   */
+  std::cout << "[ G4DarkBreMModel ] : loading event librariy..." << std::flush;
+
   bool foundOneFile = false;
   DIR *dir;            // handle to opened directory
   struct dirent *ent;  // handle to entry inside directory
@@ -457,6 +462,8 @@ void G4DarkBreMModel::SetMadGraphDataLibrary(std::string path) {
   }
 
   MakePlaceholders();  // Setup the placeholder offsets for getting data.
+
+  std::cout << "done" << std::endl;
 
   /**
    * Print out loaded MG library

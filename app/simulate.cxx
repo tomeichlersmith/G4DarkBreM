@@ -26,12 +26,18 @@
  * basic physics constructor which simply creates the A' and the dark brem
  */
 class APrimePhysics : public G4VPhysicsConstructor {
+  /// handle to the process, cleaned up when the physics list is desctructed
   std::unique_ptr<G4DarkBremsstrahlung> the_process_;
+  /// path to library for the model to load
   std::string library_path_;
+  /// mass of A' in GeV
   double ap_mass_;
+  /// true for using muons, electrons otherwise
   bool muons_;
+  /// bias factor to apply everywhere
   double bias_;
  public:
+  /// create the physics and store the parameters
   APrimePhysics(const std::string& lp, double m, bool mu, double b)
     : G4VPhysicsConstructor("APrime"), library_path_{lp}, ap_mass_{m}, muons_{mu}, bias_{b} {}
 
@@ -82,11 +88,25 @@ class APrimePhysics : public G4VPhysicsConstructor {
  * absolutely sure that we can contain the shower that may contain a dark brem.
  */
 class Hunk : public G4VUserDetectorConstruction {
+  /// depth along beam direction
   double depth_;
+  /// name of material to use for volume (findable by G4NistManager)
   std::string material_;
  public:
+  /**
+   * Create our detector constructor, storing the configuration variables
+   */
   Hunk(double d, const std::string& m)
     : G4VUserDetectorConstruction(), depth_{d}, material_{m} {}
+
+  /**
+   * Construct the geometry
+   *
+   * We build the world only slighly larger than the single hunk
+   * of material at its center. The hunk is shifted to be
+   * downstream (along z) of the origin so that the primary generator
+   * can simply shoot from the origin along z.
+   */
   virtual G4VPhysicalVolume* Construct() final override {
     // Get nist material manager
     G4NistManager* nist = G4NistManager::Instance();
@@ -145,17 +165,32 @@ class Hunk : public G4VUserDetectorConstruction {
   }
 };
 
+/**
+ * The event information we care about for studying the model
+ *
+ * Since a new instance of this object is created for each
+ * event (and destroyed at the end of the event). The default
+ * values of its members correspond to the starting values
+ * at the beginning of an event.
+ */
 class OutgoingKinematics : public G4VUserEventInformation {
+  /// have we found the dark brem products yet?
   bool found_{false};
+  /// the four momentum of the recoil lepton
   std::array<double,4> recoil_;
+  /// the four momentum of the produced dark photon (A')
   std::array<double,4> aprime_;
  public:
-  OutgoingKinematics()
-    : G4VUserEventInformation() {}
-  ~OutgoingKinematics() = default;
+  /**
+   * Check if the dark brem has been found
+   */
   bool found() const {
     return found_;
   }
+
+  /**
+   * Set the recoil 4 momentum based on the passed track
+   */
   void setRecoil(const G4Track* track) {
     found_ = true;
     recoil_ = {
@@ -165,6 +200,10 @@ class OutgoingKinematics : public G4VUserEventInformation {
       track->GetMomentum().z()
     };
   }
+
+  /**
+   * Set the dark photon 4 momentum based on the passed track
+   */
   void setAPrime(const G4Track* track) {
     found_ = true;
     aprime_ = {
@@ -174,28 +213,47 @@ class OutgoingKinematics : public G4VUserEventInformation {
       track->GetMomentum().z()
     };
   }
+
+  /**
+   * Write out the two four-momenta in CSV format to the input stream
+   */
   void stream(std::ostream& o) const {
     o << recoil_[0] << ',' << recoil_[1] << ',' << recoil_[2] << ',' << recoil_[3] << ','
       << aprime_[0] << ',' << aprime_[1] << ',' << aprime_[2] << ',' << aprime_[3] << '\n';
   }
+  
+  /**
+   * Reequired by Geant4, simply print to std::cout using stream
+   */
   virtual void Print() const final override {
     stream(std::cout);
     std::cout << std::flush;
   }
+  
+  /**
+   * Helper function to retrieve the current instance of the event information
+   */
   static OutgoingKinematics* get() {
     auto user_info = G4EventManager::GetEventManager()->GetUserInformation();
     if (not user_info) throw std::runtime_error("Attempting to 'get' not-created event information");
     return dynamic_cast<OutgoingKinematics*>(user_info);
   }
-};
+};  // OutgoingKinematics
 
 /**
  * the primary generator, a simple particle gun restricted to electrons or muons
  * along the z axis
  */
 class LeptonBeam : public G4VUserPrimaryGeneratorAction {
+  /// the gun we use for the beam
   G4ParticleGun gun_;
  public:
+  /**
+   * Configure the beam to be of the input energy and lepton
+   *
+   * Shoot along the z axis, the energy is in GeV and we
+   * shoot from the origin.
+   */
   LeptonBeam(double e, bool muons)
     : G4VUserPrimaryGeneratorAction() {
       if (muons) gun_.SetParticleDefinition(G4MuonMinus::MuonMinus());
@@ -204,6 +262,12 @@ class LeptonBeam : public G4VUserPrimaryGeneratorAction {
       gun_.SetParticlePosition(G4ThreeVector());
       gun_.SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
     }
+
+  /**
+   * Start an event by providing primaries
+   *
+   * We also construct the OutgoingKinematics structure for this event
+   */
   void GeneratePrimaries(G4Event* event) final override {
     event->SetUserInformation(new OutgoingKinematics);
     gun_.GeneratePrimaryVertex(event);
@@ -211,11 +275,31 @@ class LeptonBeam : public G4VUserPrimaryGeneratorAction {
 };
 
 /**
- * our tracking+event action so we can save the outgoing kinematics of the dark brem
+ * event action used to store the OutgoingKinematics *if* a dark brem occurred
+ *
+ * This uses OutgoingKinematics::stream to write out the CSV where data will be stored.
+ * 
+ * @note The stream method at the CSV header row written here need to match for the CSV
+ * to make sense.
+ *
+ * We don't do any caching, just trusting the std::ofstream to handle the caching,
+ * only flushing when necessary and when destructed.
+ *
+ * We also print out the number of events that successfully had a dark brem compared
+ * to the number of events requested. This is helpful for the user so that they
+ * know (1) there is not a problem and (2) potential tuning of the bias factor.
  */
 class PersistDarkBremProducts : public G4UserEventAction {
+  /// the output file we are writing to
   std::ofstream out_;
+  /// number of events that we simulated
+  long unsigned int events_started_{0};
+  /// number of events with a dark brem in it
+  long unsigned int events_completed_{0};
  public:
+  /**
+   * Open the output CSV and write the header row
+   */
   PersistDarkBremProducts(const std::string& out_file)
     : G4UserEventAction(), out_{out_file} {
     if (not out_.is_open()) {
@@ -224,14 +308,39 @@ class PersistDarkBremProducts : public G4UserEventAction {
     out_ << "recoil_energy,recoil_px,recoil_py,recoil_pz,aprime_energy,aprime_px,aprime_py,aprime_pz\n";
     out_.flush();
   }
+
+  /**
+   * Print out the number of events with a dark brem compared to the requested number
+   */
+  ~PersistDarkBremProducts() {
+    std::cout << "[g4db-simulate] Able to generate a dark brem " 
+      << events_completed_ << " / " << events_started_ 
+      << " events" << std::endl;
+  }
+  
+  /**
+   * Check the OutgoingKinematics and write out the four-momenta if the dark brem ocurred
+   */
   void EndOfEventAction(const G4Event* event) final override {
+    ++events_started_;
     auto ek{dynamic_cast<OutgoingKinematics*>(event->GetUserInformation())};
-    if (ek->found()) ek->stream(out_);
+    if (ek->found()) {
+      ++events_completed_;
+      ek->stream(out_);
+    }
   }
 };  // PersistDarkBremProducts
 
+/**
+ * Look through the tracks to find the dark brem products
+ */
 class FindDarkBremProducts : public G4UserTrackingAction {
  public:
+  /**
+   * Check the new track that has been provided to see if it was
+   * created by the dark brem process. If it was, pass this track
+   * onto OutgoingKinematics depending on if it is the A' or the lepton.
+   */
   void PreUserTrackingAction(const G4Track* track) final override {
     const G4VProcess* creator = track->GetCreatorProcess();
     if (creator and creator->GetProcessName().contains(
@@ -246,25 +355,145 @@ class FindDarkBremProducts : public G4UserTrackingAction {
 };  // FindDarkBremProducts
 
 /**
+ * print out how to use this executable
+ */
+void usage() {
+  std::cout <<
+    "\n"
+    "USAGE\n"
+    "  g4db-simulate [options] DB-LIB NUM-EVENTS\n"
+    "\n"
+    "ARGUMENTS\n"
+    "  DB-LIB     : dark brem library to scale from\n"
+    "               the user is expected to make sure that this argument aligns with\n"
+    "               the other options (lepton, incident beam energy, A' mass, etc...)\n"
+    "  NUM-EVENTS : number of events to **request**\n"
+    "               since Geant4 decides when a dark brem will occurr, it is important\n"
+    "               to allow some beam leptons to /not/ dark brem in the target so a realistic\n"
+    "               distribution of dark brem vertices is sampled."
+    "\n"
+    "OPTIONS\n"
+    "  -h, --help    : print this usage and exit"
+    "  --muons       : run using muons (without this flag, assumes electrons)\n"
+    "  -m, --ap-mass : mass of the dark photon (A') in GeV (defaults to 0.1 for electrons and 1. for muons)\n"
+    "  -d, --depth   : thickness of target in mm (defaults to 18 for electrons, 2000 for muons)\n"
+    "  -t, --target  : target material, must be findable by G4NistManager\n"
+    "                  (defaults to G4_W for electrons and G4_Cu for muons)\n"
+    "  -o, --output  : output file to write CSV data to (defaults to 'events.csv')\n"
+    "  -b, --bias    : biasing factor to use to encourage dark brem\n"
+    "                  a good starting point is generally the A' mass squared, so that is the default\n"
+    "  -e, --beam    : Beam energy in GeV (defaults to 4 for electrons and 100 for muons)\n"
+    "  --mat-list    : print the full list from G4NistManager and exit\n"
+    "\n"
+    << std::flush;
+}
+
+/**
  * The executable main for printing out the table.
  */
 int main(int argc, char* argv[]) try {
+  bool muons{false};
+  double depth{-1};
+  std::string target{};
+  std::string output{"events.csv"};
+  double bias{-1.};
+  double beam{-1.};
+  double ap_mass{-1.};
+  std::vector<std::string> positional;
+  for (int i_arg{1}; i_arg < argc; ++i_arg) {
+    std::string arg{argv[i_arg]};
+    if (arg == "-h" or arg == "--help") {
+      usage();
+      return 0;
+    } else if (arg == "--mat-list") {
+      auto nist{G4NistManager::Instance()};
+      nist->ListMaterials("simple");
+      nist->ListMaterials("compound");
+      nist->ListMaterials("hep");
+      return 0;
+    } else if (arg == "--muons") {
+      muons = true;
+    } else if (arg == "-o" or arg == "--output") {
+      if (i_arg+1 >= argc) {
+        std::cerr << arg << " requires an argument after it" << std::endl;
+        return 1;
+      }
+      output = argv[++i_arg];
+    } else if (arg == "-t" or arg == "--target") {
+      if (i_arg+1 >= argc) {
+        std::cerr << arg << " requires an argument after it" << std::endl;
+        return 1;
+      }
+      target = argv[++i_arg];
+    } else if (arg == "-m" or arg == "--ap-mass") {
+      if (i_arg+1 >= argc) {
+        std::cerr << arg << " requires an argument after it" << std::endl;
+        return 1;
+      }
+      ap_mass = std::stod(argv[++i_arg]);
+    } else if (arg == "-d" or arg == "--depth") {
+      if (i_arg+1 >= argc) {
+        std::cerr << arg << " requires an argument after it" << std::endl;
+        return 1;
+      }
+      depth = std::stod(argv[++i_arg]);
+    } else if (arg == "-b" or arg == "--bias") {
+      if (i_arg+1 >= argc) {
+        std::cerr << arg << " requires an argument after it" << std::endl;
+        return 1;
+      }
+      bias = std::stod(argv[++i_arg]);
+    } else if (arg == "-e" or arg == "--beam") {
+      if (i_arg+1 >= argc) {
+        std::cerr << arg << " requires an argument after it" << std::endl;
+        return 1;
+      }
+      beam = std::stod(argv[++i_arg]);
+    } else if (arg[0] == '-') {
+      std::cerr << arg << " is not a recognized option" << std::endl;
+      return 1;
+    } else {
+      positional.push_back(arg);
+    }
+  }
+
+  if (positional.size() != 2) {
+    std::cerr << "Exactly two positional arguments are required: DB-LIB NUM-EVENTS" << std::endl;
+    return 1;
+  }
+
+  std::string db_lib = positional[0];
+  int num_events = std::stoi(positional[1]);
+
+  if (muons) {
+    if (ap_mass < 0.) ap_mass = 1.;
+    if (beam < 0.) beam = 100.;
+    if (depth < 0.) depth = 2000;
+    if (target.empty()) target = "G4_Cu";
+  } else {
+    if (ap_mass < 0.) ap_mass = 0.1;
+    if (beam < 0.) beam = 4.;
+    if (depth < 0.) depth = 18;
+    if (target.empty()) target = "G4_W";
+  }
+
+  if (bias < 0.) bias = ap_mass*ap_mass;
+
   auto run = std::unique_ptr<G4RunManager>(new G4RunManager);
 
-  run->SetUserInitialization(new Hunk(18.,"G4_W"));
+  run->SetUserInitialization(new Hunk(depth,target));
 
-  //G4PhysListFactory factory;
-  G4VModularPhysicsList* physics = new QBBC; //factory.GetReferencePhysList("FTFP_BERT");
-  physics->RegisterPhysics(new APrimePhysics(argv[1], 100., false, 10000.));
+  G4VModularPhysicsList* physics = new QBBC;
+  physics->RegisterPhysics(new APrimePhysics(db_lib, ap_mass, muons, bias));
   run->SetUserInitialization(physics);
 
   run->Initialize();
 
   run->SetUserAction(new FindDarkBremProducts);
-  run->SetUserAction(new PersistDarkBremProducts("events.csv"));
-  run->SetUserAction(new LeptonBeam(4.0, false));
+  run->SetUserAction(new PersistDarkBremProducts(output));
+  run->SetUserAction(new LeptonBeam(beam, muons));
 
-  run->BeamOn(10);
+  run->BeamOn(num_events);
 
   return 0;
 } catch (const std::exception& e) {
