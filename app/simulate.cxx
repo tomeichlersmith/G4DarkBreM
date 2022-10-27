@@ -102,7 +102,7 @@ class Hunk : public G4VUserDetectorConstruction {
 
     G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
     if (not world_mat) {
-      throw std::runtime_error("Material 'G4_Air' unknown to G4NistManager.");
+      throw std::runtime_error("Material 'G4_AIR' unknown to G4NistManager.");
     }
 
     G4double world_half_z = 2*box_half_z+2;
@@ -145,6 +145,50 @@ class Hunk : public G4VUserDetectorConstruction {
   }
 };
 
+class OutgoingKinematics : public G4VUserEventInformation {
+  bool found_{false};
+  std::array<double,4> recoil_;
+  std::array<double,4> aprime_;
+ public:
+  OutgoingKinematics()
+    : G4VUserEventInformation() {}
+  ~OutgoingKinematics() = default;
+  bool found() const {
+    return found_;
+  }
+  void setRecoil(const G4Track* track) {
+    found_ = true;
+    recoil_ = {
+      track->GetTotalEnergy(),
+      track->GetMomentum().x(),
+      track->GetMomentum().y(),
+      track->GetMomentum().z()
+    };
+  }
+  void setAPrime(const G4Track* track) {
+    found_ = true;
+    aprime_ = {
+      track->GetTotalEnergy(),
+      track->GetMomentum().x(),
+      track->GetMomentum().y(),
+      track->GetMomentum().z()
+    };
+  }
+  void stream(std::ostream& o) const {
+    o << recoil_[0] << ',' << recoil_[1] << ',' << recoil_[2] << ',' << recoil_[3] << ','
+      << aprime_[0] << ',' << aprime_[1] << ',' << aprime_[2] << ',' << aprime_[3] << '\n';
+  }
+  virtual void Print() const final override {
+    stream(std::cout);
+    std::cout << std::flush;
+  }
+  static OutgoingKinematics* get() {
+    auto user_info = G4EventManager::GetEventManager()->GetUserInformation();
+    if (not user_info) throw std::runtime_error("Attempting to 'get' not-created event information");
+    return dynamic_cast<OutgoingKinematics*>(user_info);
+  }
+};
+
 /**
  * the primary generator, a simple particle gun restricted to electrons or muons
  * along the z axis
@@ -161,6 +205,7 @@ class LeptonBeam : public G4VUserPrimaryGeneratorAction {
       gun_.SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
     }
   void GeneratePrimaries(G4Event* event) final override {
+    event->SetUserInformation(new OutgoingKinematics);
     gun_.GeneratePrimaryVertex(event);
   }
 };
@@ -168,57 +213,37 @@ class LeptonBeam : public G4VUserPrimaryGeneratorAction {
 /**
  * our tracking+event action so we can save the outgoing kinematics of the dark brem
  */
-class PersistDarkBremProducts : public G4UserTrackingAction, public G4UserEventAction {
+class PersistDarkBremProducts : public G4UserEventAction {
   std::ofstream out_;
-  struct OutgoingKinematics {
-    bool found;
-    std::array<double,4> recoil;
-    std::array<double,4> aprime;
-    void stream(std::ostream& o) const {
-      o << recoil[0] << ',' << recoil[1] << ',' << recoil[2] << ',' << recoil[3] << ','
-        << aprime[0] << ',' << aprime[1] << ',' << aprime[2] << ',' << aprime[3] << '\n';
-    }
-  } event_kinematics_;
  public:
   PersistDarkBremProducts(const std::string& out_file)
-    : G4UserTrackingAction(),
-      G4UserEventAction(),
-      out_{out_file} {
+    : G4UserEventAction(), out_{out_file} {
     if (not out_.is_open()) {
       throw std::runtime_error("Unable to open output file '"+out_file+"'.");
     }
     out_ << "recoil_energy,recoil_px,recoil_py,recoil_pz,aprime_energy,aprime_px,aprime_py,aprime_pz\n";
     out_.flush();
   }
-  void BeginOfEventAction(const G4Event* event) final override {
-    event_kinematics_.found = false;
-  }
   void EndOfEventAction(const G4Event* event) final override {
-    if (event_kinematics_.found) event_kinematics_.stream(out_);
+    auto ek{dynamic_cast<OutgoingKinematics*>(event->GetUserInformation())};
+    if (ek->found()) ek->stream(out_);
   }
+};  // PersistDarkBremProducts
+
+class FindDarkBremProducts : public G4UserTrackingAction {
+ public:
   void PreUserTrackingAction(const G4Track* track) final override {
     const G4VProcess* creator = track->GetCreatorProcess();
     if (creator and creator->GetProcessName().contains(
                         G4DarkBremsstrahlung::PROCESS_NAME)) {
-      event_kinematics_.found = true;
       if (track->GetParticleDefinition() == G4APrime::APrime()) {
-        event_kinematics_.recoil = {
-          track->GetTotalEnergy(),
-          track->GetMomentum().x(),
-          track->GetMomentum().y(),
-          track->GetMomentum().z()
-        };
+        OutgoingKinematics::get()->setAPrime(track);
       } else {
-        event_kinematics_.aprime = {
-          track->GetTotalEnergy(),
-          track->GetMomentum().x(),
-          track->GetMomentum().y(),
-          track->GetMomentum().z()
-        };
+        OutgoingKinematics::get()->setRecoil(track);
       }
     } // track created by dark brem process
   }
-};  // PersistDarkBremProducts
+};  // FindDarkBremProducts
 
 /**
  * The executable main for printing out the table.
@@ -230,14 +255,13 @@ int main(int argc, char* argv[]) try {
 
   //G4PhysListFactory factory;
   G4VModularPhysicsList* physics = new QBBC; //factory.GetReferencePhysList("FTFP_BERT");
-  physics->RegisterPhysics(new APrimePhysics(argv[1], 100., false, 1.));
+  physics->RegisterPhysics(new APrimePhysics(argv[1], 100., false, 10000.));
   run->SetUserInitialization(physics);
 
   run->Initialize();
 
-  auto* persist = new PersistDarkBremProducts("events.csv");
-  run->SetUserAction(dynamic_cast<G4UserTrackingAction*>(persist));
-  run->SetUserAction(dynamic_cast<G4UserEventAction*>(persist));
+  run->SetUserAction(new FindDarkBremProducts);
+  run->SetUserAction(new PersistDarkBremProducts("events.csv"));
   run->SetUserAction(new LeptonBeam(4.0, false));
 
   run->BeamOn(10);
