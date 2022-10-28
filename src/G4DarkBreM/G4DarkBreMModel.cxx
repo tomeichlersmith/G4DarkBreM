@@ -156,7 +156,7 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
   double lepton_e = lepton_ke/GeV + lepton_mass;
   double lepton_e_sq = lepton_e*lepton_e;
 
-  /**
+  /*
    * "Hyper-Improved" WW
    *
    * assume theta = 0, and x = 1 for form factor integration
@@ -164,7 +164,7 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
    */
   double chi = flux_factor_chi_numerical(A,Z,MA2*MA2/(4*lepton_e_sq),MA2+lepton_mass_sq);
 
-  /**
+  /*
    * Differential cross section with respect to x and theta
    *
    * Equation (16) from Appendix A of https://arxiv.org/pdf/2101.12192.pdf
@@ -178,7 +178,7 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
     double utilde = -x*lepton_e_sq*theta_sq - MA2*(1.-x)/x - lepton_mass_sq*x;
     double utilde_sq = utilde*utilde;
 
-    /**
+    /*
      * WW
      *
      * Since muons are so much more massive than electrons, they
@@ -190,7 +190,7 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
     // maximum t kinematically limited to the incident lepton energy
     double tmax = lepton_e_sq;
 
-    /**
+    /*
      * The chi integrand limits given by
      *
      * Eqs (3.20) and (A6) of
@@ -224,14 +224,14 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
     if (tmin < 0) return 0.;
     if (tmax < tmin) return 0.;
   
-    /**
+    /*
      * numerically integrate to calculate chi ourselves
      * this _has not_ been well behaved due to the extreme values
      * of t that must be handled
     double chi = flux_factor_chi_numerical(A,Z, tmin, tmax);
      */
   
-    /**
+    /*
      * use analytic elastic-only chi derived for DMG4
      * and double-checked with Mathematica
      *
@@ -241,7 +241,7 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
      */
     double chi = flux_factor_chi_analytic(A,Z,tmin,tmax);
     
-    /**
+    /*
      * Amplitude squared is taken from 
      * Equation (17) from Appendix A of https://arxiv.org/pdf/2101.12192.pdf
      * with X = V
@@ -264,7 +264,7 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
   else
     xmax = 1 - MA / lepton_e;
 
-  /**
+  /*
    * max recoil angle of A'
    *
    * The wide angle A' are produced at a negligible rate
@@ -275,7 +275,7 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
    */
   double theta_max{0.3};
 
-  /**
+  /*
    * Integrand for integral over x
    *
    * For muons, we want to include the variation over theta from the chi
@@ -308,7 +308,7 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
 
   G4double GeVtoPb = 3.894E08;
 
-  /**
+  /*
    * The integrated_xsec should be the correct value, we are just
    * converting it to Geant4's pb units here
    */
