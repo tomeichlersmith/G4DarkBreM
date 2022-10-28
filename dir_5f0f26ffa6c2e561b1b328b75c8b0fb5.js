@@ -9,6 +9,6 @@ var dir_5f0f26ffa6c2e561b1b328b75c8b0fb5 =
       [ "G4DarkBremsstrahlung", "classG4DarkBremsstrahlung.html", "classG4DarkBremsstrahlung" ]
     ] ],
     [ "PrototypeModel.h", "PrototypeModel_8h.html", [
-      [ "g4db::PrototypeModel", "classg4db_1_1PrototypeModel.html", "classg4db_1_1PrototypeModel" ]
+      [ "PrototypeModel", "classg4db_1_1PrototypeModel.html", "classg4db_1_1PrototypeModel" ]
     ] ]
 ];

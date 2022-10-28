@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title="Geant4 implementation of the model for a particle undergoing a dark brem where we use an imported ver...">
+<g id="a_node1"><a xlink:title="Geant4 implementation of the model for a particle undergoing a dark brem where we use an imported eve...">
 <polygon fill="#bfbfbf" stroke="black" points="0,-0.5 0,-19.5 139,-19.5 139,-0.5 0,-0.5"/>
 <text text-anchor="middle" x="69.5" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">g4db::G4DarkBreMModel</text>
 </a>
@@ -20,7 +20,7 @@
 <!-- Node2 -->
 <g id="node2" class="node">
 <title>Node2</title>
-<g id="a_node2"><a xlink:href="classg4db_1_1PrototypeModel.html" target="_top" xlink:title=" ">
+<g id="a_node2"><a xlink:href="classg4db_1_1PrototypeModel.html" target="_top" xlink:title="Abstract class representing a model for dark brem.">
 <polygon fill="none" stroke="black" points="7.5,-56.5 7.5,-75.5 131.5,-75.5 131.5,-56.5 7.5,-56.5"/>
 <text text-anchor="middle" x="69.5" y="-63.5" font-family="Helvetica,sans-Serif" font-size="10.00">g4db::PrototypeModel</text>
 </a>

@@ -25,10 +25,14 @@
 var NAVTREE =
 [
   [ "G4DarkBreM", "index.html", [
+    [ "Installation", "index.html#autotoc_md1", null ],
+    [ "Validation", "index.html#autotoc_md2", null ],
+    [ "g4db executables", "md_app_README.html", [
+      [ "g4db-scample", "md_app_README.html#autotoc_md9", null ],
+      [ "g4db-xsec-calc", "md_app_README.html#autotoc_md10", null ],
+      [ "g4db-simulate", "md_app_README.html#autotoc_md11", null ]
+    ] ],
     [ "Classes", "annotated.html", [
-      [ "Cross Section Calculation", "index.html#autotoc_md4", null ],
-      [ "MadGraph Data", "index.html#autotoc_md5", null ],
-      [ "Scaling Method", "index.html#autotoc_md6", null ],
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
       [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
@@ -43,7 +47,11 @@ var NAVTREE =
       ] ]
     ] ],
     [ "Files", "files.html", [
-      [ "File List", "files.html", "files_dup" ]
+      [ "File List", "files.html", "files_dup" ],
+      [ "File Members", "globals.html", [
+        [ "All", "globals.html", null ],
+        [ "Functions", "globals_func.html", null ]
+      ] ]
     ] ]
   ] ]
 ];

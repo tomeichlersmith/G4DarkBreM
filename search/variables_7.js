@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['process_5fname_0',['PROCESS_NAME',['../classG4DarkBremsstrahlung.html#a15da7089067e058d852227e5488e33bc',1,'G4DarkBremsstrahlung']]]
+  ['library_5fpath_5f_178',['library_path_',['../classg4db_1_1G4DarkBreMModel.html#aa87a280a39e044f0053332e442729480',1,'g4db::G4DarkBreMModel::library_path_()'],['../classAPrimePhysics.html#a7e4df07e1b4c4b343b8dd53b5ba6bd55',1,'APrimePhysics::library_path_()']]]
 ];

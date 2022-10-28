@@ -1,6 +1,10 @@
 <map id="g4db::G4DarkBreMModel" name="g4db::G4DarkBreMModel">
-<area shape="rect" id="node1" title="Geant4 implementation of the model for a particle undergoing a dark brem where we use an imported ver..." alt="" coords="17,200,202,227"/>
-<area shape="rect" id="node2" href="$classg4db_1_1PrototypeModel.html" title=" " alt="" coords="5,96,171,123"/>
-<area shape="rect" id="node3" title=" " alt="" coords="195,96,282,123"/>
-<area shape="rect" id="node4" title=" " alt="" coords="169,5,308,47"/>
+<area shape="rect" id="node1" title="Geant4 implementation of the model for a particle undergoing a dark brem where we use an imported eve..." alt="" coords="1144,103,1329,129"/>
+<area shape="rect" id="node2" href="$classg4db_1_1PrototypeModel.html" title="Abstract class representing a model for dark brem." alt="" coords="759,5,925,32"/>
+<area shape="rect" id="node3" title=" " alt="" coords="717,56,967,112"/>
+<area shape="rect" id="node4" title=" " alt="" coords="304,63,604,105"/>
+<area shape="rect" id="node5" href="$structg4db_1_1G4DarkBreMModel_1_1OutgoingKinematics.html" title="Data frame to store mad graph data read in from LHE files." alt="" coords="5,63,191,105"/>
+<area shape="rect" id="node6" title=" " alt="" coords="799,136,885,163"/>
+<area shape="rect" id="node7" title=" " alt="" coords="385,129,523,170"/>
+<area shape="rect" id="node8" title=" " alt="" coords="739,187,945,229"/>
 </map>

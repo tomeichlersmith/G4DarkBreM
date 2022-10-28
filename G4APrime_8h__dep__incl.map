@@ -1,5 +1,8 @@
 <map id="include/G4DarkBreM/G4APrime.h" name="include/G4DarkBreM/G4APrime.h">
-<area shape="rect" id="node1" title="Class creating the A&#39; particle in Geant." alt="" coords="185,5,341,47"/>
+<area shape="rect" id="node1" title="Class creating the A&#39; particle in Geant." alt="" coords="575,5,731,47"/>
 <area shape="rect" id="node2" href="$G4APrime_8cxx.html" title="Class creating the A&#39; particle in Geant." alt="" coords="5,95,229,121"/>
 <area shape="rect" id="node3" href="$G4DarkBremsstrahlung_8cxx.html" title="Class providing the Dark Bremsstrahlung process class." alt="" coords="253,95,563,121"/>
+<area shape="rect" id="node4" href="$scample_8cxx.html" title="definition of g4db&#45;scample executable" alt="" coords="587,95,719,121"/>
+<area shape="rect" id="node5" href="$simulate_8cxx.html" title="definition of g4db&#45;simulate executable" alt="" coords="743,95,878,121"/>
+<area shape="rect" id="node6" href="$xsec__calc_8cxx.html" title="definition of g4db&#45;xsec&#45;calc executable" alt="" coords="902,95,1042,121"/>
 </map>

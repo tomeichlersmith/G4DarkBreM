@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['operator_3d_0',['operator=',['../classG4DarkBremsstrahlung.html#ab1038466a66b14370034131efa9d8358',1,'G4DarkBremsstrahlung']]]
+  ['isapplicable_137',['IsApplicable',['../classG4DarkBremsstrahlung.html#a7e37a347d1136a2d1a12838cfe346a37',1,'G4DarkBremsstrahlung']]]
 ];

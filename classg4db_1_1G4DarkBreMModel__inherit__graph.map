@@ -1,4 +1,4 @@
 <map id="g4db::G4DarkBreMModel" name="g4db::G4DarkBreMModel">
-<area shape="rect" id="node1" title="Geant4 implementation of the model for a particle undergoing a dark brem where we use an imported ver..." alt="" coords="5,80,191,107"/>
-<area shape="rect" id="node2" href="$classg4db_1_1PrototypeModel.html" title=" " alt="" coords="15,5,181,32"/>
+<area shape="rect" id="node1" title="Geant4 implementation of the model for a particle undergoing a dark brem where we use an imported eve..." alt="" coords="5,80,191,107"/>
+<area shape="rect" id="node2" href="$classg4db_1_1PrototypeModel.html" title="Abstract class representing a model for dark brem." alt="" coords="15,5,181,32"/>
 </map>
