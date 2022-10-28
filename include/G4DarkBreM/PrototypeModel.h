@@ -15,7 +15,6 @@
 namespace g4db {
 
 /**
- * @class G4DarkBremmsstrahlungModel
  * Abstract class representing a model for dark brem.
  *
  * The model is what actually determines two important things:

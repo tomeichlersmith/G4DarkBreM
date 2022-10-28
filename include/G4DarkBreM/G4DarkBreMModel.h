@@ -77,8 +77,8 @@ class G4DarkBreMModel : public PrototypeModel {
    * approximation that both follows the trend produced by MG/ME and is sufficiently quick.
    *
    * ## Electrons
-   * Because the electron mass is small, it typically suffices to calculate the effective photon flux $\chi$ 
-   * once rather than modeling its functional dependence on the $\aprime$ energy and angle, as in the "full" 
+   * Because the electron mass is small, it typically suffices to calculate the effective photon flux \f$\chi\f$ 
+   * once rather than modeling its functional dependence on the \f$\aprime\f$ energy and angle, as in the "full" 
    * WW approximation used below for muons. With electron's low mass, the Improved WW approximation can be used:
    * \f{equation}{
    * \sigma = \frac{pb}{GeV} \chi \int_0^{\min(1-m_e/E_0,1-m_A/E_0)} \frac{d\sigma}{dx}(x)dx
@@ -111,7 +111,7 @@ class G4DarkBreMModel : public PrototypeModel {
    * 
    * ## Muons 
    * The muon's greater mass motivated the use of the "full" WW but including the numerical evaluation of 
-   * $\chi$ at each point in phase space proved to be too costly. 
+   * \f$\chi\f$ at each point in phase space proved to be too costly. 
    * Instead, we use an analytic integration of only elastic form-factor component:
    * 
    * \f{equation}{
@@ -211,7 +211,7 @@ class G4DarkBreMModel : public PrototypeModel {
    * This function loads the directory of LHE files passed
    * into our in-memory library of events to be sampled from.
    *
-   * @param file path to directory of LHE files
+   * @param path path to directory of LHE files
    */
   void SetMadGraphDataLibrary(std::string path);
 
@@ -230,7 +230,7 @@ class G4DarkBreMModel : public PrototypeModel {
     G4double E;
   };
 
-  /*
+  /**
    * Parse an LHE File
    *
    * Parses an LHE file to extract the kinetic energy fraction and pt of the
@@ -273,8 +273,6 @@ class G4DarkBreMModel : public PrototypeModel {
    * This is only used in the ForwardOnly scaling method and is only
    * reached if the event library energies are not appropriately matched
    * with the energy range of particles that are existing in the simulation.
-   *
-   * @TODO make configurable and/or optimize somehow
    */
   unsigned int maxIterations_{10000};
 
@@ -330,7 +328,7 @@ class G4DarkBreMModel : public PrototypeModel {
   /**
    * should we always create a totally new electron when we dark brem?
    *
-   * @TODO make this configurable? I (Tom E) can't think of a reason NOT to have
+   * @note make this configurable? I (Tom E) can't think of a reason NOT to have
    * it... The alternative is to allow Geant4 to decide when to make a new
    * particle by checking if the resulting kinetic energy is below some
    * threshold.

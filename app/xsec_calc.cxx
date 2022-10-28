@@ -10,6 +10,9 @@
 #include "G4DarkBreM/G4DarkBreMModel.h"
 #include "G4DarkBreM/G4APrime.h"
 
+/**
+ * print out how to use g4db-xsec-calc
+ */
 void usage() {
   std::cout <<
     "USAGE:\n"
@@ -29,7 +32,9 @@ void usage() {
 }
 
 /**
- * The executable main for printing out the table.
+ * definition of g4db-xsec-calc
+ *
+ * We use the cross section caching table used within the G4DarkBremsstrahlung process.
  */
 int main(int argc, char* argv[]) try {
   std::string output_filename{"xsec.csv"};

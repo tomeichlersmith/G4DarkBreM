@@ -360,7 +360,7 @@ class FindDarkBremProducts : public G4UserTrackingAction {
 };  // FindDarkBremProducts
 
 /**
- * print out how to use this executable
+ * print out how to use g4db-simulate
  */
 void usage() {
   std::cout <<
@@ -394,7 +394,10 @@ void usage() {
 }
 
 /**
- * The executable main for printing out the table.
+ * definition of g4db-simulate
+ *
+ * After parsing the command line arguments, we simply do the 
+ * standard initialization and running procedure for Geant4.
  */
 int main(int argc, char* argv[]) try {
   bool muons{false};

@@ -12,6 +12,9 @@
 #include "G4DarkBreM/G4DarkBreMModel.h"
 #include "G4DarkBreM/G4APrime.h"
 
+/**
+ * printout how to use g4db-scample
+ */
 void usage() {
   std::cout << 
       "USAGE:\n"
@@ -42,6 +45,14 @@ void usage() {
       << std::flush;
 }
 
+/**
+ * definition of g4db-scample
+ *
+ * We only need to configure the G4DarkBreMModel so
+ * we simply define G4APrime and then construct the model
+ * so we can call G4DarkBreMModel::scample for the input
+ * number of events.
+ */
 int main(int argc, char* argv[]) try {
   std::string output_filename{"scaled.csv"};
   double incident_energy{4};
