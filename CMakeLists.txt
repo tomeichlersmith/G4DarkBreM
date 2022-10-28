@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
 project(G4DarkBreM
-  VERSION 1.0.0
+  VERSION 1.0.1
   DESCRIPTION "Dark brem simulation integrated within Geant4"
   LANGUAGES CXX)
 
