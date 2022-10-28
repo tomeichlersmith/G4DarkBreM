@@ -22,3 +22,7 @@ This defines the `G4DarkBreM` cmake target which later targets can link to, for 
 target_link_libraries(MySim PUBLIC G4DarkBreM)
 ```
 
+## Validation
+Analysis and validation of G4DarkBreM has been studied in another repository 
+[tomeichlersmith/ldmx-sim-technique](https://github.com/tomeichlersmith/ldmx-sim-technique).
+This repository also stands as an example for integrating G4DarkBreM into a larger simulation and processing framework.
