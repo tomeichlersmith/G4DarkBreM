@@ -1,5 +1,6 @@
 <map id="g4db::ElementXsecCache" name="g4db::ElementXsecCache">
-<area shape="rect" id="node1" title="The cache of already computed cross sections." alt="" coords="126,109,313,136"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,13,220,39"/>
-<area shape="rect" id="node3" title=" " alt="" coords="244,5,411,47"/>
+<area shape="rect" id="node1" title="The cache of already computed cross sections." alt="" coords="99,199,286,225"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,102,220,129"/>
+<area shape="rect" id="node3" title=" " alt="" coords="244,95,411,136"/>
+<area shape="rect" id="node4" href="$classg4db_1_1PrototypeModel.html" title="Abstract class representing a model for dark brem." alt="" coords="245,5,410,32"/>
 </map>

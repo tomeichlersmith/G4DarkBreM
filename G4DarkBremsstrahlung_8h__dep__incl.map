@@ -1,6 +1,6 @@
 <map id="include/G4DarkBreM/G4DarkBremsstrahlung.h" name="include/G4DarkBreM/G4DarkBremsstrahlung.h">
 <area shape="rect" id="node1" title="Class providing the Dark Bremsstrahlung process class." alt="" coords="312,5,503,47"/>
 <area shape="rect" id="node2" href="$G4DarkBremsstrahlung_8cxx.html" title="Class providing the Dark Bremsstrahlung process class." alt="" coords="5,95,316,121"/>
-<area shape="rect" id="node3" href="$simulate_8cxx.html" title="definition of g4db&#45;simulate executable" alt="" coords="340,95,475,121"/>
-<area shape="rect" id="node4" href="$xsec__calc_8cxx.html" title="definition of g4db&#45;xsec&#45;calc executable" alt="" coords="499,95,639,121"/>
+<area shape="rect" id="node3" href="$simulate_8cxx.html" title=" " alt="" coords="340,95,475,121"/>
+<area shape="rect" id="node4" href="$xsec__calc_8cxx.html" title=" " alt="" coords="499,95,639,121"/>
 </map>

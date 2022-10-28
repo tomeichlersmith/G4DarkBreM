@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="node1" class="node">
 <title>Node1</title>
-<g id="a_node1"><a xlink:title="Geant4 implementation of the model for a particle undergoing a dark brem where we use an imported eve...">
+<g id="a_node1"><a xlink:title=" ">
 <polygon fill="#bfbfbf" stroke="black" points="854,-75 854,-94 993,-94 993,-75 854,-75"/>
 <text text-anchor="middle" x="923.5" y="-82" font-family="Helvetica,sans-Serif" font-size="10.00">g4db::G4DarkBreMModel</text>
 </a>
@@ -70,7 +70,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="structg4db_1_1G4DarkBreMModel_1_1OutgoingKinematics.html" target="_top" xlink:title="Data frame to store mad graph data read in from LHE files.">
+<g id="a_node5"><a xlink:href="structg4db_1_1G4DarkBreMModel_1_1OutgoingKinematics.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="0,-93.5 0,-123.5 139,-123.5 139,-93.5 0,-93.5"/>
 <text text-anchor="start" x="8" y="-111.5" font-family="Helvetica,sans-Serif" font-size="10.00">g4db::G4DarkBreMModel</text>
 <text text-anchor="middle" x="69.5" y="-100.5" font-family="Helvetica,sans-Serif" font-size="10.00">::OutgoingKinematics</text>
@@ -87,7 +87,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:title=" ">
+<g id="a_node6"><a xlink:title="STL class.">
 <polygon fill="none" stroke="#bfbfbf" points="595,-50 595,-69 660,-69 660,-50 595,-50"/>
 <text text-anchor="middle" x="627.5" y="-57" font-family="Helvetica,sans-Serif" font-size="10.00">std::string</text>
 </a>
@@ -98,16 +98,16 @@
 <title>Node6&#45;&gt;Node1</title>
 <path fill="none" stroke="#9a32cd" stroke-dasharray="5,2" d="M670.42,-58.42C712.45,-57.87 778.95,-58.47 836,-65.5 852.63,-67.55 870.78,-71.3 886.14,-74.93"/>
 <polygon fill="#9a32cd" stroke="#9a32cd" points="670.22,-54.92 660.28,-58.58 670.33,-61.92 670.22,-54.92"/>
-<text text-anchor="middle" x="787.5" y="-79.5" font-family="Helvetica,sans-Serif" font-size="10.00"> library_path_</text>
-<text text-anchor="middle" x="787.5" y="-68.5" font-family="Helvetica,sans-Serif" font-size="10.00">method_name_</text>
+<text text-anchor="middle" x="787.5" y="-79.5" font-family="Helvetica,sans-Serif" font-size="10.00"> method_name_</text>
+<text text-anchor="middle" x="787.5" y="-68.5" font-family="Helvetica,sans-Serif" font-size="10.00">library_path_</text>
 </g>
 <!-- Node7 -->
 <g id="node7" class="node">
 <title>Node7</title>
-<g id="a_node7"><a xlink:title=" ">
+<g id="a_node7"><a xlink:title="STL class.">
 <polygon fill="none" stroke="#bfbfbf" points="284.5,-44.5 284.5,-74.5 388.5,-74.5 388.5,-44.5 284.5,-44.5"/>
 <text text-anchor="start" x="292.5" y="-62.5" font-family="Helvetica,sans-Serif" font-size="10.00">std::basic_string&lt;</text>
-<text text-anchor="middle" x="336.5" y="-51.5" font-family="Helvetica,sans-Serif" font-size="10.00"> Char &gt;</text>
+<text text-anchor="middle" x="336.5" y="-51.5" font-family="Helvetica,sans-Serif" font-size="10.00"> char &gt;</text>
 </a>
 </g>
 </g>

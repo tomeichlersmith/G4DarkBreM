@@ -1,7 +1,13 @@
 <map id="APrimePhysics" name="APrimePhysics">
-<area shape="rect" id="node1" title="basic physics constructor which simply creates the A&#39; and the dark brem" alt="" coords="187,185,306,212"/>
-<area shape="rect" id="node2" title=" " alt="" coords="5,96,179,123"/>
-<area shape="rect" id="node3" title=" " alt="" coords="203,96,290,123"/>
-<area shape="rect" id="node4" title=" " alt="" coords="177,5,316,47"/>
-<area shape="rect" id="node5" title=" " alt="" coords="315,96,616,123"/>
+<area shape="rect" id="node1" title="basic physics constructor which simply creates the A&#39; and the dark brem" alt="" coords="360,467,479,493"/>
+<area shape="rect" id="node2" title=" " alt="" coords="71,377,245,404"/>
+<area shape="rect" id="node3" title="STL class." alt="" coords="564,199,651,225"/>
+<area shape="rect" id="node6" href="$classG4DarkBremsstrahlung.html" title=" " alt="" coords="332,288,507,315"/>
+<area shape="rect" id="node4" title="STL class." alt="" coords="538,95,677,136"/>
+<area shape="rect" id="node5" title=" " alt="" coords="269,377,570,404"/>
+<area shape="rect" id="node7" title=" " alt="" coords="5,199,159,225"/>
+<area shape="rect" id="node8" href="$classg4db_1_1ElementXsecCache.html" title="The cache of already computed cross sections." alt="" coords="183,199,370,225"/>
+<area shape="rect" id="node9" title=" " alt="" coords="108,102,323,129"/>
+<area shape="rect" id="node10" title=" " alt="" coords="347,95,513,136"/>
+<area shape="rect" id="node11" href="$classg4db_1_1PrototypeModel.html" title="Abstract class representing a model for dark brem." alt="" coords="347,5,513,32"/>
 </map>

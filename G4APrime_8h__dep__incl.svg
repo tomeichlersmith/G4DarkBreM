@@ -51,7 +51,7 @@
 <!-- Node4 -->
 <g id="node4" class="node">
 <title>Node4</title>
-<g id="a_node4"><a xlink:href="scample_8cxx.html" target="_top" xlink:title="definition of g4db&#45;scample executable">
+<g id="a_node4"><a xlink:href="scample_8cxx.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="436.5,-0.5 436.5,-19.5 535.5,-19.5 535.5,-0.5 436.5,-0.5"/>
 <text text-anchor="middle" x="486" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">app/scample.cxx</text>
 </a>
@@ -66,7 +66,7 @@
 <!-- Node5 -->
 <g id="node5" class="node">
 <title>Node5</title>
-<g id="a_node5"><a xlink:href="simulate_8cxx.html" target="_top" xlink:title="definition of g4db&#45;simulate executable">
+<g id="a_node5"><a xlink:href="simulate_8cxx.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="553.5,-0.5 553.5,-19.5 654.5,-19.5 654.5,-0.5 553.5,-0.5"/>
 <text text-anchor="middle" x="604" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">app/simulate.cxx</text>
 </a>
@@ -81,7 +81,7 @@
 <!-- Node6 -->
 <g id="node6" class="node">
 <title>Node6</title>
-<g id="a_node6"><a xlink:href="xsec__calc_8cxx.html" target="_top" xlink:title="definition of g4db&#45;xsec&#45;calc executable">
+<g id="a_node6"><a xlink:href="xsec__calc_8cxx.html" target="_top" xlink:title=" ">
 <polygon fill="none" stroke="black" points="672.5,-0.5 672.5,-19.5 777.5,-19.5 777.5,-0.5 672.5,-0.5"/>
 <text text-anchor="middle" x="725" y="-7.5" font-family="Helvetica,sans-Serif" font-size="10.00">app/xsec_calc.cxx</text>
 </a>

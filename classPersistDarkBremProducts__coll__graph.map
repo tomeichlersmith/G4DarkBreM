@@ -1,9 +1,9 @@
 <map id="PersistDarkBremProducts" name="PersistDarkBremProducts">
 <area shape="rect" id="node1" title="event action used to store the OutgoingKinematics if a dark brem occurred" alt="" coords="7,428,195,455"/>
 <area shape="rect" id="node2" title=" " alt="" coords="5,339,153,365"/>
-<area shape="rect" id="node3" title=" " alt="" coords="178,339,287,365"/>
-<area shape="rect" id="node4" title=" " alt="" coords="157,248,308,289"/>
-<area shape="rect" id="node5" title=" " alt="" coords="160,157,305,199"/>
-<area shape="rect" id="node6" title=" " alt="" coords="147,81,318,108"/>
-<area shape="rect" id="node7" title=" " alt="" coords="179,5,286,32"/>
+<area shape="rect" id="node3" title="STL class." alt="" coords="178,339,287,365"/>
+<area shape="rect" id="node4" title="STL class." alt="" coords="157,248,308,289"/>
+<area shape="rect" id="node5" title="STL class." alt="" coords="160,157,305,199"/>
+<area shape="rect" id="node6" title="STL class." alt="" coords="147,81,318,108"/>
+<area shape="rect" id="node7" title="STL class." alt="" coords="179,5,286,32"/>
 </map>
