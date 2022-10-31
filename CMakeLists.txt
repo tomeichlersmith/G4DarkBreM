@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.12)
 
 project(G4DarkBreM
-  VERSION 1.0.1
+  VERSION 1.1.0
   DESCRIPTION "Dark brem simulation integrated within Geant4"
   LANGUAGES CXX)
 
 # Search for Geant4 and load its settings
-find_package(Geant4 REQUIRED)
-find_package(Boost REQUIRED)
+find_package(Geant4 10.2.3 REQUIRED)
+find_package(Boost 1.68 REQUIRED)
 
 include(${Geant4_USE_FILE})
 

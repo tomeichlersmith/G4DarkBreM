@@ -408,10 +408,8 @@ void G4DarkBreMModel::GenerateChange(
   // stop tracking and create new secondary instead of primary
   if (alwaysCreateNewLepton_) {
     /*
-     * We _could_ attempt to mimic the lepton we are killing by copying
-     * over all of its information into the newly created track.
-     *
-     * This procedure is /somewhat/ sensitive and so hasn't been investigated.
+     * Create a new lepton in order to make it easier to extract 
+     * the outgoing sim-level dark brem kinematics.
      */
     G4DynamicParticle *el = new G4DynamicParticle(
         track.GetDefinition(), recoilMomentum);
@@ -429,9 +427,9 @@ void G4DarkBreMModel::GenerateChange(
     particleChange.SetNumberOfSecondaries(1);
     particleChange.AddSecondary(dphoton);
     particleChange.ProposeMomentumDirection(recoilMomentum.unit());
-    double recoil_energy = sqrt(recoilMomentum.mag2()+Mel*Mel);
+    double recoil_energy = sqrt(recoilMomentum.mag2()+Ml*Ml);
     // energy of primary recoiling
-    G4double finalKE = recoil_energy - Mel;
+    G4double finalKE = recoil_energy - Ml;
     particleChange.ProposeEnergy(finalKE);
   }
 }
