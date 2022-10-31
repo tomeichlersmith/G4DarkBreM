@@ -7,6 +7,7 @@ project(G4DarkBreM
 
 # Search for Geant4 and load its settings
 find_package(Geant4 REQUIRED)
+find_package(Boost REQUIRED)
 
 include(${Geant4_USE_FILE})
 
@@ -15,7 +16,7 @@ add_library(G4DarkBreM SHARED
   src/G4DarkBreM/G4APrime.cxx
   src/G4DarkBreM/G4DarkBreMModel.cxx
   src/G4DarkBreM/G4DarkBremsstrahlung.cxx)
-target_link_libraries(G4DarkBreM PUBLIC ${Geant4_LIBRARIES})
+target_link_libraries(G4DarkBreM PUBLIC ${Geant4_LIBRARIES} Boost::boost)
 target_include_directories(G4DarkBreM PUBLIC include)
 install(TARGETS G4DarkBreM DESTINATION lib)
 

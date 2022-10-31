@@ -3,7 +3,10 @@
 Geant4 Dark Bremmstrahlung from MadGraph
 
 ## Installation
-The only dependency of G4DarkBreM is Geant4 which has [an extensive installation guide](http://cern.ch/geant4-userdoc/UsersGuides/InstallationGuide/html/). 
+The only dependencies of G4DarkBreM are Geant4 which has [an extensive installation guide](http://cern.ch/geant4-userdoc/UsersGuides/InstallationGuide/html/)
+and Boost which can be installed [from the website](https://www.boost.org/doc/libs/1_80_0/more/getting_started/unix-variants.html)
+or via your package manager (e.g. [on Ubuntu](https://stackoverflow.com/questions/12578499/how-to-install-boost-on-ubuntu)).
+
 While G4DarkBreM is not explicitly limited to a certain platform, it has only been used on Linux-based operating systems and explicitly uses C++11 standard features.
 
 After installing Geant4, one can build and install G4DarkBreM using tools probably used to install Geant4 (if built from scratch).
