@@ -50,7 +50,7 @@ void usage() {
  *
  * We only need to configure the G4DarkBreMModel so
  * we simply define G4APrime and then construct the model
- * so we can call G4DarkBreMModel::scample for the input
+ * so we can call G4DarkBreMModel::sampleAndScale for the input
  * number of events.
  */
 int main(int argc, char* argv[]) try {
@@ -128,7 +128,7 @@ int main(int argc, char* argv[]) try {
   f << "recoil_energy,recoil_px,recoil_py,recoil_pz\n";
 
   for (int i_event{0}; i_event < num_events; ++i_event) {
-    G4ThreeVector recoil = db_model.scample(incident_energy, lepton_mass);
+    G4ThreeVector recoil = db_model.sampleAndScale(incident_energy, lepton_mass);
     double recoil_energy = sqrt(recoil.mag2() + lepton_mass*lepton_mass);
 
     f << recoil_energy << ','

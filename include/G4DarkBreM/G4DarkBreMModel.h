@@ -154,8 +154,8 @@ class G4DarkBreMModel : public PrototypeModel {
                                               G4double atomicZ);
 
   /**
-   * Perform the SCAling and saMPLE procedure to scale one of the MG events
-   * in our library to the input incident lepton energy (and mass).
+   * Sample one of the MG events in our library and then scale it to the
+   * input incident lepton energy.
    *
    * This is also helpful for testing the scaling procedure in its own
    * executable separate from the Geant4 infrastructure.
@@ -163,36 +163,60 @@ class G4DarkBreMModel : public PrototypeModel {
    * @note The vector returned is relative to the incident lepton as if
    * it came in along the z-axis.
    *
-   * Gets an energy fraction and Pt from madgraph files.
-   * The scaling of this energy fraction and Pt to the actual lepton
-   * energy depends on the input method.
+   * Gets an energy fraction and transverse momentum (\f$p_T\f$) from the
+   * loaded library of MadGraph events using the entry in the library with
+   * the nearest incident energy above the actual input incident energy.
+   *
+   * The scaling of this energy fraction and \f$p_T\f$ to the actual lepton
+   * energy depends on the input method. In all cases, the azimuthal angle
+   * is chosen uniformly between 0 and \f$2\pi\f$.
    *
    * ## Forward Only
-   * Scales the energy so that the fraction of kinectic energy is constant,
-   * keeps the Pt constant. If the Pt is larger than the new energy, that event
-   * is skipped, and a new one is taken from the file. Chooses the Pz of the
-   * recoil lepton to always be positive.
+   * Scales the energy so that the fraction of kinetic energy is constant,
+   * keeping the \f$p_T\f$ constant. 
+   *
+   * If the \f$p_T\f$ is larger than the new energy, that event
+   * is skipped, and a new one is taken from the file. If the loaded library
+   * does not fully represent the range of incident energies being seen
+   * by the simulation, this will occur frequently.
+   *
+   * With only the kinetic energy fraction and \f$p_T\f$, the sign of
+   * the longitudinal momentum \f$p_z\f$ is undetermined. This method
+   * simply chooses the \f$p_z\f$ of the recoil lepton to always be positive.
    *
    * ## CM Scaling
-   * Scale MadGraph vertex to actual energy of lepton using Lorentz boosts,
-   * and then extract the momentum from that.
+   * Scale MadGraph vertex to actual energy of lepton using Lorentz boosts.
+   *
+   * The scaling is done via two boosts.
+   * 1. Boost out of the center-of-momentum (CoM) frame read in along with the
+   *    MadGraph event library.
+   * 2. Boost into approximately) the incident lepton energy frame by
+   *    constructing a "new" CoM frame using the actual CoM frame's 
+   *    transverse momentum and lowering the \f$p_z\f$ and energy of 
+   *    the CoM by the difference between the input incident
+   *    energy and the sampled incident energy.
+   *
+   * After these boosts, the energy of the recoil and its \f$p_T\f$ are
+   * extracted.
    *
    * ## Undefined
    * Don't scale the MadGraph vertex to the actual energy of the lepton.
+   *
+   * We simply copy the read-in recoil energy's energy, momentum, and \f$p_T\f$.
    *
    * @param[in] incident_energy incident total energy of the lepton [GeV] 
    * @param[in] lepton_mass mass of incident lepton [GeV]
    * @return G4ThreeVector representing the recoil lepton's outgoing momentum
    */
-  G4ThreeVector scample(double incident_energy, double lepton_mass);
+  G4ThreeVector sampleAndScale(double incident_energy, double lepton_mass);
 
   /**
    * Simulates the emission of a dark photon + lepton
    *
-   * @see scample for how the event library is sampled and scaled to the incident
+   * @see sampleAndScale for how the event library is sampled and scaled to the incident
    * lepton's actual energy
    *
-   * After calling scample, we rotate the outgoing lepton's momentum to the
+   * After calling sampleAndScale, we rotate the outgoing lepton's momentum to the
    * frame of the incident particle and then calculate the dark photon's
    * momentum such that three-momentum is conserved.
    *

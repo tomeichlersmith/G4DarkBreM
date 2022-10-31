@@ -319,7 +319,7 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
   return cross;
 }
 
-G4ThreeVector G4DarkBreMModel::scample(double incident_energy, double lepton_mass) {
+G4ThreeVector G4DarkBreMModel::sampleAndScale(double incident_energy, double lepton_mass) {
   // mass A' in GeV
   static const double MA = G4APrime::APrime()->GetPDGMass() / CLHEP::GeV;
   OutgoingKinematics data = GetMadgraphData(incident_energy);
@@ -394,7 +394,7 @@ void G4DarkBreMModel::GenerateChange(
   // convert to energy units in LHE files [GeV]
   G4double incidentEnergy = step.GetPostStepPoint()->GetTotalEnergy()/CLHEP::GeV;
 
-  G4ThreeVector recoilMomentum = scample(incidentEnergy, Ml);
+  G4ThreeVector recoilMomentum = sampleAndScale(incidentEnergy, Ml);
   recoilMomentum.rotateUz(track.GetMomentumDirection());
 
   // create g4dynamicparticle object for the dark photon.
