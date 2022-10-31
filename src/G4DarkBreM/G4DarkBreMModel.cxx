@@ -72,6 +72,13 @@ static double flux_factor_chi_numerical(G4double A, G4double Z, double tmin, dou
    * we've manually expanded the integrand to cancel out the 1/t^2 factor
    * from the differential, this helps the numerical integration converge
    * because we aren't teetering on the edge of division by zero
+   *
+   * This `auto` represents a _function_ whose return value is a `double`
+   * and which has a single input `t`. This lambda expression saves us
+   * the time of having to re-calculate the form factor constants that
+   * do not depend on `t` because it can inherit their values from the
+   * environment. The return value is a double since it is calculated
+   * by simple arithmetic operations on doubles.
    */
   auto integrand = [&](double t) {
     double ael_factor = 1./(ael_inv2 + t),
@@ -168,6 +175,12 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
    * Differential cross section with respect to x and theta
    *
    * Equation (16) from Appendix A of https://arxiv.org/pdf/2101.12192.pdf
+   *
+   * This `auto` represents a lambda-expression function, inheriting many
+   * pre-calculated constants (like lepton_e and chi) while also calculating
+   * the variables dependent on the integration variables. The return value
+   * of this function is a double since it is calculated by arithmetic
+   * operations on doubles.
    */
   auto diff_cross = [&](double x, double theta) {
     if (x*lepton_e < threshold_) return 0.;
@@ -286,6 +299,9 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
    * integral has already been done analytically and we can use the
    * numerical Chi (including both inelastic and elastic form factors)
    * calculated above.  
+   *
+   * This is the final lambda expression used here. Its one argument is a double
+   * and it returns a double.
    */
   auto theta_integral = [&](double x) {
     if (muons_) {
