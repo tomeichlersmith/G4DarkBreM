@@ -32,7 +32,7 @@ G4DarkBremsstrahlung::G4DarkBremsstrahlung(bool muons, bool only_one_per_event,
   /*
    * In G4 speak, a "discrete" process is one that only happens at the end of
    * steps. we want the DB to be discrete because it is not a "slow braking"
-   * like ionization, the electron suddenly has the interaction and loses a
+   * like ionization, the lepton suddenly has the interaction and loses a
    * lot of its energy.
    *
    * The first argument to this function is the process we are adding.
@@ -94,7 +94,7 @@ void G4DarkBremsstrahlung::PrintInfo() {
 
 G4VParticleChange* G4DarkBremsstrahlung::PostStepDoIt(const G4Track& track,
                                                        const G4Step& step) {
-  // Debugging Purposes: Check if track we get is an electron
+  // Debugging Purposes: Check if track we get is the configured lepton
   if (not IsApplicable(*track.GetParticleDefinition()))
     throw std::runtime_error("Dark brem process received a track that isn't applicable."); 
 

@@ -50,12 +50,12 @@ class PrototypeModel {
    * Calculate the cross section given the input parameters
    *
    * @see G4DarkBremmstrahlung::GetMeanFreePath
-   * @param[in] electronKE current electron kinetic energy
-   * @param[in] atomicA atomic-mass number for the element the electron is in
-   * @param[in] atomicZ atomic-number for the element the electron is in
+   * @param[in] leptonKE current lepton kinetic energy
+   * @param[in] atomicA atomic-mass number for the element the lepton is in
+   * @param[in] atomicZ atomic-number for the element the lepton is in
    * @returns cross section with units incorporated as a G4double
    */
-  virtual G4double ComputeCrossSectionPerAtom(G4double electronKE,
+  virtual G4double ComputeCrossSectionPerAtom(G4double leptonKE,
                                               G4double atomicA,
                                               G4double atomicZ) = 0;
 

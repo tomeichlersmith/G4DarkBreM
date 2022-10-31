@@ -76,7 +76,7 @@ class G4DarkBremsstrahlung : public G4VDiscreteProcess {
   /**
    * Checks if the passed particle should be able to do this process
    *
-   * @return true if particle is electron
+   * @return true if particle is the configured lepton
    */
   virtual G4bool IsApplicable(const G4ParticleDefinition& p);
 
@@ -169,7 +169,7 @@ class G4DarkBremsstrahlung : public G4VDiscreteProcess {
   bool cache_xsec_;
 
   /**
-   * Are we dark-brem off muons or electrons?
+   * Are we dark-bremming off muons or electrons?
    */
   bool muons_;
 

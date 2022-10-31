@@ -181,8 +181,8 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
     /*
      * WW
      *
-     * Since muons are so much more massive than electrons, they
-     * keep form factor integration limits dependent on x and theta
+     * Since muons are so much more massive than electrons, we keep 
+     * the form factor integration limits dependent on x and theta
      */
 
     // non-zero theta and non-zero m_l
@@ -323,10 +323,10 @@ G4ThreeVector G4DarkBreMModel::scample(double incident_energy, double lepton_mas
   // mass A' in GeV
   static const double MA = G4APrime::APrime()->GetPDGMass() / CLHEP::GeV;
   OutgoingKinematics data = GetMadgraphData(incident_energy);
-  double EAcc = (data.electron.e() - lepton_mass) *
+  double EAcc = (data.lepton.e() - lepton_mass) *
                     ((incident_energy - lepton_mass - MA) / (data.E - lepton_mass - MA))
                 + lepton_mass;
-  double Pt = data.electron.perp();
+  double Pt = data.lepton.perp();
   double P = sqrt(EAcc * EAcc - lepton_mass * lepton_mass);
   if (method_ == DarkBremMethod::ForwardOnly) {
     unsigned int i = 0;
@@ -334,16 +334,16 @@ G4ThreeVector G4DarkBreMModel::scample(double incident_energy, double lepton_mas
       // Skip events until the transverse energy is less than the total energy.
       i++;
       data = GetMadgraphData(incident_energy);
-      EAcc = (data.electron.e() - lepton_mass) *
+      EAcc = (data.lepton.e() - lepton_mass) *
                  ((incident_energy - lepton_mass - MA) / (data.E - lepton_mass - MA))
              + lepton_mass;
-      Pt = data.electron.perp();
+      Pt = data.lepton.perp();
       P = sqrt(EAcc * EAcc - lepton_mass * lepton_mass);
 
       if (i > maxIterations_) {
         std::cerr
             << "Could not produce a realistic vertex with library energy "
-            << data.electron.e() << " GeV.\n"
+            << data.lepton.e() << " GeV.\n"
             << "Consider expanding your libary of A' vertices to include a "
                "beam energy closer to "
             << incident_energy << " GeV."
@@ -352,15 +352,15 @@ G4ThreeVector G4DarkBreMModel::scample(double incident_energy, double lepton_mas
       }
     }
   } else if (method_ == DarkBremMethod::CMScaling) {
-    LorentzVector el(data.electron.px(), data.electron.py(), data.electron.pz(),
-                      data.electron.e());
+    LorentzVector el(data.lepton.px(), data.lepton.py(), data.lepton.pz(),
+                      data.lepton.e());
     double ediff = data.E - incident_energy;
     LorentzVector newcm(data.centerMomentum.px(), data.centerMomentum.py(),
                          data.centerMomentum.pz() - ediff,
                          data.centerMomentum.e() - ediff);
     el.boost(-1. * data.centerMomentum.boostVector());
     el.boost(newcm.boostVector());
-    double newE = (data.electron.e() - lepton_mass) *
+    double newE = (data.lepton.e() - lepton_mass) *
                       ((incident_energy - lepton_mass - MA) / (data.E - lepton_mass - MA)) +
                   lepton_mass;
     el.setE(newE);
@@ -368,9 +368,9 @@ G4ThreeVector G4DarkBreMModel::scample(double incident_energy, double lepton_mas
     Pt = el.perp();
     P = el.vect().mag();
   } else if (method_ == DarkBremMethod::Undefined) {
-    EAcc = data.electron.e();
+    EAcc = data.lepton.e();
     P = sqrt(EAcc * EAcc - lepton_mass * lepton_mass);
-    Pt = data.electron.perp();
+    Pt = data.lepton.perp();
   }
 
   // outgoing lepton momentum
@@ -388,25 +388,25 @@ G4ThreeVector G4DarkBreMModel::scample(double incident_energy, double lepton_mas
 void G4DarkBreMModel::GenerateChange(
     G4ParticleChange &particleChange, const G4Track &track,
     const G4Step &step) {
-  // mass of incident lepton (usually electrons, muons experimental)
-  double Mel = track.GetDefinition()->GetPDGMass() / CLHEP::GeV;
+  // mass of incident lepton 
+  double Ml = track.GetDefinition()->GetPDGMass() / CLHEP::GeV;
 
   // convert to energy units in LHE files [GeV]
   G4double incidentEnergy = step.GetPostStepPoint()->GetTotalEnergy()/CLHEP::GeV;
 
-  G4ThreeVector recoilMomentum = scample(incidentEnergy, Mel);
+  G4ThreeVector recoilMomentum = scample(incidentEnergy, Ml);
   recoilMomentum.rotateUz(track.GetMomentumDirection());
 
   // create g4dynamicparticle object for the dark photon.
   // define its 3-momentum so we conserve 3-momentum with primary and recoil
-  // electron NOTE: does _not_ take nucleus recoil into account
+  // lepton NOTE: does _not_ take nucleus recoil into account
   G4ThreeVector darkPhotonMomentum =
       track.GetMomentum() - recoilMomentum;
   G4DynamicParticle *dphoton =
       new G4DynamicParticle(G4APrime::APrime(), darkPhotonMomentum);
 
   // stop tracking and create new secondary instead of primary
-  if (alwaysCreateNewElectron_) {
+  if (alwaysCreateNewLepton_) {
     /*
      * We _could_ attempt to mimic the lepton we are killing by copying
      * over all of its information into the newly created track.
@@ -516,7 +516,7 @@ void G4DarkBreMModel::ParseLHE(std::string fname) {
         std::istringstream jss(line);
         jss >> ptype >> state >> skip >> skip >> skip >> skip >> e_px >> e_py >>
             e_pz >> e_E >> e_M;
-        if ((ptype == 11 or ptype == 13) && (state == 1)) {  // Find a final state electron.
+        if ((ptype == 11 or ptype == 13) && (state == 1)) {  // Find a final state lepton
           for (int i = 0; i < 2; i++) {
             std::getline(ifile, line);
           }
@@ -536,7 +536,7 @@ void G4DarkBreMModel::ParseLHE(std::string fname) {
             double cmpy = a_py + e_py;
             double cmpz = a_pz + e_pz;
             double cmE = a_E + e_E;
-            evnt.electron = LorentzVector(e_px, e_py, e_pz, e_E);
+            evnt.lepton = LorentzVector(e_px, e_py, e_pz, e_E);
             evnt.centerMomentum = LorentzVector(cmpx, cmpy, cmpz, cmE);
             evnt.E = ebeam;
             madGraphData_[ebeam].push_back(evnt);

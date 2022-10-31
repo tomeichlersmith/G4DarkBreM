@@ -23,10 +23,10 @@ namespace g4db {
  * - library_path : the full path to the directory containing the LHE dark brem
  *   vertices that will be read in to make the vertex library
  * - epsilon : strength of the dark photon - photon mixing
- * - threshold : minimum energy in GeV for the electron to have a non-zero
+ * - threshold : minimum energy in GeV for the lepton to have a non-zero
  *   cross section for going dark brem
  * - method : scaling method to use to scale the dark brem vertices from
- *   the library to the actual electron energy when a dark brem occurs
+ *   the library to the actual lepton energy when a dark brem occurs
  * - whether we are dark bremming of muons or electrons
  *
  * The required parameter is a vertex library generated in MadGraph
@@ -164,21 +164,21 @@ class G4DarkBreMModel : public PrototypeModel {
    * it came in along the z-axis.
    *
    * Gets an energy fraction and Pt from madgraph files.
-   * The scaling of this energy fraction and Pt to the actual electron
+   * The scaling of this energy fraction and Pt to the actual lepton
    * energy depends on the input method.
    *
    * ## Forward Only
    * Scales the energy so that the fraction of kinectic energy is constant,
    * keeps the Pt constant. If the Pt is larger than the new energy, that event
    * is skipped, and a new one is taken from the file. Chooses the Pz of the
-   * recoil electron to always be positive.
+   * recoil lepton to always be positive.
    *
    * ## CM Scaling
-   * Scale MadGraph vertex to actual energy of electron using Lorentz boosts,
+   * Scale MadGraph vertex to actual energy of lepton using Lorentz boosts,
    * and then extract the momentum from that.
    *
    * ## Undefined
-   * Don't scale the MadGraph vertex to the actual energy of the electron.
+   * Don't scale the MadGraph vertex to the actual energy of the lepton.
    *
    * @param[in] incident_energy incident total energy of the lepton [GeV] 
    * @param[in] lepton_mass mass of incident lepton [GeV]
@@ -221,12 +221,12 @@ class G4DarkBreMModel : public PrototypeModel {
    * Data frame to store mad graph data read in from LHE files.
    */
   struct OutgoingKinematics {
-    /// 4-momentum of electron in center of momentum frame for electron-A'
+    /// 4-momentum of lepton in center of momentum frame for electron-A'
     /// system
-    LorentzVector electron;
+    LorentzVector lepton;
     /// 4-vector pointing to center of momentum frame
     LorentzVector centerMomentum;
-    /// energy of electron before brem (used as key in mad graph data map)
+    /// energy of lepton before brem (used as key in mad graph data map)
     G4double E;
   };
 
@@ -300,10 +300,10 @@ class G4DarkBreMModel : public PrototypeModel {
    * inside of this model.
    */
   enum DarkBremMethod {
-    /// Use actual electron energy and get pT from LHE 
+    /// Use actual lepton energy and get pT from LHE 
     /// (such that \f$p_T^2+m_l^2 < E_{acc}^2\f$)
     ForwardOnly = 1,
-    /// Boost LHE vertex momenta to the actual electron energy
+    /// Boost LHE vertex momenta to the actual lepton energy
     CMScaling = 2,
     /// Use LHE vertex as is
     Undefined = 3
@@ -326,33 +326,31 @@ class G4DarkBreMModel : public PrototypeModel {
   std::string library_path_;
 
   /**
-   * should we always create a totally new electron when we dark brem?
+   * should we always create a totally new lepton when we dark brem?
    *
    * @note make this configurable? I (Tom E) can't think of a reason NOT to have
    * it... The alternative is to allow Geant4 to decide when to make a new
    * particle by checking if the resulting kinetic energy is below some
    * threshold.
    */
-  bool alwaysCreateNewElectron_{true};
+  bool alwaysCreateNewLepton_{true};
 
   /**
    * Storage of data from mad graph
    *
-   * Maps incoming electron energy to various options for outgoing kinematics.
-   * This is a hefty map and is what stores **all** of the vertices
-   * imported from the LHE library of dark brem vertices.
-   *
-   * Library is read in from configuration parameter 'darkbrem.madgraphlibrary'
+   * Maps incoming lepton energy to various options for outgoing kinematics.
+   * This is a hefty map and is what stores **all** of the events
+   * imported from the LHE library of dark brem events.
    */
   std::map<double, std::vector<OutgoingKinematics> > madGraphData_;
 
   /**
    * Stores a map of current access points to mad graph data.
    *
-   * Maps incoming electron energy to the index of the data vector
+   * Maps incoming lepton energy to the index of the data vector
    * that we will get the data from.
    *
-   * Also sorts the incoming electron energy so that we can find
+   * Also sorts the incoming lepton energy so that we can find
    * the sampling energy that is closest above the actual incoming energy.
    */
   std::map<double, unsigned int> currentDataPoints_;

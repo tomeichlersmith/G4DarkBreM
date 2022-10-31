@@ -33,7 +33,7 @@ class ElementXsecCache {
    * and calculate the cross section if it wasn't calculated before.
    *
    * @throws std::runtime_error if no model is available for calculating cross sections
-   * @param[in] energy Energy of incident electron [MeV]
+   * @param[in] energy Energy of incident lepton [MeV]
    * @param[in] A atomic mass of element [atomic mass units]
    * @param[in] Z atomic number of element [num protons]
    * @returns cross section corresponding to the input parameters (including
@@ -80,7 +80,7 @@ class ElementXsecCache {
    * of Xsecs. Right now, since the internal unit of energy in Geant4 is MeV,
    * the cache is binned at the 1MeV scale.
    *
-   * @param[in] energy Energy of incident electron [MeV]
+   * @param[in] energy Energy of incident lepton [MeV]
    * @param[in] A atomic mass of element [atomic mass units]
    * @param[in] Z atomic number of element [num protons]
    * @returns unsigned integer cache key for these three inputs
