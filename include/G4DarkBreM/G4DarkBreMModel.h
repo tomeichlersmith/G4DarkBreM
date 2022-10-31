@@ -231,45 +231,6 @@ class G4DarkBreMModel : public PrototypeModel {
                               const G4Track& track, const G4Step& step);
 
   /**
-   * @struct OutgoingKinematics
-   *
-   * Data frame to store mad graph data read in from LHE files.
-   */
-  struct OutgoingKinematics {
-    /// 4-momentum of lepton in center of momentum frame for electron-A'
-    /// system
-    LorentzVector lepton;
-    /// 4-vector pointing to center of momentum frame
-    LorentzVector centerMomentum;
-    /// energy of lepton before brem (used as key in mad graph data map)
-    G4double E;
-  };
- private:
-  /**
-   * Set the library of dark brem events to be scaled.
-   *
-   * This function loads the directory of LHE files passed
-   * into our in-memory library of events to be sampled from.
-   *
-   * @param path path to directory of LHE files
-   */
-  void SetMadGraphDataLibrary(std::string path);
-
-  /**
-   * Parse an LHE File
-   *
-   * Parses an LHE file to extract the kinetic energy fraction and pt of the
-   * outgoing electron in each event. Loads the two numbers from every event
-   * into a map of vectors of pairs (mgdata). Map is keyed by energy, vector
-   * pairs are energy fraction + pt. Also creates an list of energies and
-   * placeholders (energies), so that different energies can be looped
-   * separately.
-   *
-   * @param fname name of LHE file to parse
-   */
-  void ParseLHE(std::string fname);
-
-  /**
    * Fill vector of currentDataPoints_ with the same number of items as the
    * madgraph data.
    *

@@ -453,40 +453,17 @@ void G4DarkBreMModel::GenerateChange(
 }
 
 void G4DarkBreMModel::SetMadGraphDataLibrary(std::string path) {
-  // Assumptions:
-  //  - Directory passed is a flat directory (no sub directories) containing LHE
-  //  files
-  //  - LHE files are events generated with the correct mass point
-  //
-  // A future improvement could be parsing a directory and only selecting LHE files
-  // the contain dark photons of the configure mass. This has not been implemented
-  // because there has been no reason to merge dark brem event libraries corresponding
-  // to different mass points.
-
   /*
    * print status to user so they know what's happening
    */
   if (GetVerboseLevel() > 0) G4cout << "[ G4DarkBreMModel ] : loading event librariy..." << G4endl;
 
-  bool foundOneFile = false;
-  DIR *dir;            // handle to opened directory
-  struct dirent *ent;  // handle to entry inside directory
-  if ((dir = opendir(path.c_str())) != NULL) {
-    // directory can be opened
-    while ((ent = readdir(dir)) != NULL) {
-      std::string fp = path + '/' + std::string(ent->d_name);
-      if (fp.substr(fp.find_last_of('.') + 1) == "lhe") {
-        // file ends in '.lhe'
-        ParseLHE(fp);
-        foundOneFile = true;
-      }
-    }
-    closedir(dir);
-  }
 
-  if (not foundOneFile) {
-    throw std::runtime_error("Directory '" + path +
-        "' was unable to be opened or no '.lhe' files were found inside it.");
+  parseLibrary(path, madGraphData_);
+
+  if (madGraphData_.size() == 0) {
+    throw std::runtime_error("BadConf : Unable to find any library entries at '"+path+"'\n"
+        "  The library is either a single CSV file or a directory of LHE files.");
   }
 
   MakePlaceholders();  // Setup the placeholder offsets for getting data.
@@ -506,66 +483,6 @@ void G4DarkBreMModel::SetMadGraphDataLibrary(std::string path) {
   }
 
   return;
-}
-
-void G4DarkBreMModel::ParseLHE(std::string fname) {
-  static const double MA =
-      G4APrime::APrime()->GetPDGMass() / CLHEP::GeV;  // mass A' in GeV
-
-  std::ifstream ifile;
-  ifile.open(fname.c_str());
-  if (!ifile) {
-    throw std::runtime_error("Unable to open LHE file '"+fname+"'.");
-  }
-
-  std::string line;
-  while (std::getline(ifile, line)) {
-    std::istringstream iss(line);
-    int ptype, state;
-    double skip, px, py, pz, E, M;
-    if (iss >> ptype >> state >> skip >> skip >> skip >> skip >> px >> py >>
-        pz >> E >> M) {
-      if ((ptype == 11 or ptype == 13) && (state == -1)) {
-        double ebeam = E;
-        double e_px, e_py, e_pz, a_px, a_py, a_pz, e_E, a_E, e_M, a_M;
-        for (int i = 0; i < 2; i++) {
-          std::getline(ifile, line);
-        }
-        std::istringstream jss(line);
-        jss >> ptype >> state >> skip >> skip >> skip >> skip >> e_px >> e_py >>
-            e_pz >> e_E >> e_M;
-        if ((ptype == 11 or ptype == 13) && (state == 1)) {  // Find a final state lepton
-          for (int i = 0; i < 2; i++) {
-            std::getline(ifile, line);
-          }
-          std::istringstream kss(line);
-          kss >> ptype >> state >> skip >> skip >> skip >> skip >> a_px >>
-              a_py >> a_pz >> a_E >> a_M;
-          if (ptype == aprime_lhe_id_ and state == 1) {
-            if (abs(1. - a_M / MA) > 1e-3) {
-              throw std::runtime_error(
-                              "A MadGraph imported event has a different "
-                              "APrime mass than the model has (MadGraph = " +
-                                  std::to_string(a_M) + "GeV; Model = " +
-                                  std::to_string(MA) + "GeV).");
-            }
-            OutgoingKinematics evnt;
-            double cmpx = a_px + e_px;
-            double cmpy = a_py + e_py;
-            double cmpz = a_pz + e_pz;
-            double cmE = a_E + e_E;
-            evnt.lepton = LorentzVector(e_px, e_py, e_pz, e_E);
-            evnt.centerMomentum = LorentzVector(cmpx, cmpy, cmpz, cmE);
-            evnt.E = ebeam;
-            madGraphData_[ebeam].push_back(evnt);
-          }  // get a prime kinematics
-        }    // check for final state
-      }      // check for particle type and state
-    }        // able to get momentum/energy numbers
-  }          // while getting lines
-  // Add the energy to the list, with a random offset between 0 and the total
-  // number of entries.
-  ifile.close();
 }
 
 void G4DarkBreMModel::MakePlaceholders() {
