@@ -407,7 +407,12 @@ void G4DarkBreMModel::GenerateChange(
 
   // stop tracking and create new secondary instead of primary
   if (alwaysCreateNewElectron_) {
-    // TODO copy over all other particle information from track I am killing
+    /*
+     * We _could_ attempt to mimic the lepton we are killing by copying
+     * over all of its information into the newly created track.
+     *
+     * This procedure is /somewhat/ sensitive and so hasn't been investigated.
+     */
     G4DynamicParticle *el = new G4DynamicParticle(
         track.GetDefinition(), recoilMomentum);
     particleChange.SetNumberOfSecondaries(2);
@@ -416,8 +421,11 @@ void G4DarkBreMModel::GenerateChange(
     particleChange.ProposeTrackStatus(fStopAndKill);
     // continue tracking
   } else {
-    // just have primary lose energy (don't rename to different track ID)
-    // TODO untested this branch, not sure if it works as expected
+    /*
+     * just have primary lose energy (don't rename to different track ID)
+     *
+     * This branch is untested and so we are not sure if it works as expected.
+     */
     particleChange.SetNumberOfSecondaries(1);
     particleChange.AddSecondary(dphoton);
     particleChange.ProposeMomentumDirection(recoilMomentum.unit());
@@ -433,9 +441,13 @@ void G4DarkBreMModel::SetMadGraphDataLibrary(std::string path) {
   //  - Directory passed is a flat directory (no sub directories) containing LHE
   //  files
   //  - LHE files are events generated with the correct mass point
-  // TODO automatically select LHE files of the correct mass point?
+  //
+  // A future improvement could be parsing a directory and only selecting LHE files
+  // the contain dark photons of the configure mass. This has not been implemented
+  // because there has been no reason to merge dark brem event libraries corresponding
+  // to different mass points.
 
-  /**
+  /*
    * print status to user so they know what's happening
    */
   std::cout << "[ G4DarkBreMModel ] : loading event librariy..." << std::flush;
@@ -465,7 +477,7 @@ void G4DarkBreMModel::SetMadGraphDataLibrary(std::string path) {
 
   std::cout << "done" << std::endl;
 
-  /**
+  /*
    * Print out loaded MG library
   std::cout << "MadGraph Library of Dark Brem Events:\n";
   for (const auto &kV : madGraphData_) {
