@@ -14,3 +14,4 @@ This executable, similar to above, allows the user to call the cross section cal
 This is a full Geant4 simulation focused on a simple prism of material limited to electrons or muons shot directly into it. This is not G4DarkBreM's only use case, but it is a good one for testing that it is functioning properly.
 
 This simulation is over simplified and **should not** be used for production-level studies. Among other simplifications, it does not implement a biasing procedure for the dark brem process and does not alter the random number seed.
+Nevertheless, it does hold several helpful example classes in the g4db::example namespace that can be a good starting point for developing a more thorough simulation.
