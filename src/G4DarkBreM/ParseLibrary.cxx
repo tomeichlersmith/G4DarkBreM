@@ -29,45 +29,14 @@ bool hasEnding(const std::string& str, const std::string& end) {
   }
 }
 
-namespace reader {
-
-class Text {
-  std::ifstream input_;
- public:
-  Text(const std::string& path)
-    : input_{path} {
-      if (not input_.is_open()) {
-        throw std::runtime_error("Unable to open text file '"+path+"'.");
-      }
-    }
-  bool pop(std::string& line) {
-    return bool(std::getline(input_, line));
-  }
-};
-
-class GZip {
-  boost::iostreams::filtering_istream input_;
- public:
-  GZip(const std::string& path) {
-    input_.push(boost::iostreams::gzip_decompressor());
-    input_.push(boost::iostreams::file_source(path));
-  }
-  bool pop(std::string& line) {
-    return bool(std::getline(input_, line));
-  }
-};
-
-}
-
 namespace parser {
 
-template<class LineByLine>
 class LHE {
-  LineByLine reader_;
+  boost::iostreams::filtering_istream& reader_;
   int aprime_lhe_id_;
  public:
-  LHE(const std::string& path, int aid)
-    : reader_{path}, aprime_lhe_id_{aid} {}
+  LHE(boost::iostreams::filtering_istream& r, int aid)
+    : reader_{r}, aprime_lhe_id_{aid} {}
   /**
    * Parse an LHE file from the input stream
    *
@@ -75,7 +44,7 @@ class LHE {
    */
   void load(std::map<double, std::vector<OutgoingKinematics>>& lib) {
     std::string line;
-    while (reader_.pop(line)) {
+    while (std::getline(reader_,line)) {
       std::istringstream iss(line);
       int ptype, state;
       double skip, px, py, pz, E, M;
@@ -85,14 +54,14 @@ class LHE {
           double ebeam = E;
           double e_px, e_py, e_pz, a_px, a_py, a_pz, e_E, a_E, e_M, a_M;
           for (int i = 0; i < 2; i++) {
-            reader_.pop(line);
+            std::getline(reader_,line);
           }
           std::istringstream jss(line);
           jss >> ptype >> state >> skip >> skip >> skip >> skip >> e_px >> e_py >>
               e_pz >> e_E >> e_M;
           if ((ptype == 11 or ptype == 13) && (state == 1)) {  // Find a final state lepton
             for (int i = 0; i < 2; i++) {
-              reader_.pop(line);
+              std::getline(reader_,line);
             }
             std::istringstream kss(line);
             kss >> ptype >> state >> skip >> skip >> skip >> skip >> a_px >>
@@ -115,9 +84,8 @@ class LHE {
   }
 };  // LHE
 
-template<class LineByLine>
 class CSV {
-  LineByLine reader_;
+  boost::iostreams::filtering_istream& reader_;
 
   static std::vector<std::string> split(const std::string& line) {
     std::istringstream lss{line};
@@ -136,16 +104,16 @@ class CSV {
     return vals;
   }
  public:
-  CSV(const std::string& path) : reader_{path} {
+  CSV(boost::iostreams::filtering_istream& r) : reader_{r} {
       std::string line;
-      if (not reader_.pop(line)) {
-        throw std::runtime_error("Empty CSV file '"+path+"'.");
+      if (not std::getline(reader_, line)) {
+        throw std::runtime_error("Empty CSV file.");
       }
       std::vector<std::string> columns{split(line)};
   }
   void load(std::map<double, std::vector<OutgoingKinematics>>& lib) {
     std::string line;
-    while (reader_.pop(line)) {
+    while (std::getline(reader_, line)) {
       std::vector<double> vals{convert(split(line))};
       if (vals.size() != 9) {
         throw std::runtime_error("Malformed row in CSV file: not exactly 9 columns");
@@ -172,19 +140,13 @@ void parseLibrary(const std::string& path, int aprime_lhe_id, std::map<double, s
   // because there has been no reason to merge dark brem event libraries corresponding
   // to different mass points.
 
-  if (hasEnding(path, ".gz")) {
-    // zlib compressed data file
-    if (hasEnding(path, ".csv.gz")) 
-      parser::CSV<reader::GZip>(path).load(lib);
-    else if (hasEnding(path, ".lhe.gz")) 
-      parser::LHE<reader::GZip>(path, aprime_lhe_id).load(lib);
-    else 
-      throw std::runtime_error("GZip compressed file '"
-          +path+"'does not have a recognized extension ('.lhe.gz' or '.csv.gz').");
-  } if (hasEnding(path, ".csv")) {
-    parser::CSV<reader::Text>(path).load(lib); 
-  } else if (hasEnding(path, ".lhe")) {
-    parser::LHE<reader::Text>(path, aprime_lhe_id).load(lib);
+  if (hasEnding(path, ".csv") or hasEnding(path, ".csv.gz") or hasEnding(path, ".lhe") or hasEnding(path, ".lhe.gz")) {
+    // accepted file extensions
+    boost::iostreams::filtering_istream reader;
+    if (hasEnding(path, ".gz")) reader.push(boost::iostreams::gzip_decompressor());
+    reader.push(boost::iostreams::file_source(path)); 
+    if (hasEnding(path, ".csv") or hasEnding(path, ".csv.gz")) parser::CSV(reader).load(lib); 
+    else parser::LHE(reader, aprime_lhe_id).load(lib);
   } else {
     // assume directory of files
     DIR *dir;            // handle to opened directory
@@ -200,6 +162,8 @@ void parseLibrary(const std::string& path, int aprime_lhe_id, std::map<double, s
         }
       }
       closedir(dir);
+    } else {
+      throw std::runtime_error("Unable to open '"+path+"' as a directory.");
     }
   }
 }
