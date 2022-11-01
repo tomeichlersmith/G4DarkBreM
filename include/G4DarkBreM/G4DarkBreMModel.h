@@ -4,9 +4,9 @@
 #include <memory>
 #include <map>
 
+#include "G4DarkBreM/ParseLibrary.h"
 #include "G4DarkBreM/PrototypeModel.h"
 
-#include "CLHEP/Vector/LorentzVector.h"
 
 namespace g4db {
 
@@ -33,8 +33,6 @@ namespace g4db {
  * (library_path).
  */
 class G4DarkBreMModel : public PrototypeModel {
-  /// the class we use to store four vectors
-  using LorentzVector = CLHEP::HepLorentzVector;
  public:
   /**
    * Set the parameters for this model.
@@ -229,6 +227,17 @@ class G4DarkBreMModel : public PrototypeModel {
    */
   virtual void GenerateChange(G4ParticleChange& particleChange,
                               const G4Track& track, const G4Step& step);
+
+ private:
+  /**
+   * Set the library of dark brem events to be scaled.
+   *
+   * This function loads the directory of LHE files passed
+   * into our in-memory library of events to be sampled from.
+   *
+   * @param path path to directory of LHE files
+   */
+  void SetMadGraphDataLibrary(const std::string& path);
 
   /**
    * Fill vector of currentDataPoints_ with the same number of items as the

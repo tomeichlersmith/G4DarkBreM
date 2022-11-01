@@ -1,3 +1,11 @@
+#include <dirent.h>
+#include <fstream>
+#include <sstream>
+
+#include <boost/iostreams/operations.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
+
 #include "G4DarkBreM/ParseLibrary.h"
 
 namespace g4db {
@@ -17,30 +25,63 @@ bool hasEnding(const std::string& str, const std::string& end) {
   }
 }
 
-namespace parser {
-class LHE {
-  std::ifstream input_text_;
+namespace reader {
+
+class Text {
+  std::ifstream input_;
  public:
-  LHE(const std::string& path)
-    : input_text_{path} {
-      if (not input_text_.open()) {
-        throw std::runtime_error("Unable to open '"+path+"'.");
+  Text(const std::string& path)
+    : input_{path} {
+      if (not input_.is_open()) {
+        throw std::runtime_error("Unable to open text file '"+path+"'.");
       }
+    }
+  bool pop(std::string& line) {
+    return bool(std::getline(input_, line));
   }
-  ~LHE() {
-    input_text_.close();
+};
+
+class GZip {
+  std::ifstream raw_file_;
+  boost::iostreams::filtering_stream<boost::iostreams::input> input_;
+ public:
+  GZip(const std::string& path) : raw_file_{path} {
+    if (not raw_file_.is_open()) {
+      throw std::runtime_error("Unable to open file '"+path+"'.");
+    }
+    input_.push(boost::iostreams::zlib_decompressor());
+    input_.push(raw_file_);
   }
+  bool pop(std::string& line) {
+    int c;
+    if ((c = boost::iostreams::get(input_)) == EOF) return false;
+    line.clear();
+    line += c; // add character already extracted above
+    while((c = boost::iostreams::get(input_)) != EOF and c != '\n')
+      line += c;
+    return true;
+  }
+};
+
+}
+
+namespace parser {
+
+template<class LineByLine>
+class LHE {
+  LineByLine reader_;
+  int aprime_lhe_id_;
+ public:
+  LHE(const std::string& path, int aid)
+    : reader_{path}, aprime_lhe_id_{aid} {}
   /**
    * Parse an LHE file from the input stream
    *
    * @param[in,out] lib library being constructed
    */
   void load(std::map<double, std::vector<OutgoingKinematics>>& lib) {
-    static const double MA =
-        G4APrime::APrime()->GetPDGMass() / CLHEP::GeV;  // mass A' in GeV
-  
     std::string line;
-    while (std::getline(is, line)) {
+    while (reader_.pop(line)) {
       std::istringstream iss(line);
       int ptype, state;
       double skip, px, py, pz, E, M;
@@ -50,33 +91,26 @@ class LHE {
           double ebeam = E;
           double e_px, e_py, e_pz, a_px, a_py, a_pz, e_E, a_E, e_M, a_M;
           for (int i = 0; i < 2; i++) {
-            std::getline(ifile, line);
+            reader_.pop(line);
           }
           std::istringstream jss(line);
           jss >> ptype >> state >> skip >> skip >> skip >> skip >> e_px >> e_py >>
               e_pz >> e_E >> e_M;
           if ((ptype == 11 or ptype == 13) && (state == 1)) {  // Find a final state lepton
             for (int i = 0; i < 2; i++) {
-              std::getline(ifile, line);
+              reader_.pop(line);
             }
             std::istringstream kss(line);
             kss >> ptype >> state >> skip >> skip >> skip >> skip >> a_px >>
                 a_py >> a_pz >> a_E >> a_M;
-            if (ptype == 622 and state == 1) {
-              if (abs(1. - a_M / MA) > 1e-3) {
-                throw std::runtime_error(
-                                "A MadGraph imported event has a different "
-                                "APrime mass than the model has (MadGraph = " +
-                                    std::to_string(a_M) + "GeV; Model = " +
-                                    std::to_string(MA) + "GeV).");
-              }
+            if (ptype == aprime_lhe_id_ and state == 1) {
               OutgoingKinematics evnt;
               double cmpx = a_px + e_px;
               double cmpy = a_py + e_py;
               double cmpz = a_pz + e_pz;
               double cmE = a_E + e_E;
-              evnt.lepton = LorentzVector(e_px, e_py, e_pz, e_E);
-              evnt.centerMomentum = LorentzVector(cmpx, cmpy, cmpz, cmE);
+              evnt.lepton = CLHEP::HepLorentzVector(e_px, e_py, e_pz, e_E);
+              evnt.centerMomentum = CLHEP::HepLorentzVector(cmpx, cmpy, cmpz, cmE);
               evnt.E = ebeam;
               lib[ebeam].push_back(evnt);
             }  // get a prime kinematics
@@ -87,44 +121,53 @@ class LHE {
   }
 };  // LHE
 
+template<class LineByLine>
 class CSV {
-  std::ifstream input_text_;
- public:
-  CSV(const std::string& path)
-    : input_text_{path} {
-      if (not input_text_.open()) {
-        throw std::runtime_error("Unable to open '"+path+"'.");
-      }
-  }
-  ~CSV() {
-    input_text_.close();
-  }
-  void load(std::map<double, std::vector<OutgoingKinematics>>& lib) {
-  }
-};
+  LineByLine reader_;
 
-class LHEGZ {
-  FILE* source_{NULL};
-  z_stream strm_;
- public:
-  LHEGZ(const std::string& path)
-    : source_{fopen(path.c_str())} {
-      if (source_ == NULL) {
-        throw std::runtime_error("Unable to open '"+path+"'.");
-      }
+  static std::vector<std::string> split(const std::string& line) {
+    std::istringstream lss{line};
+    std::vector<std::string> columns;
+    std::string cell;
+    while (std::getline(lss,cell,',')) {
+      columns.push_back(cell);
     }
-  ~LHEGZ() {
-    if (source_ != NULL) fclose(source_);
+    if (not lss and cell.empty()) columns.push_back("");
+    return columns;
+  }
+
+  static std::vector<double> convert(const std::vector<std::string>& cells) {
+    std::vector<double> vals;
+    for (const std::string& cell : cells) vals.push_back(std::stod(cell));
+    return vals;
+  }
+ public:
+  CSV(const std::string& path) : reader_{path} {
+      std::string line;
+      if (not reader_.pop(line)) {
+        throw std::runtime_error("Empty CSV file '"+path+"'.");
+      }
+      std::vector<std::string> columns{split(line)};
   }
   void load(std::map<double, std::vector<OutgoingKinematics>>& lib) {
+    std::string line;
+    while (reader_.pop(line)) {
+      std::vector<double> vals{convert(split(line))};
+      if (vals.size() != 9) {
+        throw std::runtime_error("Malformed row in CSV file: not exactly 9 columns");
+      }
+      OutgoingKinematics ok;
+      ok.E = vals[0];
+      ok.lepton = CLHEP::HepLorentzVector(vals[2], vals[3], vals[4], vals[1]);
+      ok.centerMomentum = CLHEP::HepLorentzVector(vals[6], vals[7], vals[8], vals[5]);
+      lib[ok.E].push_back(ok);
+    }
   }
 };
 
 }  // namspace parser
 
-}
-
-void parseLibrary(const std::string& path, std::map<double, std::vector<OutgoingKinematics>>& lib) {
+void parseLibrary(const std::string& path, int aprime_lhe_id, std::map<double, std::vector<OutgoingKinematics>>& lib) {
   // Assumptions:
   //  - Directory passed is a flat directory (no sub directories) containing LHE
   //  files
@@ -137,16 +180,17 @@ void parseLibrary(const std::string& path, std::map<double, std::vector<Outgoing
 
   if (hasEnding(path, ".gz")) {
     // zlib compressed data file
+    if (hasEnding(path, ".csv.gz")) 
+      parser::CSV<reader::GZip>(path).load(lib);
+    else if (hasEnding(path, ".lhe.gz")) 
+      parser::LHE<reader::GZip>(path, aprime_lhe_id).load(lib);
+    else 
+      throw std::runtime_error("GZip compressed file '"
+          +path+"'does not have a recognized extension ('.lhe.gz' or '.csv.gz').");
   } if (hasEnding(path, ".csv")) {
-    ParseCSV(path, lib);  
+    parser::CSV<reader::Text>(path).load(lib); 
   } else if (hasEnding(path, ".lhe")) {
-    std::ifstream ifile;
-    ifile.open(fname.c_str());
-    if (!ifile) {
-      throw std::runtime_error("Unable to open LHE file '"+fname+"'.");
-    }
-    ParseLHE(ifile, lib);
-    ifile.close();
+    parser::LHE<reader::Text>(path, aprime_lhe_id).load(lib);
   } else {
     // assume directory of files
     DIR *dir;            // handle to opened directory
@@ -155,14 +199,34 @@ void parseLibrary(const std::string& path, std::map<double, std::vector<Outgoing
       // directory can be opened
       while ((ent = readdir(dir)) != NULL) {
         std::string fp = path + '/' + std::string(ent->d_name);
-        if (hasEnding(fp,".lhe") or hasEnding(fp, ".lhe.gz")) {
-          // file ends in '.lhe' or '.lhe.gz'
-          parseLibrary(fp, lib);
+        if (hasEnding(fp,".lhe") or hasEnding(fp, ".lhe.gz")
+            or hasEnding(fp,".csv") or hasEnding(fp, ".csv.gz")) {
+          // file ends in one of the acceptable endings
+          parseLibrary(fp, aprime_lhe_id, lib);
         }
       }
       closedir(dir);
     }
   }
+}
+
+void dumpLibrary(std::ostream& o, const std::map<double, std::vector<OutgoingKinematics>>& lib) {
+  o << "incident_energy,recoil_energy,recoil_px,recoil_py,recoil_pz,"
+         "centerMomentum_energy,centerMomentum_px,centerMomentum_py,centerMomentum_pz\n";
+  for (const auto& lib_entry : lib) {
+    for (const auto& sample : lib_entry.second) {
+      o << sample.E << ','
+        << sample.lepton.e() << ','
+        << sample.lepton.px() << ','
+        << sample.lepton.py() << ','
+        << sample.lepton.pz() << ','
+        << sample.centerMomentum.e() << ','
+        << sample.centerMomentum.px() << ','
+        << sample.centerMomentum.py() << ','
+        << sample.centerMomentum.pz() << '\n';
+    }
+  }
+  o.flush();
 }
 
 }

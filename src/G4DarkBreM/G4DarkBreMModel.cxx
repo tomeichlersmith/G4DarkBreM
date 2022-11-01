@@ -1,6 +1,7 @@
 
 #include "G4DarkBreM/G4DarkBreMModel.h"
 #include "G4DarkBreM/G4APrime.h"
+#include "G4DarkBreM/ParseLibrary.h"
 
 // Geant4
 #include "Randomize.hh"
@@ -15,7 +16,6 @@
 #include <boost/math/quadrature/gauss_kronrod.hpp>
 
 // STL
-#include <dirent.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -370,12 +370,12 @@ G4ThreeVector G4DarkBreMModel::scale(double incident_energy, double lepton_mass)
       }
     }
   } else if (method_ == DarkBremMethod::CMScaling) {
-    LorentzVector el(data.lepton.px(), data.lepton.py(), data.lepton.pz(),
-                      data.lepton.e());
+    CLHEP::HepLorentzVector el(data.lepton.px(), data.lepton.py(), data.lepton.pz(),
+                               data.lepton.e());
     double ediff = data.E - incident_energy;
-    LorentzVector newcm(data.centerMomentum.px(), data.centerMomentum.py(),
-                         data.centerMomentum.pz() - ediff,
-                         data.centerMomentum.e() - ediff);
+    CLHEP::HepLorentzVector newcm(data.centerMomentum.px(), data.centerMomentum.py(),
+                                  data.centerMomentum.pz() - ediff,
+                                  data.centerMomentum.e() - ediff);
     el.boost(-1. * data.centerMomentum.boostVector());
     el.boost(newcm.boostVector());
     double newE = (data.lepton.e() - lepton_mass) *
@@ -452,14 +452,13 @@ void G4DarkBreMModel::GenerateChange(
   }
 }
 
-void G4DarkBreMModel::SetMadGraphDataLibrary(std::string path) {
+void G4DarkBreMModel::SetMadGraphDataLibrary(const std::string& path) {
   /*
    * print status to user so they know what's happening
    */
   if (GetVerboseLevel() > 0) G4cout << "[ G4DarkBreMModel ] : loading event librariy..." << G4endl;
 
-
-  parseLibrary(path, madGraphData_);
+  parseLibrary(path, aprime_lhe_id_, madGraphData_);
 
   if (madGraphData_.size() == 0) {
     throw std::runtime_error("BadConf : Unable to find any library entries at '"+path+"'\n"
@@ -495,7 +494,7 @@ void G4DarkBreMModel::MakePlaceholders() {
   }
 }
 
-G4DarkBreMModel::OutgoingKinematics
+OutgoingKinematics
 G4DarkBreMModel::sample(double incident_energy) {
   // Cycle through imported beam energies until the closest one above is found,
   // or the max is reached.
