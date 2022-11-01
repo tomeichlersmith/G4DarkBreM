@@ -1,6 +1,6 @@
 /** 
- * @file scample.cxx
- * definition of g4db-scample executable
+ * @file scale.cxx
+ * definition of g4db-scale executable
  */
 
 #include <iostream>
@@ -13,12 +13,12 @@
 #include "G4DarkBreM/G4APrime.h"
 
 /**
- * printout how to use g4db-scample
+ * printout how to use g4db-scale
  */
 void usage() {
   std::cout << 
       "USAGE:\n"
-      "  g4db-scample [options] db-lib\n"
+      "  g4db-scale [options] db-lib\n"
       "\n"
       "Run the scaling procedure for the input incident energy and madgraph file\n"
       "\n"
@@ -46,7 +46,7 @@ void usage() {
 }
 
 /**
- * definition of g4db-scample
+ * definition of g4db-scale
  *
  * We only need to configure the G4DarkBreMModel so
  * we simply define G4APrime and then construct the model

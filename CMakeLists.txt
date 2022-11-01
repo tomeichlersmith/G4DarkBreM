@@ -24,9 +24,9 @@ add_executable(g4db-xsec-calc app/xsec_calc.cxx)
 target_link_libraries(g4db-xsec-calc PRIVATE G4DarkBreM)
 install(TARGETS g4db-xsec-calc DESTINATION bin)
 
-add_executable(g4db-scample app/scample.cxx)
-target_link_libraries(g4db-scample PRIVATE G4DarkBreM)
-install(TARGETS g4db-scample DESTINATION bin)
+add_executable(g4db-scale app/scale.cxx)
+target_link_libraries(g4db-scale PRIVATE G4DarkBreM)
+install(TARGETS g4db-scale DESTINATION bin)
 
 add_executable(g4db-simulate app/simulate.cxx)
 target_link_libraries(g4db-simulate PRIVATE G4DarkBreM ${Geant4_LIBRARIES})

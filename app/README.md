@@ -4,7 +4,7 @@ G4DarkBreM comes with three executables that are helpful for studying its behavi
 
 All of these executables output CSV text files for easier analysis.
 
-## g4db-scample
+## g4db-scale
 This executable calls the sample and scale procedure _directly_, allowing the user to study how the procedure affects the outgoing kinematic distributions without having to wait for an entire Geant4 simulation to progress.
 
 ## g4db-xsec-calc
