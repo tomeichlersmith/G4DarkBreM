@@ -17,6 +17,29 @@ G4APrime* G4APrime::APrime(G4double theMass) {
     if (theMass < 0)
       throw std::runtime_error("Attempting to access the APrime particle before it has been initialized.");
 
+    /**
+     * Here are the properties of the formal Geant4 dark photon we define.
+     *
+     * Property | Value 
+     * ---|---
+     * short name | A^1 
+     * mass | configured 
+     * mass width | 0 
+     * electric charge | 0 
+     * spin | 0
+     * parity | 0
+     * conjugation | 0
+     * isospin | 0
+     * isospin3 | 0
+     * Gparity | 0
+     * long name | APrime
+     * lepton number | 0
+     * baryon number | 0
+     * PDG ID encoding | 622
+     * is stable (no decay) | true
+     * lifetime | -1 (i.e. no decay)
+     * decay table | nullptr (i.e. no decay)
+     */
     const G4String& name = "A^1";
     G4double mass = theMass;
     G4double width = 0.;
