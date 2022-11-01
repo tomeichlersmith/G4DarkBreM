@@ -464,7 +464,7 @@ void G4DarkBreMModel::SetMadGraphDataLibrary(std::string path) {
   /*
    * print status to user so they know what's happening
    */
-  std::cout << "[ G4DarkBreMModel ] : loading event librariy..." << std::flush;
+  G4cout << "[ G4DarkBreMModel ] : loading event librariy..." << G4endl;
 
   bool foundOneFile = false;
   DIR *dir;            // handle to opened directory
@@ -489,7 +489,7 @@ void G4DarkBreMModel::SetMadGraphDataLibrary(std::string path) {
 
   MakePlaceholders();  // Setup the placeholder offsets for getting data.
 
-  std::cout << "done" << std::endl;
+  G4cout << "[ G4DarkBreMModel ] : done" << G4endl;
 
   /*
    * Print out loaded MG library

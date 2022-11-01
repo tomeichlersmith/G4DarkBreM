@@ -48,23 +48,24 @@ G4DarkBremsstrahlung::G4DarkBremsstrahlung(bool muons, bool only_one_per_event,
   if (muons_) {
     particle_def = G4MuonMinus::Definition();
   }
-  std::cout << "[ G4DarkBremsstrahlung ] : Connecting dark brem to " 
+  G4cout << "[ G4DarkBremsstrahlung ] : Connecting dark brem to " 
     << particle_def->GetParticleName() << " "
-    << particle_def->GetPDGEncoding() << std::endl;
+    << particle_def->GetPDGEncoding() << G4endl;
   G4int ret = particle_def->GetProcessManager()->AddDiscreteProcess(this);
   if (ret < 0) {
     throw std::runtime_error("Particle process manager returned a non-zero status "
         + std::to_string(ret) + " when attempting to register dark brem to it.");
   } else {
-    std::cout << "[ G4DarkBremsstrahlung ] : successfully put dark brem in index " 
-      << ret << " of process table." << std::endl;
+    G4cout
+      << "[ G4DarkBremsstrahlung ] : successfully put dark brem in index " 
+      << ret << " of process table." << G4endl;
   }
   /**
    * have our custom dark brem process go first in any process ordering
    */
   particle_def->GetProcessManager()->SetProcessOrderingToFirst(this,
       G4ProcessVectorDoItIndex::idxAll);
-  std::cout << "[ G4DarkBremsstrahlung ] : set dark brem process ordering to first" << std::endl;
+  G4cout << "[ G4DarkBremsstrahlung ] : set dark brem process ordering to first" << G4endl;
 }
 
 void G4DarkBremsstrahlung::SetModel(std::shared_ptr<g4db::PrototypeModel> the_model) {
