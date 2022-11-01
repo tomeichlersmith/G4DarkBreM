@@ -29,103 +29,88 @@ bool hasEnding(const std::string& str, const std::string& end) {
   }
 }
 
-namespace parser {
+/**
+ * namespace holding implementation of library parsing
+ */
+namespace parse {
 
-class LHE {
-  boost::iostreams::filtering_istream& reader_;
-  int aprime_lhe_id_;
- public:
-  LHE(boost::iostreams::filtering_istream& r, int aid)
-    : reader_{r}, aprime_lhe_id_{aid} {}
-  /**
-   * Parse an LHE file from the input stream
-   *
-   * @param[in,out] lib library being constructed
-   */
-  void load(std::map<double, std::vector<OutgoingKinematics>>& lib) {
-    std::string line;
-    while (std::getline(reader_,line)) {
-      std::istringstream iss(line);
-      int ptype, state;
-      double skip, px, py, pz, E, M;
-      if (iss >> ptype >> state >> skip >> skip >> skip >> skip >> px >> py >>
-          pz >> E >> M) {
-        if ((ptype == 11 or ptype == 13) && (state == -1)) {
-          double ebeam = E;
-          double e_px, e_py, e_pz, a_px, a_py, a_pz, e_E, a_E, e_M, a_M;
+/**
+ * Parse an LHE file from the input stream
+ *
+ * @param[in] reader input stream reading the file
+ * @param[in] aprime_lhe_id ID number of the dark photon within the LHE file
+ * @param[in,out] lib dark brem event library to fill
+ */
+void lhe(boost::iostreams::filtering_istream& reader, int aprime_lhe_id, std::map<double, std::vector<OutgoingKinematics>>& lib) {
+  std::string line;
+  while (std::getline(reader,line)) {
+    std::istringstream iss(line);
+    int ptype, state;
+    double skip, px, py, pz, E, M;
+    if (iss >> ptype >> state >> skip >> skip >> skip >> skip >> px >> py >>
+        pz >> E >> M) {
+      if ((ptype == 11 or ptype == 13) && (state == -1)) {
+        double ebeam = E;
+        double e_px, e_py, e_pz, a_px, a_py, a_pz, e_E, a_E, e_M, a_M;
+        for (int i = 0; i < 2; i++) {
+          std::getline(reader,line);
+        }
+        std::istringstream jss(line);
+        jss >> ptype >> state >> skip >> skip >> skip >> skip >> e_px >> e_py >>
+            e_pz >> e_E >> e_M;
+        if ((ptype == 11 or ptype == 13) && (state == 1)) {  // Find a final state lepton
           for (int i = 0; i < 2; i++) {
-            std::getline(reader_,line);
+            std::getline(reader,line);
           }
-          std::istringstream jss(line);
-          jss >> ptype >> state >> skip >> skip >> skip >> skip >> e_px >> e_py >>
-              e_pz >> e_E >> e_M;
-          if ((ptype == 11 or ptype == 13) && (state == 1)) {  // Find a final state lepton
-            for (int i = 0; i < 2; i++) {
-              std::getline(reader_,line);
-            }
-            std::istringstream kss(line);
-            kss >> ptype >> state >> skip >> skip >> skip >> skip >> a_px >>
-                a_py >> a_pz >> a_E >> a_M;
-            if (ptype == aprime_lhe_id_ and state == 1) {
-              OutgoingKinematics evnt;
-              double cmpx = a_px + e_px;
-              double cmpy = a_py + e_py;
-              double cmpz = a_pz + e_pz;
-              double cmE = a_E + e_E;
-              evnt.lepton = CLHEP::HepLorentzVector(e_px, e_py, e_pz, e_E);
-              evnt.centerMomentum = CLHEP::HepLorentzVector(cmpx, cmpy, cmpz, cmE);
-              evnt.E = ebeam;
-              lib[ebeam].push_back(evnt);
-            }  // get a prime kinematics
-          }    // check for final state
-        }      // check for particle type and state
-      }        // able to get momentum/energy numbers
-    }          // while getting lines
+          std::istringstream kss(line);
+          kss >> ptype >> state >> skip >> skip >> skip >> skip >> a_px >>
+              a_py >> a_pz >> a_E >> a_M;
+          if (ptype == aprime_lhe_id and state == 1) {
+            OutgoingKinematics evnt;
+            double cmpx = a_px + e_px;
+            double cmpy = a_py + e_py;
+            double cmpz = a_pz + e_pz;
+            double cmE = a_E + e_E;
+            evnt.lepton = CLHEP::HepLorentzVector(e_px, e_py, e_pz, e_E);
+            evnt.centerMomentum = CLHEP::HepLorentzVector(cmpx, cmpy, cmpz, cmE);
+            evnt.E = ebeam;
+            lib[ebeam].push_back(evnt);
+          }  // get a prime kinematics
+        }    // check for final state
+      }      // check for particle type and state
+    }        // able to get momentum/energy numbers
+  }          // while getting lines
+}
+
+/**
+ * parse the input stream as a CSV file, filling the input library
+ *
+ * @param[in] reader input stream reading the file
+ * @param[in,out] lib dark brem event library to fill
+ */
+void csv(boost::iostreams::filtering_istream& reader, std::map<double, std::vector<OutgoingKinematics>>& lib) {
+  std::string line;
+  if (not std::getline(reader_, line)) {
+    throw std::runtime_error("Empty CSV file.");
   }
-};  // LHE
-
-class CSV {
-  boost::iostreams::filtering_istream& reader_;
-
-  static std::vector<std::string> split(const std::string& line) {
+  while (std::getline(reader_, line)) {
     std::istringstream lss{line};
-    std::vector<std::string> columns;
+    std::vector<double> vals;
     std::string cell;
     while (std::getline(lss,cell,',')) {
-      columns.push_back(cell);
+      vals.push_back(std::stod(cell));
     }
-    if (not lss and cell.empty()) columns.push_back("");
-    return columns;
-  }
-
-  static std::vector<double> convert(const std::vector<std::string>& cells) {
-    std::vector<double> vals;
-    for (const std::string& cell : cells) vals.push_back(std::stod(cell));
-    return vals;
-  }
- public:
-  CSV(boost::iostreams::filtering_istream& r) : reader_{r} {
-      std::string line;
-      if (not std::getline(reader_, line)) {
-        throw std::runtime_error("Empty CSV file.");
-      }
-      std::vector<std::string> columns{split(line)};
-  }
-  void load(std::map<double, std::vector<OutgoingKinematics>>& lib) {
-    std::string line;
-    while (std::getline(reader_, line)) {
-      std::vector<double> vals{convert(split(line))};
-      if (vals.size() != 9) {
-        throw std::runtime_error("Malformed row in CSV file: not exactly 9 columns");
-      }
-      OutgoingKinematics ok;
-      ok.E = vals[0];
-      ok.lepton = CLHEP::HepLorentzVector(vals[2], vals[3], vals[4], vals[1]);
-      ok.centerMomentum = CLHEP::HepLorentzVector(vals[6], vals[7], vals[8], vals[5]);
-      lib[ok.E].push_back(ok);
+    if (not lss and cell.empty()) vals.push_back(-9999);
+    if (vals.size() != 9) {
+      throw std::runtime_error("Malformed row in CSV file: not exactly 9 columns");
     }
+    OutgoingKinematics ok;
+    ok.E = vals[0];
+    ok.lepton = CLHEP::HepLorentzVector(vals[2], vals[3], vals[4], vals[1]);
+    ok.centerMomentum = CLHEP::HepLorentzVector(vals[6], vals[7], vals[8], vals[5]);
+    lib[ok.E].push_back(ok);
   }
-};
+}
 
 }  // namspace parser
 
@@ -145,8 +130,8 @@ void parseLibrary(const std::string& path, int aprime_lhe_id, std::map<double, s
     boost::iostreams::filtering_istream reader;
     if (hasEnding(path, ".gz")) reader.push(boost::iostreams::gzip_decompressor());
     reader.push(boost::iostreams::file_source(path)); 
-    if (hasEnding(path, ".csv") or hasEnding(path, ".csv.gz")) parser::CSV(reader).load(lib); 
-    else parser::LHE(reader, aprime_lhe_id).load(lib);
+    if (hasEnding(path, ".csv") or hasEnding(path, ".csv.gz")) parse::csv(reader, lib); 
+    else parse::lhe(reader, aprime_lhe_id, lib);
   } else {
     // assume directory of files
     DIR *dir;            // handle to opened directory
