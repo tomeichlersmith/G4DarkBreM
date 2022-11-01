@@ -118,7 +118,7 @@ int main(int argc, char* argv[]) try {
   //    repeat all that code
   G4DarkBremsstrahlung db_process(
       std::make_shared<g4db::G4DarkBreMModel>("forward_only",
-        0.0, 1.0, "NOT NEEDED", muons, false),
+        0.0, 1.0, "NOT NEEDED", muons, 622, false),
       false, 1.0, true);
 
   int bar_width = 80;

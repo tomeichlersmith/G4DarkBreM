@@ -114,9 +114,11 @@ static double flux_factor_chi_analytic(G4double A, G4double Z, double tmin, doub
 }
 
 G4DarkBreMModel::G4DarkBreMModel(const std::string& method_name, double threshold,
-    double epsilon, const std::string& library_path, bool muons, bool load_library)
+    double epsilon, const std::string& library_path, bool muons, int aprime_lhe_id, 
+    bool load_library)
     : PrototypeModel(muons), method_(DarkBremMethod::Undefined),
-      method_name_{method_name}, epsilon_{epsilon}, library_path_{library_path} {
+      method_name_{method_name}, epsilon_{epsilon}, library_path_{library_path},
+      aprime_lhe_id_{aprime_lhe_id} {
   if (method_name_ == "forward_only") {
     method_ = DarkBremMethod::ForwardOnly;
   } else if (method_name_ == "cm_scaling") {
@@ -539,7 +541,7 @@ void G4DarkBreMModel::ParseLHE(std::string fname) {
           std::istringstream kss(line);
           kss >> ptype >> state >> skip >> skip >> skip >> skip >> a_px >>
               a_py >> a_pz >> a_E >> a_M;
-          if (ptype == 622 and state == 1) {
+          if (ptype == aprime_lhe_id_ and state == 1) {
             if (abs(1. - a_M / MA) > 1e-3) {
               throw std::runtime_error(
                               "A MadGraph imported event has a different "

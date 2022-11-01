@@ -44,6 +44,8 @@ class G4DarkBreMModel : public PrototypeModel {
    * @param[in] epsilon dark photon mixing strength
    * @param[in] library_path directory in which MG library is stored
    * @param[in] muons true if using muons, false for electrons
+   * @param[in] aprime_lhe_id PDG ID number for the dark photon in the LHE files 
+   * being loaded for the library. Only used if parsing LHE files.
    * @param[in] load_library only used in cross section executable where it is known
    *            that the library will not be used during program run
    *
@@ -54,7 +56,7 @@ class G4DarkBreMModel : public PrototypeModel {
    */
   G4DarkBreMModel(const std::string& method_name, double threshold, 
       double epsilon, const std::string& library_path, bool muons, 
-      bool load_library = true);
+      int aprime_lhe_id = 622, bool load_library = true);
 
   /**
    * Destructor
@@ -324,6 +326,15 @@ class G4DarkBreMModel : public PrototypeModel {
    * Configurable with 'epsilon'
    */
   double epsilon_;
+
+  /**
+   * PDG ID number for the A' (dark photon) as written in the LHE files 
+   * being loaded as the dark brem event library.
+   *
+   * This is only used if parsing LHE files and can be ignored if the
+   * library is being loaded from an already-constructed CSV.
+   */
+  int aprime_lhe_id_;
 
   /**
    * @enum DarkBremMethod
