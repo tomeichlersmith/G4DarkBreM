@@ -27,27 +27,32 @@ G4DarkBremsstrahlung::G4DarkBremsstrahlung(
                          fElectromagnetic),
       only_one_per_event_{only_one_per_event},
       global_bias_{global_bias}, cache_xsec_{cache_xsec}, model_{the_model} {
-  // we need to pretend to be an EM process so 
-  // the biasing framework recognizes us
+  /**
+   * @note we need to pretend to be an electromagnetic process 
+   * so that the biasing framework can recognize us.
+   * This introduces the extra complexity of needing to be a specific
+   * EM subtype that is different from the other EM subtypes since
+   * the process type and subtype are used to identify processes
+   * in the physics process tables.
+   *
+   * The Geant4 enum G4EmProcessSubType lists the standard subtypes;
+   * however, some physics lists introduce more EM subtypes than those
+   * listed there. You can use G4ProcessManager::GetProcessList in order
+   * to find out what EM subtypes are available in your specific physics
+   * list configuration. Deducing an available sub type from the current
+   * process list in code is dangerous since there may be more processes 
+   * constructed after us.
+   */
   SetProcessSubType(63);  // needs to be different from the other Em Subtypes
 
   SetVerboseLevel(verbose_level);
   model_->SetVerboseLevel(verbose_level);
 
-  /*
+  /**
    * In G4 speak, a "discrete" process is one that only happens at the end of
-   * steps. we want the DB to be discrete because it is not a "slow braking"
+   * steps. We want the DB to be discrete because it is not a "slow braking"
    * like ionization, the lepton suddenly has the interaction and loses a
    * lot of its energy.
-   *
-   * The first argument to this function is the process we are adding.
-   *      The process manager handles cleaning up the processes,
-   *      so we just give it a new pointer.
-   * The second argument is the "ordering" index.
-   *      This index determines when the process is called w.r.t. the other
-   * processes that could be called at the end of the step. Not providing the
-   * second argument means that the ordering index is given a default value of
-   * 1000 which seems to be safely above all the internal/default processes.
    */
   G4ParticleDefinition* particle_def{G4Electron::ElectronDefinition()};
   if (model_->DarkBremOffMuons()) {
@@ -68,7 +73,9 @@ G4DarkBremsstrahlung::G4DarkBremsstrahlung(
       << ret << " of process table." << G4endl;
   }
   /**
-   * have our custom dark brem process go first in any process ordering
+   * We have our custom dark brem process go first in any process ordering
+   * so that we always have the opportunity to dark brem if the cross section
+   * allows it.
    */
   particle_def->GetProcessManager()->SetProcessOrderingToFirst(this,
       G4ProcessVectorDoItIndex::idxAll);
@@ -110,14 +117,20 @@ G4VParticleChange* G4DarkBremsstrahlung::PostStepDoIt(const G4Track& track,
 
   if (only_one_per_event_) {
     /**
-     * Deactivate the process after one dark brem if we restrict ourselves to 
-     * only one per event. If this is in the stepping action instead, more than 
-     * one brem can occur within each step. Reactivated in RunManager::TerminateOneEvent 
+     * If configured to do so, we deactivate the process after one dark brem.
+     * If this is in the stepping action instead, more than one brem can occur 
+     * within each step. 
+     *
+     * @note In order to use this feature, one must re-activate the DB process
+     * at the end of each event. This could be done in RunManager::TerminateOneEvent
+     * or G4UserEventAction::EndOfEventAction.
      *
      * Both biased and unbiased process could be in the run (but not at the same time),
      * so we turn off both while silencing the warnings from the process table.
-    std::cout << "Deactivating dark brem process" << std::endl;
+     * Reactivating the process is essentially the same code as here except using
+     * `true` intead of `false` in SetProcessActivation.
      */
+    if (GetVerboseLevel() > 2) G4cout << "Deactivating dark brem process." << G4endl;
     std::vector<G4String> db_process_name_options = {
         "biasWrapper(" + PROCESS_NAME + ")", PROCESS_NAME};
     G4ProcessManager* pman = track.GetDefinition()->GetProcessManager();

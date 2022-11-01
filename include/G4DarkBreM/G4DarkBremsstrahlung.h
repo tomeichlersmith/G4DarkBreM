@@ -161,8 +161,8 @@ class G4DarkBremsstrahlung : public G4VDiscreteProcess {
    * SampleSecondaries is called.
    *
    * @note If a user wants to use this option, the dark brem process
-   * should be _always_ re-activated in the RunManager::TerminateOneEvent 
-   * method. This reactivation has no effect when the process is already active.
+   * should be _always_ re-activated at the end of each event.
+   * This reactivation has no effect when the process is already active.
    */
   bool only_one_per_event_;
 
