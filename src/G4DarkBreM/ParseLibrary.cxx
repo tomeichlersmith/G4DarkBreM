@@ -37,6 +37,32 @@ namespace parse {
 /**
  * Parse an LHE file from the input stream
  *
+ * We go line-by-line through the input text stream, looking for dark brem events.
+ * A "dark brem event" in this context is defined below.
+ *
+ * ```
+ *   lepton_id -1 <skip> <skip> <skip> <skip> px py pz E m
+ *   <skip-line>
+ *   <skip-line>
+ *   lepton_id 1 <skip> <skip> <skip> <skip> px py pz E m
+ *   <skip-line>
+ *   <skip-line>
+ *   aprime_id 1 <skip> <skip> <skip> <skip> px py pz E m
+ * ```
+ *
+ * This matches a subcomponent of the LHE scheme written by MadGraph/MadEvent
+ * (hence the reason this is the "lhe" parser); however, a lot of information
+ * is skipped and additional assumptions are made in order to increase the 
+ * parsing speed.
+ *
+ * The `lepton_id` is allowed to be _either_ 11 or 13 _everywhere_. No consistency
+ * checking is done.
+ *
+ * The `E` from the first line is used as the incident lepton energy.
+ * The four-momentum from the middle line is the recoil lepton's four momentum,
+ * and the four-momentum from the last line is used in conjuction with the
+ * recoil four-momentum to calculate the center of momentum vector.
+ *
  * @param[in] reader input stream reading the file
  * @param[in] aprime_lhe_id ID number of the dark photon within the LHE file
  * @param[in,out] lib dark brem event library to fill
@@ -47,24 +73,24 @@ void lhe(boost::iostreams::filtering_istream& reader, int aprime_lhe_id, std::ma
     std::istringstream iss(line);
     int ptype, state;
     double skip, px, py, pz, E, M;
-    if (iss >> ptype >> state >> skip >> skip >> skip >> skip >> px >> py >>
-        pz >> E >> M) {
+    if (iss >> ptype >> state >> skip >> skip >> skip >> skip 
+            >> px >> py >> pz >> E >> M) {
       if ((ptype == 11 or ptype == 13) && (state == -1)) {
-        double ebeam = E;
+        double incident_energy = E;
         double e_px, e_py, e_pz, a_px, a_py, a_pz, e_E, a_E, e_M, a_M;
         for (int i = 0; i < 2; i++) {
           std::getline(reader,line);
         }
         std::istringstream jss(line);
-        jss >> ptype >> state >> skip >> skip >> skip >> skip >> e_px >> e_py >>
-            e_pz >> e_E >> e_M;
+        jss >> ptype >> state >> skip >> skip >> skip >> skip 
+            >> e_px >> e_py >> e_pz >> e_E >> e_M;
         if ((ptype == 11 or ptype == 13) && (state == 1)) {  // Find a final state lepton
           for (int i = 0; i < 2; i++) {
             std::getline(reader,line);
           }
           std::istringstream kss(line);
-          kss >> ptype >> state >> skip >> skip >> skip >> skip >> a_px >>
-              a_py >> a_pz >> a_E >> a_M;
+          kss >> ptype >> state >> skip >> skip >> skip >> skip 
+              >> a_px >> a_py >> a_pz >> a_E >> a_M;
           if (ptype == aprime_lhe_id and state == 1) {
             OutgoingKinematics evnt;
             double cmpx = a_px + e_px;
@@ -73,8 +99,8 @@ void lhe(boost::iostreams::filtering_istream& reader, int aprime_lhe_id, std::ma
             double cmE = a_E + e_E;
             evnt.lepton = CLHEP::HepLorentzVector(e_px, e_py, e_pz, e_E);
             evnt.centerMomentum = CLHEP::HepLorentzVector(cmpx, cmpy, cmpz, cmE);
-            evnt.E = ebeam;
-            lib[ebeam].push_back(evnt);
+            evnt.E = incident_energy;
+            lib[incident_energy].push_back(evnt);
           }  // get a prime kinematics
         }    // check for final state
       }      // check for particle type and state
@@ -85,15 +111,36 @@ void lhe(boost::iostreams::filtering_istream& reader, int aprime_lhe_id, std::ma
 /**
  * parse the input stream as a CSV file, filling the input library
  *
+ * The CSV file is expected to have a **single** header line which
+ * names the columns. These column names have no requirements
+ * (besides the existence of this line).
+ *
+ * The CSV is required to have 9 columns on all non-empty lines of the file.
+ * The 9 columns of the CSV all are in MeV and _in order_ are
+ * 1. The incident lepton energy
+ * 2. The total energy of the recoil
+ * 3. The x-component of the recoil momentum
+ * 4. The y-component of the recoil momentum
+ * 5. The z-component of the recoil momentum
+ * 6. The total energy of the A'
+ * 7. The x-component of the A' momentum
+ * 8. The y-component of the A' momentum
+ * 9. The z-component of the A' momentum
+ *
+ * @note If developing this function, make sure to update dumpLibrary
+ * so that they can be used in conjuction.
+ *
  * @param[in] reader input stream reading the file
  * @param[in,out] lib dark brem event library to fill
  */
 void csv(boost::iostreams::filtering_istream& reader, std::map<double, std::vector<OutgoingKinematics>>& lib) {
   std::string line;
-  if (not std::getline(reader_, line)) {
+  // skip the header line
+  if (not std::getline(reader, line)) {
     throw std::runtime_error("Empty CSV file.");
   }
-  while (std::getline(reader_, line)) {
+  // read in all non-empty lines
+  while (std::getline(reader, line) and not line.empty()) {
     std::istringstream lss{line};
     std::vector<double> vals;
     std::string cell;
@@ -115,25 +162,35 @@ void csv(boost::iostreams::filtering_istream& reader, std::map<double, std::vect
 }  // namspace parser
 
 void parseLibrary(const std::string& path, int aprime_lhe_id, std::map<double, std::vector<OutgoingKinematics>>& lib) {
-  // Assumptions:
-  //  - Directory passed is a flat directory (no sub directories) containing LHE
-  //  files
-  //  - LHE files are events generated with the correct mass point
-  //
-  // A future improvement could be parsing a directory and only selecting LHE files
-  // the contain dark photons of the configure mass. This has not been implemented
-  // because there has been no reason to merge dark brem event libraries corresponding
-  // to different mass points.
-
   if (hasEnding(path, ".csv") or hasEnding(path, ".csv.gz") or hasEnding(path, ".lhe") or hasEnding(path, ".lhe.gz")) {
-    // accepted file extensions
+    /**
+     * If the input path has one of the four file extensions below,
+     * we assume it is a file to be parsed into the library.
+     * - '.csv'
+     * - '.csv.gz'
+     * - '.lhe'
+     * - '.lhe.gz'
+     *
+     * If the extension ends with '.gz', then a decompression step is
+     * added to the input stream. Boost.Iostream provides the 
+     * gzip_decompressor "filter" which does the decompression on the
+     * data stream as it is being read in.
+     *
+     * @see parse::csv for files ending with '.csv' or '.csv.gz'
+     * @see parse::lhe for files ending with '.lhe' or '.lhe.gz'
+     */
     boost::iostreams::filtering_istream reader;
     if (hasEnding(path, ".gz")) reader.push(boost::iostreams::gzip_decompressor());
     reader.push(boost::iostreams::file_source(path)); 
     if (hasEnding(path, ".csv") or hasEnding(path, ".csv.gz")) parse::csv(reader, lib); 
     else parse::lhe(reader, aprime_lhe_id, lib);
   } else {
-    // assume directory of files
+    /**
+     * If the input path _does not_ match one of the four accepted
+     * extensions, then we assume it is a directory 
+     *
+     * @note We _do not_ recursively enter subdirectories.
+     */
     DIR *dir;            // handle to opened directory
     struct dirent *ent;  // handle to entry inside directory
     if ((dir = opendir(path.c_str())) != NULL) {
@@ -142,18 +199,30 @@ void parseLibrary(const std::string& path, int aprime_lhe_id, std::map<double, s
         std::string fp = path + '/' + std::string(ent->d_name);
         if (hasEnding(fp,".lhe") or hasEnding(fp, ".lhe.gz")
             or hasEnding(fp,".csv") or hasEnding(fp, ".csv.gz")) {
-          // file ends in one of the acceptable endings
+          /**
+           * If any of the directory entries has one of the acceptable
+           * extensions, we recursively call this function on that 
+           * file path so that it can be parsed into the library.
+           */
           parseLibrary(fp, aprime_lhe_id, lib);
         }
       }
       closedir(dir);
     } else {
+      /**
+       * If we can't open the path that we assumed was a directory as a directory,
+       * we end processing.
+       */
       throw std::runtime_error("Unable to open '"+path+"' as a directory.");
     }
   }
 }
 
 void dumpLibrary(std::ostream& o, const std::map<double, std::vector<OutgoingKinematics>>& lib) {
+  /**
+   * This function writes out the input library as CSV to the input output stream
+   * in the same format as expected by parse::csv.
+   */
   o << "incident_energy,recoil_energy,recoil_px,recoil_py,recoil_pz,"
          "centerMomentum_energy,centerMomentum_px,centerMomentum_py,centerMomentum_pz\n";
   for (const auto& lib_entry : lib) {

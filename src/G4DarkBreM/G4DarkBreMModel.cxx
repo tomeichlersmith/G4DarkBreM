@@ -55,7 +55,7 @@ using int_method = boost::math::quadrature::gauss_kronrod<double, 61>;
  * https://journals.aps.org/prd/pdf/10.1103/PhysRevD.80.075018
  */
 static double flux_factor_chi_numerical(G4double A, G4double Z, double tmin, double tmax) {
-  /**
+  /*
    * bin = (mu_p^2 - 1)/(4 m_pr^2)
    * mel = mass of electron in GeV
    */
@@ -69,15 +69,16 @@ static double flux_factor_chi_numerical(G4double A, G4double Z, double tmin, dou
                ain_inv2 = pow(ain, -2);
 
   /**
-   * we've manually expanded the integrand to cancel out the 1/t^2 factor
+   * We've manually expanded the integrand to cancel out the 1/t^2 factor
    * from the differential, this helps the numerical integration converge
    * because we aren't teetering on the edge of division by zero
    *
-   * This `auto` represents a _function_ whose return value is a `double`
-   * and which has a single input `t`. This lambda expression saves us
-   * the time of having to re-calculate the form factor constants that
-   * do not depend on `t` because it can inherit their values from the
-   * environment. The return value is a double since it is calculated
+   * The `auto` used in the integrand definition represents a _function_ 
+   * whose return value is a `double` and which has a single input `t`. 
+   * This lambda expression saves us the time of having to re-calculate 
+   * the form factor constants that do not depend on `t` because it 
+   * can inherit their values from the environment. 
+   * The return value is a double since it is calculated
    * by simple arithmetic operations on doubles.
    */
   auto integrand = [&](double t) {
