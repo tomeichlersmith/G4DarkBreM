@@ -154,8 +154,8 @@ class G4DarkBreMModel : public PrototypeModel {
                                               G4double atomicZ);
 
   /**
-   * Sample one of the MG events in our library and then scale it to the
-   * input incident lepton energy.
+   * Scale one of the MG events in our library to the input incident 
+   * lepton energy.
    *
    * This is also helpful for testing the scaling procedure in its own
    * executable separate from the Geant4 infrastructure.
@@ -208,15 +208,15 @@ class G4DarkBreMModel : public PrototypeModel {
    * @param[in] lepton_mass mass of incident lepton [GeV]
    * @return G4ThreeVector representing the recoil lepton's outgoing momentum
    */
-  G4ThreeVector sampleAndScale(double incident_energy, double lepton_mass);
+  G4ThreeVector scale(double incident_energy, double lepton_mass);
 
   /**
    * Simulates the emission of a dark photon + lepton
    *
-   * @see sampleAndScale for how the event library is sampled and scaled to the incident
+   * @see scale for how the event library is sampled and scaled to the incident
    * lepton's actual energy
    *
-   * After calling sampleAndScale, we rotate the outgoing lepton's momentum to the
+   * After calling scale, we rotate the outgoing lepton's momentum to the
    * frame of the incident particle and then calculate the dark photon's
    * momentum such that three-momentum is conserved.
    *
@@ -227,17 +227,6 @@ class G4DarkBreMModel : public PrototypeModel {
    */
   virtual void GenerateChange(G4ParticleChange& particleChange,
                               const G4Track& track, const G4Step& step);
-
- private:
-  /**
-   * Set the library of dark brem events to be scaled.
-   *
-   * This function loads the directory of LHE files passed
-   * into our in-memory library of events to be sampled from.
-   *
-   * @param path path to directory of LHE files
-   */
-  void SetMadGraphDataLibrary(std::string path);
 
   /**
    * @struct OutgoingKinematics
@@ -253,6 +242,16 @@ class G4DarkBreMModel : public PrototypeModel {
     /// energy of lepton before brem (used as key in mad graph data map)
     G4double E;
   };
+ private:
+  /**
+   * Set the library of dark brem events to be scaled.
+   *
+   * This function loads the directory of LHE files passed
+   * into our in-memory library of events to be sampled from.
+   *
+   * @param path path to directory of LHE files
+   */
+  void SetMadGraphDataLibrary(std::string path);
 
   /**
    * Parse an LHE File
@@ -273,22 +272,31 @@ class G4DarkBreMModel : public PrototypeModel {
    * madgraph data.
    *
    * Randomly choose a starting point so that the simulation run isn't dependent
-   * on the order of LHE vertices in the library.
+   * on the order of the events as written in the LHE library. The random starting
+   * position is uniformly chosen using G4Uniform() so. The sample function
+   * will loop from the last event parsed back to the first event parsed so that
+   * the starting position does not matter.
+   *
+   * In this function, we also update maxIterations_ so that it is equal to the smallest
+   * entry in the library (with a maximum of 10k). This saves time in the situation where
+   * an incorrect library was accidentally used and the simulation is looping through events
+   * attempting to find one that can fit its criteria.
    */
   void MakePlaceholders();
 
   /**
-   * Returns mad graph data given an energy [GeV].
+   * Returns MadGraph data given an energy [GeV].
    *
-   * Gets the energy fraction and Pt from the imported LHE data.
-   * E0 should be in GeV, returns the total energy and Pt in GeV.
-   * Scales from the closest imported beam energy above the given value (scales
-   * down to avoid biasing issues).
+   * Gets the energy fraction and \f$p_T\f$ from the imported LHE data.
+   * incident_energy should be in GeV, returns the sample outgoing kinematics.
    *
-   * @param E0 energy of particle undergoing dark brem [GeV]
-   * @return total energy and transverse momentum of particle [GeV]
+   * Samples from the closest imported incident energy _above_ the given value
+   * (this helps avoid biasing issues).
+   *
+   * @param incident_energy energy of particle undergoing dark brem [GeV]
+   * @return sample outgoing kinematics
    */
-  OutgoingKinematics GetMadgraphData(double E0);
+  OutgoingKinematics sample(double incident_energy);
 
  private:
   /**

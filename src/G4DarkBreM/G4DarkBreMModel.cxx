@@ -335,10 +335,10 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
   return cross;
 }
 
-G4ThreeVector G4DarkBreMModel::sampleAndScale(double incident_energy, double lepton_mass) {
+G4ThreeVector G4DarkBreMModel::scale(double incident_energy, double lepton_mass) {
   // mass A' in GeV
   static const double MA = G4APrime::APrime()->GetPDGMass() / CLHEP::GeV;
-  OutgoingKinematics data = GetMadgraphData(incident_energy);
+  OutgoingKinematics data = sample(incident_energy);
   double EAcc = (data.lepton.e() - lepton_mass) *
                     ((incident_energy - lepton_mass - MA) / (data.E - lepton_mass - MA))
                 + lepton_mass;
@@ -349,7 +349,7 @@ G4ThreeVector G4DarkBreMModel::sampleAndScale(double incident_energy, double lep
     while (Pt * Pt + lepton_mass * lepton_mass > EAcc * EAcc) {
       // Skip events until the transverse energy is less than the total energy.
       i++;
-      data = GetMadgraphData(incident_energy);
+      data = sample(incident_energy);
       EAcc = (data.lepton.e() - lepton_mass) *
                  ((incident_energy - lepton_mass - MA) / (data.E - lepton_mass - MA))
              + lepton_mass;
@@ -410,7 +410,7 @@ void G4DarkBreMModel::GenerateChange(
   // convert to energy units in LHE files [GeV]
   G4double incidentEnergy = step.GetPostStepPoint()->GetTotalEnergy()/CLHEP::GeV;
 
-  G4ThreeVector recoilMomentum = sampleAndScale(incidentEnergy, Ml);
+  G4ThreeVector recoilMomentum = scale(incidentEnergy, Ml);
   recoilMomentum.rotateUz(track.GetMomentumDirection());
 
   // create g4dynamicparticle object for the dark photon.
@@ -575,9 +575,7 @@ void G4DarkBreMModel::MakePlaceholders() {
 }
 
 G4DarkBreMModel::OutgoingKinematics
-G4DarkBreMModel::GetMadgraphData(double E0) {
-  OutgoingKinematics cmdata;  // data frame to return
-
+G4DarkBreMModel::sample(double incident_energy) {
   // Cycle through imported beam energies until the closest one above is found,
   // or the max is reached.
   double samplingE = 0.;
@@ -586,25 +584,20 @@ G4DarkBreMModel::GetMadgraphData(double E0) {
     // check if went under the sampling energy
     //  the map is sorted by key, so we can be done right after E0 goes under
     //  samplingE
-    if (E0 < samplingE) break;
+    if (incident_energy < samplingE) break;
   }
   // now samplingE is the closest energy above E0 or the maximum energy imported
   // from mad graph
 
-  // Need to loop around if we hit the end, when the size of
-  // madGraphData_[samplingE] is smaller than
-  //  the number of events we want
+  // Need to loop around if we hit the end, in case our random
+  // starting position happens to be late enough in the file
   if (currentDataPoints_.at(samplingE) >= madGraphData_.at(samplingE).size()) {
     currentDataPoints_[samplingE] = 0;
   }
 
-  // Get the lorentz vectors from the index given by the placeholder.
-  cmdata = madGraphData_.at(samplingE).at(currentDataPoints_.at(samplingE));
-
-  // Increment the current index
-  currentDataPoints_[samplingE]++;
-
-  return cmdata;
+  // increment the current index _after_ getting its entry from
+  // the in-memory library
+  return madGraphData_.at(samplingE).at(currentDataPoints_[samplingE]++);
 }
 
 }  // namespace g4db
