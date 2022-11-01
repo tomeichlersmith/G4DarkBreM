@@ -28,6 +28,15 @@
 #include "G4DarkBreM/G4APrime.h"
 
 /**
+ * example simulation application required classes
+ *
+ * this namespace is here _only_ to put these example classes
+ * deeper into the documentation so that users can see the 
+ * important stuff first.
+ */
+namespace g4db::example {
+
+/**
  * basic physics constructor which simply creates the A' and the dark brem
  */
 class APrimePhysics : public G4VPhysicsConstructor {
@@ -357,6 +366,8 @@ class FindDarkBremProducts : public G4UserTrackingAction {
   }
 };  // FindDarkBremProducts
 
+}  // namespace g4db::example
+
 /**
  * print out how to use g4db-simulate
  */
@@ -487,17 +498,17 @@ int main(int argc, char* argv[]) try {
 
   auto run = std::unique_ptr<G4RunManager>(new G4RunManager);
 
-  run->SetUserInitialization(new Hunk(depth,target));
+  run->SetUserInitialization(new g4db::example::Hunk(depth,target));
 
   G4VModularPhysicsList* physics = new QBBC;
-  physics->RegisterPhysics(new APrimePhysics(db_lib, ap_mass, muons, bias));
+  physics->RegisterPhysics(new g4db::example::APrimePhysics(db_lib, ap_mass, muons, bias));
   run->SetUserInitialization(physics);
 
   run->Initialize();
 
-  run->SetUserAction(new FindDarkBremProducts);
-  run->SetUserAction(new PersistDarkBremProducts(output));
-  run->SetUserAction(new LeptonBeam(beam, muons));
+  run->SetUserAction(new g4db::example::FindDarkBremProducts);
+  run->SetUserAction(new g4db::example::PersistDarkBremProducts(output));
+  run->SetUserAction(new g4db::example::LeptonBeam(beam, muons));
 
   run->BeamOn(num_events);
 
