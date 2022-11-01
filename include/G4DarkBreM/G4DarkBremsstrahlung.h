@@ -36,10 +36,10 @@ class G4DarkBremsstrahlung : public G4VDiscreteProcess {
    * Configures this process by doing three main things:
    *  1. Registers this process with Geant4 as a 'fElectromagnetic' process
    *     - Needed for Geant4 Biasing Framework to recognize this process as
-   * "bias-able"
+   *       "bias-able"
    *  2. Defines the EM subtype as one different from all other EM processes
    *     - Needed so we don't replace another EM process
-   *  3. Configures the process
+   *  3. Decide on the model for dark bremming
    *
    * We add ourselves to the process table for muons (or electrons),
    * so the caller **does not** need to do this. Normally, this is done
@@ -47,26 +47,16 @@ class G4DarkBremsstrahlung : public G4VDiscreteProcess {
    * to avoid mistakenly adding the dark brem process configured for muons
    * to the electron table (and vis-versa).
    *
-   * @note Make sure to call SetModel immediately after constructing
-   * the process.
-   *
+   * @param[in] the_model model to use for dark brem simulation
    * @param[in] muons true if muons are dark bremming, false for electrons
    * @param[in] only_one_per_event true if de-activating process after first dark brem
    * @param[in] global_bias bias xsec globally by this factor
    * @param[in] cache_xsec true if we should cache xsecs at the MeV level of precision
+   * @param[in] verbose_level level of verbosity to print for this process and model
    */
-  G4DarkBremsstrahlung(bool muons, bool only_one_per_event = false, 
-      double global_bias = 1., bool cache_xsec = true);
-
-  /**
-   * Decide on the model for dark bremming
-   *
-   * This can only be called once per run and must be called **immediately**
-   * after construction so that the process is configured properly.
-   *
-   * @param[in] the_model model to use for dark brem simulation
-   */
-  void SetModel(std::shared_ptr<g4db::PrototypeModel> the_model);
+  G4DarkBremsstrahlung(std::shared_ptr<g4db::PrototypeModel> the_model,
+      bool only_one_per_event = false, double global_bias = 1., 
+      bool cache_xsec = true, int verbose_leve = 0);
 
   /**
    * Destructor
@@ -120,14 +110,32 @@ class G4DarkBremsstrahlung : public G4VDiscreteProcess {
   /**
    * Calculate the mean free path given the input conditions
    *
+   * If the input track's particle definition does not align with
+   * how we are configured (checked via IsApplicable), then we return
+   * DBL_MAX to signal that this should never happen.
+   *
+   * We calculate the total cross section by calculating the total cross
+   * section for each element in the current material and weighting
+   * those cross sections by the number of atoms per volume in the material.
+   * This allows the process to handle the material dependence on the cross
+   * section, leaving the detailed elemental cross section calculation
+   * to the model.
+   *
+   * The `global_bias` parameter from the constructor is also used
+   * here after-the-calculation in order to allow rudimentary biasing.
+   * The use of `global_bias` is discouraged in favor of using Geant4's
+   * biasing infrastructure.
+   *
    * We maintain a cache for the cross sections calculated by the model
    * so that later in the run it is less likely that the model will
    * need to be called to calculate the cross section. This is done
    * in order to attempt to improve speed of simulation and avoid
    * repetition of the same, deterministic calculations.
-   *
-   * If you want to turn off the cache-ing behavior, set 'cache_xsec' to false
+   * If you want to turn off the cache-ing behavior, set `cache_xsec` to false
    * in the constructor.
+   *
+   * If the total cross section is above DBL_MIN, then it is inverted to
+   * obtain the mean free path. Otherwise, DBL_MAX is returned.
    *
    * @see G4DarkBremsstrahlungModel::ComputeCrossSectionPerAtom
    * @param[in] track G4Track that is being stepped
@@ -167,11 +175,6 @@ class G4DarkBremsstrahlung : public G4VDiscreteProcess {
    * Should we have a cache for the computed cross sections?
    */
   bool cache_xsec_;
-
-  /**
-   * Are we dark-bremming off muons or electrons?
-   */
-  bool muons_;
 
   /**
    * The model that we are using in this run.

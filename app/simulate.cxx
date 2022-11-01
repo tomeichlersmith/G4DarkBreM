@@ -73,16 +73,14 @@ class APrimePhysics : public G4VPhysicsConstructor {
    */
   void ConstructProcess() final override {
     the_process_ = std::unique_ptr<G4DarkBremsstrahlung>(new G4DarkBremsstrahlung(
-        muons_,
-        false, /* only one per event */
-        bias_, /* global bias */
-        true /* cache xsec */));
-    the_process_->SetModel(
         std::shared_ptr<g4db::G4DarkBreMModel>(new g4db::G4DarkBreMModel(
           "forward_only", /* scaling method */
           0.0, /* minimum energy threshold to dark brem [GeV] */
           1.0, /* epsilon */
-          library_path_, muons_)));
+          library_path_, muons_)),
+        false, /* only one per event */
+        bias_, /* global bias */
+        true /* cache xsec */));
   }
 };  // APrimePhysics
 

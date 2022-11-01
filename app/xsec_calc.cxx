@@ -116,9 +116,10 @@ int main(int argc, char* argv[]) try {
   // create the process to do proper initializations
   //    this holds the xsec cache as well so we don't have to
   //    repeat all that code
-  G4DarkBremsstrahlung db_process(muons, false, 1.0, true);
-  db_process.SetModel(std::make_shared<g4db::G4DarkBreMModel>("forward_only",
-      0.0, 1.0, "NOT NEEDED", muons, false));
+  G4DarkBremsstrahlung db_process(
+      std::make_shared<g4db::G4DarkBreMModel>("forward_only",
+        0.0, 1.0, "NOT NEEDED", muons, false),
+      false, 1.0, true);
 
   int bar_width = 80;
   int pos = 0;

@@ -39,6 +39,43 @@ class PrototypeModel {
   virtual ~PrototypeModel() = default;
 
   /**
+   * Define the verbose level
+   *
+   * This is called after the model is passed into the process
+   * so that the model and the process have the same verbose level.
+   * Only call this if you wish the model and the process to not have
+   * the same verbose level.
+   *
+   * @param[in] l verbose leve
+   */
+  void SetVerboseLevel(int l) {
+    verbose_level_ = l;
+  }
+
+  /**
+   * Get the verbose level of the model
+   * 
+   * Use this in model functions to decide if a printout should
+   * be done or not.
+   *
+   * @return integer level (higher means more detail)
+   */
+  int GetVerboseLevel() const {
+    return verbose_level_;
+  }
+
+  /**
+   * Check if we are bremming off muons
+   *
+   * If false, assume we are bremming off electrons.
+   *
+   * @return true if dark bremming of muons
+   */
+  bool DarkBremOffMuons() const {
+    return muons_;
+  }
+
+  /**
    * Print the configuration of this model
    *
    * Helpful for debugging and keeping the process compliant
@@ -77,6 +114,8 @@ class PrototypeModel {
  protected:
   /// whether muons (true) or electrons (false) are dark bremming
   bool muons_;
+  /// verbose level for this model
+  int verbose_level_{0};
 };  // PrototypeModel
 
 } // namespace g4db

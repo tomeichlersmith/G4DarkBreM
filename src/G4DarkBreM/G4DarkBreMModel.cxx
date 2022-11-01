@@ -464,7 +464,7 @@ void G4DarkBreMModel::SetMadGraphDataLibrary(std::string path) {
   /*
    * print status to user so they know what's happening
    */
-  G4cout << "[ G4DarkBreMModel ] : loading event librariy..." << G4endl;
+  if (GetVerboseLevel() > 0) G4cout << "[ G4DarkBreMModel ] : loading event librariy..." << G4endl;
 
   bool foundOneFile = false;
   DIR *dir;            // handle to opened directory
@@ -489,17 +489,19 @@ void G4DarkBreMModel::SetMadGraphDataLibrary(std::string path) {
 
   MakePlaceholders();  // Setup the placeholder offsets for getting data.
 
-  G4cout << "[ G4DarkBreMModel ] : done" << G4endl;
+  if (GetVerboseLevel() > 0) G4cout << "[ G4DarkBreMModel ] : done" << G4endl;
 
   /*
    * Print out loaded MG library
-  std::cout << "MadGraph Library of Dark Brem Events:\n";
-  for (const auto &kV : madGraphData_) {
-    std::cout << "\t" << std::setw(8) << kV.first << " GeV Beam -> "
-              << std::setw(6) << kV.second.size() << " Events\n"
-  }
-  std::cout << std::flush;
    */
+  if (GetVerboseLevel() > 1) {
+    G4cout << "MadGraph Library of Dark Brem Events:\n";
+    for (const auto &kV : madGraphData_) {
+      G4cout << "\t" << std::setw(8) << kV.first << " GeV Beam -> "
+                << G4setw(6) << kV.second.size() << " Events\n"
+    }
+    G4cout << G4endl;
+  }
 
   return;
 }
