@@ -462,7 +462,9 @@ void G4DarkBreMModel::SetMadGraphDataLibrary(const std::string& path) {
 
   if (madGraphData_.size() == 0) {
     throw std::runtime_error("BadConf : Unable to find any library entries at '"+path+"'\n"
-        "  The library is either a single CSV file or a directory of LHE files.");
+        "  The library is either a single CSV file or a directory of LHE files.\n"
+        "  Any individual file can be compressed with `gzip`.\n"
+        "  This means the valid extensions are '.lhe', '.lhe.gz', '.csv', and '.csv.gz'");
   }
 
   MakePlaceholders();  // Setup the placeholder offsets for getting data.
