@@ -22,7 +22,7 @@ const std::string G4DarkBremsstrahlung::PROCESS_NAME = "DarkBrem";
 G4DarkBremsstrahlung::G4DarkBremsstrahlung(
     std::shared_ptr<g4db::PrototypeModel> the_model,
     bool only_one_per_event, double global_bias, 
-    bool cache_xsec, int verbose_level)
+    bool cache_xsec, int verbose_level, int subtype)
     : G4VDiscreteProcess(G4DarkBremsstrahlung::PROCESS_NAME,
                          fElectromagnetic),
       only_one_per_event_{only_one_per_event},
@@ -43,7 +43,7 @@ G4DarkBremsstrahlung::G4DarkBremsstrahlung(
    * process list in code is dangerous since there may be more processes 
    * constructed after us.
    */
-  SetProcessSubType(63);  // needs to be different from the other Em Subtypes
+  SetProcessSubType(subtype);
 
   SetVerboseLevel(verbose_level);
   model_->SetVerboseLevel(verbose_level);
