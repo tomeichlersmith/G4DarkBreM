@@ -59,14 +59,27 @@ class G4APrime : public G4ParticleDefinition {
   /**
    * Accessor for APrime definition
    *
-   * The first call to this function defines the mass
-   * and then later calls can call it without an argument
-   * because we will just return the single instance
-   * of the A' definition.
+   * @throws std::runtime_error if the APrime is not initialized yet.
    *
-   * @param[in] theMass mass of the A' in MeV
+   * @see Initialize for configuring and constructing the APrime
+   * at the start of a run.
    */
-  static G4APrime* APrime(G4double theMass = -1 * MeV);
+  static G4APrime* APrime();
+
+  /**
+   * Initialize the APrime particle with the passed configuration
+   * 
+   * @throws std::runtime_error if the APrime has already been initialized
+   *
+   * @param[in] mass The mass of the APrime in MeV
+   * @param[in] id The PDG ID number to use for the APrime particle
+   *
+   * The default value for the PDG ID is set to 62 and has been arbitrarily
+   * chosen from the range defined by 11(c) in the 
+   * [PDG ID numbering scheme](https://pdg.lbl.gov/2007/reviews/montecarlorpp.pdf),
+   * avoiding the already-defined "one-of-a-kind" particles using 39, 41, and 42.
+   */
+  static void Initialize(double mass, int id = 62);
 };
 
 #endif  // SIMCORE_DARKBREM_G4APRIME_H_

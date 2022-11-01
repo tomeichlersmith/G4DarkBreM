@@ -66,7 +66,7 @@ class APrimePhysics : public G4VPhysicsConstructor {
    * deletes them at the end of the run.
    */
   void ConstructParticle() final override {
-    G4APrime::APrime(ap_mass_);
+    G4APrime::Initialize(ap_mass_);
   }
 
   /**

@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) try {
   max_energy *= GeV;
 
   // the process accesses the A' mass from the G4 particle
-  G4APrime::APrime(ap_mass/GeV);
+  G4APrime::Initialize(ap_mass/GeV);
   // create the process to do proper initializations
   //    this holds the xsec cache as well so we don't have to
   //    repeat all that code

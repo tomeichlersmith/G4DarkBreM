@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) try {
   }
 
   // the process accesses the A' mass from the G4 particle
-  G4APrime::APrime(ap_mass/GeV);
+  G4APrime::Initialize(ap_mass/GeV);
   // create the model, this is where the LHE file is parsed
   //    into an in-memory library to sample and scale from
   g4db::G4DarkBreMModel db_model("forward_only", 0.0, 1.0, db_lib, muons);
