@@ -497,8 +497,8 @@ void G4DarkBreMModel::SetMadGraphDataLibrary(std::string path) {
   if (GetVerboseLevel() > 1) {
     G4cout << "MadGraph Library of Dark Brem Events:\n";
     for (const auto &kV : madGraphData_) {
-      G4cout << "\t" << std::setw(8) << kV.first << " GeV Beam -> "
-                << G4setw(6) << kV.second.size() << " Events\n"
+      G4cout << "\t" << kV.first << " GeV Beam -> "
+                << kV.second.size() << " Events\n";
     }
     G4cout << G4endl;
   }

@@ -1,6 +1,8 @@
 #ifndef G4DarkBREM_ELEMENTXSECCACHE_H
 #define G4DarkBREM_ELEMENTXSECCACHE_H
 
+#include <memory>
+
 #include "G4DarkBreM/PrototypeModel.h"
 
 namespace g4db {
