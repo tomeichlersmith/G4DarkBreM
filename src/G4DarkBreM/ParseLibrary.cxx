@@ -4,7 +4,11 @@
 
 #include <boost/iostreams/operations.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/filter/zlib.hpp>
+#include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/stream.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/close.hpp>
 
 #include "G4DarkBreM/ParseLibrary.h"
 
@@ -42,24 +46,14 @@ class Text {
 };
 
 class GZip {
-  std::ifstream raw_file_;
-  boost::iostreams::filtering_stream<boost::iostreams::input> input_;
+  boost::iostreams::filtering_istream input_;
  public:
-  GZip(const std::string& path) : raw_file_{path} {
-    if (not raw_file_.is_open()) {
-      throw std::runtime_error("Unable to open file '"+path+"'.");
-    }
-    input_.push(boost::iostreams::zlib_decompressor());
-    input_.push(raw_file_);
+  GZip(const std::string& path) {
+    input_.push(boost::iostreams::gzip_decompressor());
+    input_.push(boost::iostreams::file_source(path));
   }
   bool pop(std::string& line) {
-    int c;
-    if ((c = boost::iostreams::get(input_)) == EOF) return false;
-    line.clear();
-    line += c; // add character already extracted above
-    while((c = boost::iostreams::get(input_)) != EOF and c != '\n')
-      line += c;
-    return true;
+    return bool(std::getline(input_, line));
   }
 };
 
