@@ -12,6 +12,9 @@
 #include "G4Step.hh"
 #include "G4ParticleChange.hh"
 
+/**
+ * G4DarkBreM internal namespace
+ */
 namespace g4db {
 
 /**
