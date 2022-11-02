@@ -2,6 +2,18 @@
 
 Geant4 Dark Bremmstrahlung from MadGraph
 
+<p align="center">
+  <a href="https://www.apache.org/licenses/LICENSE-2.0" alt="Apache 2.0 license">
+    <img src="https://img.shields.io/badge/license-Apache%202-blue" />
+  </a>
+  <a href="https://github.com/tomeichlersmith/G4DarkBreM/actions" alt="Actions">
+    <img src="https://img.shields.io/github/workflow/status/tomeichlersmith/G4DarkBreM/Test" />
+  </a>
+  <a href="https://github.com/tomeichlersmith/G4DarkBreM/releases" alt="Releases">
+    <img src="https://img.shields.io/github/v/release/tomeichlersmith/G4DarkBreM" />
+  </a>
+</p>
+
 ## Installation
 The only dependencies of G4DarkBreM are Geant4 which has [an extensive installation guide](http://cern.ch/geant4-userdoc/UsersGuides/InstallationGuide/html/)
 and Boost which can be installed [from the website](https://www.boost.org/doc/libs/1_80_0/more/getting_started/unix-variants.html)
