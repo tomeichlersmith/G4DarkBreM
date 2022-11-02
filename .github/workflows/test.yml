@@ -12,14 +12,14 @@ jobs:
         boost: [1.80.0]
         geant4: [11.0.3]
     env:
-      CMAKE_PREFIX_PATH: ~/deps
+      INSTALL_PREFIX: ${{github.workspace}}/deps
     steps:
       -
         name: cache dependencies
         id: cache-deps
         uses: actions/cache@v3
         with:
-          path: ~/deps
+          path: ${{env.INSTALL_PREFIX}}
           key: boost-${{matrix.boost}}-geant4-${{matrix.geant4}}
       -
         name: install boost
@@ -31,7 +31,7 @@ jobs:
             tar -xz --strip-components=1 --directory src
           cd src
           ./bootstrap.sh
-          ./b2 install --prefix=~/deps
+          ./b2 install --prefix=${INSTALL_PREFIX}
           cd ..
           rm -rf src
       -
@@ -44,7 +44,7 @@ jobs:
           cmake \
             -DGEANT4_INSTALL_DATA=ON \
             -DGEANT4_INSTALL_EXAMPLES=OFF \
-            -DCMAKE_INSTALL_PREFIX=~/deps \
+            -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
             -B src/build \
             -S src
           cmake --build src/build --target install
@@ -56,6 +56,6 @@ jobs:
         name: test compile
         run: |
           source ~/deps/bin/geant4.sh
-          cmake -B build -S . -DBoost_DIR=~/deps/
+          cmake -B build -S . 
           cmake --build build
 
