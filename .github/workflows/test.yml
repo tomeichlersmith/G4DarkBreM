@@ -23,7 +23,7 @@ jobs:
           key: boost-${{matrix.boost}}-geant4-${{matrix.geant4}}
       -
         name: install boost
-        if: ${{ steps.cache-deps.outputs.catch-hit != 'true' }}
+        if: ${{ steps.cache-deps.outputs.cache-hit != 'true' }}
         run: |
           mkdir src
           boost_version=${{matrix.boost}}
@@ -36,7 +36,7 @@ jobs:
           rm -rf src
       -
         name: install geant4
-        if: ${{ steps.cache-deps.outputs.catch-hit != 'true' }}
+        if: ${{ steps.cache-deps.outputs.cache-hit != 'true' }}
         run: |
           mkdir src
           wget -q -O - https://github.com/geant4/geant4/archive/refs/tags/v${{matrix.geant4}}.tar.gz |\
