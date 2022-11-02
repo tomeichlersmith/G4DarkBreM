@@ -19,7 +19,9 @@ void ElementXsecCache::stream(std::ostream& o) const {
   o << "A [au],Z [protons],Energy [MeV],Xsec [pb]\n"
     << std::setprecision(std::numeric_limits<double>::digits10 +
                          1);  // maximum precision
-  for (auto const& [key, xsec] : the_cache_) {
+  for (auto const& cache_entry : the_cache_) {
+    const key_t& key = cache_entry.first;
+    const double& xsec = cache_entry.second;
     key_t E = key % MAX_E;
     key_t A = ((key - E) / MAX_E) % MAX_A;
     key_t Z = ((key - E) / MAX_E - A) / MAX_A;

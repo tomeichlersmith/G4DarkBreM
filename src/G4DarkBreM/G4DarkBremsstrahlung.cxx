@@ -134,7 +134,7 @@ G4VParticleChange* G4DarkBremsstrahlung::PostStepDoIt(const G4Track& track,
     std::vector<G4String> db_process_name_options = {
         "biasWrapper(" + PROCESS_NAME + ")", PROCESS_NAME};
     G4ProcessManager* pman = track.GetDefinition()->GetProcessManager();
-    for (std::size_t i_proc{0}; i_proc < pman->GetProcessList()->size(); i_proc++) {
+    for (int i_proc{0}; i_proc < pman->GetProcessList()->size(); i_proc++) {
       G4VProcess* p{(*(pman->GetProcessList()))[i_proc]};
       if (p->GetProcessName().contains(PROCESS_NAME)) {
         pman->SetProcessActivation(p, false);

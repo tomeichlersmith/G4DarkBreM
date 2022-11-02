@@ -27,6 +27,8 @@
 #include "G4DarkBreM/G4DarkBreMModel.h"
 #include "G4DarkBreM/G4APrime.h"
 
+namespace g4db {
+
 /**
  * example simulation application required classes
  *
@@ -34,7 +36,7 @@
  * deeper into the documentation so that users can see the 
  * important stuff first.
  */
-namespace g4db::example {
+namespace example {
 
 /**
  * basic physics constructor which simply creates the A' and the dark brem
@@ -366,7 +368,8 @@ class FindDarkBremProducts : public G4UserTrackingAction {
   }
 };  // FindDarkBremProducts
 
-}  // namespace g4db::example
+}  // namespace example
+}  // namespace g4db
 
 /**
  * print out how to use g4db-simulate

@@ -42,7 +42,6 @@ int main(int argc, char* argv[]) try {
   double min_energy{0.};
   double max_energy{4.};
   double energy_step{0.1};
-  double target_density{19.30};
   double target_Z{74.};
   double target_A{183.84};
   bool muons{false};
@@ -92,7 +91,6 @@ int main(int argc, char* argv[]) try {
         std::cerr << arg << " requires three arguments: DENSITY Z A" << std::endl;
         return 1;
       }
-      target_density = std::stod(args[0]);
       target_Z       = std::stod(args[1]);
       target_A       = std::stod(args[2]);
     } else {

@@ -89,7 +89,7 @@ static double flux_factor_chi_numerical(G4double A, G4double Z, double tmin, dou
     
     return (pow(ael_factor*del_factor*Z, 2)
             +
-            Z*pow(ain_factor*nucl*din*din*din*din, 2)
+            Z*pow(ain_factor*nucl*din_factor*din_factor*din_factor*din_factor, 2)
            )*(t-tmin);
   };
 
@@ -116,9 +116,11 @@ static double flux_factor_chi_analytic(G4double A, G4double Z, double tmin, doub
 G4DarkBreMModel::G4DarkBreMModel(const std::string& method_name, double threshold,
     double epsilon, const std::string& library_path, bool muons, int aprime_lhe_id, 
     bool load_library)
-    : PrototypeModel(muons), method_(DarkBremMethod::Undefined),
-      method_name_{method_name}, epsilon_{epsilon}, library_path_{library_path},
-      aprime_lhe_id_{aprime_lhe_id} {
+    : PrototypeModel(muons), maxIterations_{10000}, 
+      threshold_{std::max(threshold, 2.*G4APrime::APrime()->GetPDGMass()/CLHEP::GeV)},
+      epsilon_{epsilon}, aprime_lhe_id_{aprime_lhe_id}, 
+      method_(DarkBremMethod::Undefined), method_name_{method_name}, 
+      library_path_{library_path} {
   if (method_name_ == "forward_only") {
     method_ = DarkBremMethod::ForwardOnly;
   } else if (method_name_ == "cm_scaling") {
@@ -128,10 +130,6 @@ G4DarkBreMModel::G4DarkBreMModel(const std::string& method_name, double threshol
   } else {
     throw std::runtime_error("Invalid dark brem interpretaion/scaling method '"+method_name_+"'.");
   }
-
-  threshold_ = std::max(threshold,
-      2. * G4APrime::APrime()->GetPDGMass() / CLHEP::GeV  // mass A' in GeV
-  );
 
   if (load_library) SetMadGraphDataLibrary(library_path_);
 }
