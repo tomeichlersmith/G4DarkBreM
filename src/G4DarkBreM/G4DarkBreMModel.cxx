@@ -171,7 +171,7 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
    * assume theta = 0, and x = 1 for form factor integration
    * i.e. now chi is a constant pulled out of the integration
    */
-  double chi = flux_factor_chi_numerical(A,Z,MA2*MA2/(4*lepton_e_sq),MA2+lepton_mass_sq);
+  double chi_hiww = flux_factor_chi_numerical(A,Z,MA2*MA2/(4*lepton_e_sq),MA2+lepton_mass_sq);
 
   /*
    * Differential cross section with respect to x and theta
@@ -254,7 +254,7 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
      * according to Mathematica so it is expensive to
      * compute and only an O(few) percent change.
      */
-    double chi = flux_factor_chi_analytic(A,Z,tmin,tmax);
+    double chi_analytic_elastic_only = flux_factor_chi_analytic(A,Z,tmin,tmax);
     
     /*
      * Amplitude squared is taken from 
@@ -268,7 +268,7 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
 
     return 2.*pow(epsilon_,2.)*pow(alphaEW,3.)
              *sqrt(x_sq*lepton_e_sq - MA2)*lepton_e*(1.-x)
-             *(chi/utilde_sq)*amplitude_sq*sin(theta);
+             *(chi_analytic_elastic_only/utilde_sq)*amplitude_sq*sin(theta);
   };
 
   // deduce integral bounds
@@ -317,7 +317,7 @@ G4double G4DarkBreMModel::ComputeCrossSectionPerAtom(
       double beta = sqrt(1 - MA2/lepton_e_sq),
              nume = 1. - x + x*x/3.,
              deno = MA2*(1-x)/x + lepton_mass_sq;
-      return 4*pow(epsilon_,2)*pow(alphaEW,3)*chi*beta*nume/deno;
+      return 4*pow(epsilon_,2)*pow(alphaEW,3)*chi_hiww*beta*nume/deno;
     }
   };
 
