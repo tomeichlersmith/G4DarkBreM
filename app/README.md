@@ -15,3 +15,8 @@ This is a full Geant4 simulation focused on a simple prism of material limited t
 
 This simulation is over simplified and **should not** be used for production-level studies. Among other simplifications, it does not implement a biasing procedure for the dark brem process and does not alter the random number seed.
 Nevertheless, it does hold several helpful example classes in the g4db::example namespace that can be a good starting point for developing a more thorough simulation.
+
+## g4db-extract-library
+This helps test the library parsing procedure by reading in LHE (or `gzip` compressed LHE) into memory and then dumping the resulting library to a CSV text file. 
+The output CSV can then be used by the model if the user so wishes and/or used for easier analysis of the raw library kinematics.
+See g4db::parse::csv for an explanation of the columns of the CSV.

@@ -1,6 +1,7 @@
 
 #include "G4DarkBreM/G4DarkBreMModel.h"
 #include "G4DarkBreM/G4APrime.h"
+#include "G4DarkBreM/ParseLibrary.h"
 
 // Geant4
 #include "Randomize.hh"
@@ -15,7 +16,6 @@
 #include <boost/math/quadrature/gauss_kronrod.hpp>
 
 // STL
-#include <dirent.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,7 +55,7 @@ using int_method = boost::math::quadrature::gauss_kronrod<double, 61>;
  * https://journals.aps.org/prd/pdf/10.1103/PhysRevD.80.075018
  */
 static double flux_factor_chi_numerical(G4double A, G4double Z, double tmin, double tmax) {
-  /**
+  /*
    * bin = (mu_p^2 - 1)/(4 m_pr^2)
    * mel = mass of electron in GeV
    */
@@ -69,15 +69,16 @@ static double flux_factor_chi_numerical(G4double A, G4double Z, double tmin, dou
                ain_inv2 = pow(ain, -2);
 
   /**
-   * we've manually expanded the integrand to cancel out the 1/t^2 factor
+   * We've manually expanded the integrand to cancel out the 1/t^2 factor
    * from the differential, this helps the numerical integration converge
    * because we aren't teetering on the edge of division by zero
    *
-   * This `auto` represents a _function_ whose return value is a `double`
-   * and which has a single input `t`. This lambda expression saves us
-   * the time of having to re-calculate the form factor constants that
-   * do not depend on `t` because it can inherit their values from the
-   * environment. The return value is a double since it is calculated
+   * The `auto` used in the integrand definition represents a _function_ 
+   * whose return value is a `double` and which has a single input `t`. 
+   * This lambda expression saves us the time of having to re-calculate 
+   * the form factor constants that do not depend on `t` because it 
+   * can inherit their values from the environment. 
+   * The return value is a double since it is calculated
    * by simple arithmetic operations on doubles.
    */
   auto integrand = [&](double t) {
@@ -368,12 +369,12 @@ G4ThreeVector G4DarkBreMModel::scale(double incident_energy, double lepton_mass)
       }
     }
   } else if (method_ == DarkBremMethod::CMScaling) {
-    LorentzVector el(data.lepton.px(), data.lepton.py(), data.lepton.pz(),
-                      data.lepton.e());
+    CLHEP::HepLorentzVector el(data.lepton.px(), data.lepton.py(), data.lepton.pz(),
+                               data.lepton.e());
     double ediff = data.E - incident_energy;
-    LorentzVector newcm(data.centerMomentum.px(), data.centerMomentum.py(),
-                         data.centerMomentum.pz() - ediff,
-                         data.centerMomentum.e() - ediff);
+    CLHEP::HepLorentzVector newcm(data.centerMomentum.px(), data.centerMomentum.py(),
+                                  data.centerMomentum.pz() - ediff,
+                                  data.centerMomentum.e() - ediff);
     el.boost(-1. * data.centerMomentum.boostVector());
     el.boost(newcm.boostVector());
     double newE = (data.lepton.e() - lepton_mass) *
@@ -450,41 +451,19 @@ void G4DarkBreMModel::GenerateChange(
   }
 }
 
-void G4DarkBreMModel::SetMadGraphDataLibrary(std::string path) {
-  // Assumptions:
-  //  - Directory passed is a flat directory (no sub directories) containing LHE
-  //  files
-  //  - LHE files are events generated with the correct mass point
-  //
-  // A future improvement could be parsing a directory and only selecting LHE files
-  // the contain dark photons of the configure mass. This has not been implemented
-  // because there has been no reason to merge dark brem event libraries corresponding
-  // to different mass points.
-
+void G4DarkBreMModel::SetMadGraphDataLibrary(const std::string& path) {
   /*
    * print status to user so they know what's happening
    */
   if (GetVerboseLevel() > 0) G4cout << "[ G4DarkBreMModel ] : loading event librariy..." << G4endl;
 
-  bool foundOneFile = false;
-  DIR *dir;            // handle to opened directory
-  struct dirent *ent;  // handle to entry inside directory
-  if ((dir = opendir(path.c_str())) != NULL) {
-    // directory can be opened
-    while ((ent = readdir(dir)) != NULL) {
-      std::string fp = path + '/' + std::string(ent->d_name);
-      if (fp.substr(fp.find_last_of('.') + 1) == "lhe") {
-        // file ends in '.lhe'
-        ParseLHE(fp);
-        foundOneFile = true;
-      }
-    }
-    closedir(dir);
-  }
+  parseLibrary(path, aprime_lhe_id_, madGraphData_);
 
-  if (not foundOneFile) {
-    throw std::runtime_error("Directory '" + path +
-        "' was unable to be opened or no '.lhe' files were found inside it.");
+  if (madGraphData_.size() == 0) {
+    throw std::runtime_error("BadConf : Unable to find any library entries at '"+path+"'\n"
+        "  The library is either a single CSV file or a directory of LHE files.\n"
+        "  Any individual file can be compressed with `gzip`.\n"
+        "  This means the valid extensions are '.lhe', '.lhe.gz', '.csv', and '.csv.gz'");
   }
 
   MakePlaceholders();  // Setup the placeholder offsets for getting data.
@@ -506,66 +485,6 @@ void G4DarkBreMModel::SetMadGraphDataLibrary(std::string path) {
   return;
 }
 
-void G4DarkBreMModel::ParseLHE(std::string fname) {
-  static const double MA =
-      G4APrime::APrime()->GetPDGMass() / CLHEP::GeV;  // mass A' in GeV
-
-  std::ifstream ifile;
-  ifile.open(fname.c_str());
-  if (!ifile) {
-    throw std::runtime_error("Unable to open LHE file '"+fname+"'.");
-  }
-
-  std::string line;
-  while (std::getline(ifile, line)) {
-    std::istringstream iss(line);
-    int ptype, state;
-    double skip, px, py, pz, E, M;
-    if (iss >> ptype >> state >> skip >> skip >> skip >> skip >> px >> py >>
-        pz >> E >> M) {
-      if ((ptype == 11 or ptype == 13) && (state == -1)) {
-        double ebeam = E;
-        double e_px, e_py, e_pz, a_px, a_py, a_pz, e_E, a_E, e_M, a_M;
-        for (int i = 0; i < 2; i++) {
-          std::getline(ifile, line);
-        }
-        std::istringstream jss(line);
-        jss >> ptype >> state >> skip >> skip >> skip >> skip >> e_px >> e_py >>
-            e_pz >> e_E >> e_M;
-        if ((ptype == 11 or ptype == 13) && (state == 1)) {  // Find a final state lepton
-          for (int i = 0; i < 2; i++) {
-            std::getline(ifile, line);
-          }
-          std::istringstream kss(line);
-          kss >> ptype >> state >> skip >> skip >> skip >> skip >> a_px >>
-              a_py >> a_pz >> a_E >> a_M;
-          if (ptype == aprime_lhe_id_ and state == 1) {
-            if (abs(1. - a_M / MA) > 1e-3) {
-              throw std::runtime_error(
-                              "A MadGraph imported event has a different "
-                              "APrime mass than the model has (MadGraph = " +
-                                  std::to_string(a_M) + "GeV; Model = " +
-                                  std::to_string(MA) + "GeV).");
-            }
-            OutgoingKinematics evnt;
-            double cmpx = a_px + e_px;
-            double cmpy = a_py + e_py;
-            double cmpz = a_pz + e_pz;
-            double cmE = a_E + e_E;
-            evnt.lepton = LorentzVector(e_px, e_py, e_pz, e_E);
-            evnt.centerMomentum = LorentzVector(cmpx, cmpy, cmpz, cmE);
-            evnt.E = ebeam;
-            madGraphData_[ebeam].push_back(evnt);
-          }  // get a prime kinematics
-        }    // check for final state
-      }      // check for particle type and state
-    }        // able to get momentum/energy numbers
-  }          // while getting lines
-  // Add the energy to the list, with a random offset between 0 and the total
-  // number of entries.
-  ifile.close();
-}
-
 void G4DarkBreMModel::MakePlaceholders() {
   currentDataPoints_.clear();
   maxIterations_ = 10000;
@@ -576,7 +495,7 @@ void G4DarkBreMModel::MakePlaceholders() {
   }
 }
 
-G4DarkBreMModel::OutgoingKinematics
+OutgoingKinematics
 G4DarkBreMModel::sample(double incident_energy) {
   // Cycle through imported beam energies until the closest one above is found,
   // or the max is reached.
