@@ -28,29 +28,29 @@ jobs:
         name: install boost
         if: ${{ steps.cache-deps.outputs.cache-hit != 'true' }}
         run: |
-          mkdir src
+          mkdir dep-src
           boost_version=${{matrix.boost}}
           wget -q -O - https://boostorg.jfrog.io/artifactory/main/release/${boost_version}/source/boost_${boost_version//./_}.tar.gz |\
-            tar -xz --strip-components=1 --directory src
-          cd src
+            tar -xz --strip-components=1 --directory dep-src
+          cd dep-src
           ./bootstrap.sh
           ./b2 install --prefix=${INSTALL_PREFIX}
           cd ..
-          rm -rf src
+          rm -rf dep-src
       -
         name: install geant4
         if: ${{ steps.cache-deps.outputs.cache-hit != 'true' }}
         run: |
-          mkdir src
+          mkdir dep-src
           wget -q -O - https://github.com/geant4/geant4/archive/refs/tags/v${{matrix.geant4}}.tar.gz |\
-            tar -xz --strip-components=1 --directory src
+            tar -xz --strip-components=1 --directory dep-src
           cmake \
             -DGEANT4_INSTALL_EXAMPLES=OFF \
             -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
-            -B src/build \
-            -S src
+            -B dep-src/build \
+            -S dep-src
           cmake --build src/build --target install
-          rm -rf src 
+          rm -rf dep-src 
       -
         name: test compile
         run: |
