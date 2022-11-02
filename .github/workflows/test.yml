@@ -52,7 +52,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
             -B dep-src/build \
             -S dep-src
-          cmake --build src/build --target install
+          cmake --build dep-src/build --target install
           rm -rf dep-src 
       -
         name: test compile
