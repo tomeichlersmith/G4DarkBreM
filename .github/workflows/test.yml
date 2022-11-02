@@ -25,7 +25,7 @@ jobs:
         name: install geant4
         run: |
           mkdir src
-          wget -q -O - https://github.com/geant4/geant4/archive/<version>.tar.gz |\
+          wget -q -O - https://github.com/geant4/geant4/archive/refs/tags/v11.0.3.tar.gz |\
             tar -xz --strip-components=1 --directory src
           cmake \
             -DGEANT4_INSTALL_DATA=ON \
