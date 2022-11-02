@@ -7,14 +7,27 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        boost: [1.80.0]
+        geant4: [11.0.3]
     env:
       CMAKE_PREFIX_PATH: ~/deps
     steps:
       -
+        name: cache dependencies
+        id: cache-deps
+        uses: actions/cache@v3
+        with:
+          path: ~/deps
+          key: boost-${{matrix.boost}}-geant4-${{matrix.geant4}}
+      -
         name: install boost
+        if: ${{ steps.cache-deps.outputs.catch-hit != 'true' }}
         run: |
           mkdir src
-          wget -q -O - https://boostorg.jfrog.io/artifactory/main/release/1.80.0/source/boost_1_80_0.tar.gz |\
+          boost_version=${{matrix.boost}}
+          wget -q -O - https://boostorg.jfrog.io/artifactory/main/release/${boost_version}/source/boost_${boost_version//./_}.tar.gz |\
             tar -xz --strip-components=1 --directory src
           cd src
           ./bootstrap.sh
@@ -23,9 +36,10 @@ jobs:
           rm -rf src
       -
         name: install geant4
+        if: ${{ steps.cache-deps.outputs.catch-hit != 'true' }}
         run: |
           mkdir src
-          wget -q -O - https://github.com/geant4/geant4/archive/refs/tags/v11.0.3.tar.gz |\
+          wget -q -O - https://github.com/geant4/geant4/archive/refs/tags/v${{matrix.geant4}}.tar.gz |\
             tar -xz --strip-components=1 --directory src
           cmake \
             -DGEANT4_INSTALL_DATA=ON \
