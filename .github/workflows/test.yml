@@ -1,0 +1,47 @@
+
+name: Test
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      CMAKE_PREFIX_PATH: ~/deps
+    steps:
+      -
+        name: install boost
+        run: |
+          mkdir src
+          wget -q -O - https://boostorg.jfrog.io/artifactory/main/release/1.80.0/source/boost_1_80_0.tar.gz |\
+            tar -xz --strip-components=1 --directory src
+          cd src
+          ./bootstrap.sh
+          ./b2 install --prefix=~/deps
+          cd ..
+          rm -rf src
+      -
+        name: install geant4
+        run: |
+          mkdir src
+          wget -q -O - https://github.com/geant4/geant4/archive/<version>.tar.gz |\
+            tar -xz --strip-components=1 --directory src
+          cmake \
+            -DGEANT4_INSTALL_DATA=ON \
+            -DGEANT4_INSTALL_EXAMPLES=OFF \
+            -DCMAKE_INSTALL_PREFIX=~/deps \
+            -B src/build \
+            -S src
+          cmake --build src/build --target install
+          rm -rf src 
+      -
+        name: checkout source
+        uses: actions/checkout@v3
+      -
+        name: test compile
+        run: |
+          source ~/deps/bin/geant4.sh
+          cmake -B build -S . -DBoost_DIR=~/deps/
+          cmake --build build
+
