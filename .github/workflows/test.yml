@@ -9,8 +9,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        boost: [1.80.0]
-        geant4: [11.0.3]
+        boost: [1.80.0, 1.71.0, 1.68.0]
+        geant4: [11.0.3, 10.7.4, 10.2.3]
     env:
       INSTALL_PREFIX: ${{github.workspace}}/deps
     steps:
@@ -45,7 +45,6 @@ jobs:
           wget -q -O - https://github.com/geant4/geant4/archive/refs/tags/v${{matrix.geant4}}.tar.gz |\
             tar -xz --strip-components=1 --directory src
           cmake \
-            -DGEANT4_INSTALL_DATA=ON \
             -DGEANT4_INSTALL_EXAMPLES=OFF \
             -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
             -B src/build \
@@ -55,8 +54,6 @@ jobs:
       -
         name: test compile
         run: |
-          ls 
-          ls ${INSTALL_PREFIX}
           source ${INSTALL_PREFIX}/bin/geant4.sh
           export CMAKE_PREFIX_PATH=${INSTALL_PREFIX}
           cmake -B build -S . 
