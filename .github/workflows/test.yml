@@ -49,13 +49,14 @@ jobs:
             -S src
           cmake --build src/build --target install
           rm -rf src 
-#      -
-#        name: checkout source
-#        uses: actions/checkout@v3
-#      -
-#        name: test compile
-#        run: |
-#          source ~/deps/bin/geant4.sh
-#          cmake -B build -S . 
-#          cmake --build build
-#
+      -
+        name: checkout source
+        uses: actions/checkout@v3
+      -
+        name: test compile
+        run: |
+          source ${INSTALL_PREFIX}/bin/geant4.sh
+          export CMAKE_PREFIX_PATH=${INSTALL_PREFIX}
+          cmake -B build -S . 
+          cmake --build build
+
