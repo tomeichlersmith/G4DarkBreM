@@ -47,7 +47,7 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
             -B src/build \
             -S src
-          cmake --build src/build --target install
+          cmake --build src/build --target install -- -j
           rm -rf src 
       -
         name: checkout source
