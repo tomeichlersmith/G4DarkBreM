@@ -47,15 +47,15 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
             -B src/build \
             -S src
-          cmake --build src/build --target install -- -j
+          cmake --build src/build --target install
           rm -rf src 
-      -
-        name: checkout source
-        uses: actions/checkout@v3
-      -
-        name: test compile
-        run: |
-          source ~/deps/bin/geant4.sh
-          cmake -B build -S . 
-          cmake --build build
-
+#      -
+#        name: checkout source
+#        uses: actions/checkout@v3
+#      -
+#        name: test compile
+#        run: |
+#          source ~/deps/bin/geant4.sh
+#          cmake -B build -S . 
+#          cmake --build build
+#
