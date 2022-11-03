@@ -7,7 +7,7 @@ project(G4DarkBreM
 
 # Search for Geant4 and load its settings
 find_package(Geant4 10.2.3 REQUIRED)
-find_package(Boost 1.68 REQUIRED COMPONENTS headers iostreams)
+find_package(Boost 1.68 REQUIRED COMPONENTS iostreams)
 
 include(${Geant4_USE_FILE})
 
