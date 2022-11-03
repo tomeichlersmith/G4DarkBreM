@@ -34,7 +34,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">G4DarkBreM
-   &#160;<span id="projectnumber">v1.0.1</span>
+   &#160;<span id="projectnumber">v1.1.0</span>
    </div>
    <div id="projectbrief">Geant4 Dark Bremmstrahlung from MadGraph</div>
   </td>
@@ -120,9 +120,12 @@ Collaboration diagram for G4APrime:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a59297ef0d3ddd6030019ac62f1d02e2a"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classG4APrime.html">G4APrime</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classG4APrime.html#a59297ef0d3ddd6030019ac62f1d02e2a">APrime</a> (G4double theMass=-1 *MeV)</td></tr>
-<tr class="memdesc:a59297ef0d3ddd6030019ac62f1d02e2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Accessor for APrime definition.  <a href="classG4APrime.html#a59297ef0d3ddd6030019ac62f1d02e2a">More...</a><br /></td></tr>
-<tr class="separator:a59297ef0d3ddd6030019ac62f1d02e2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1836c6a175d89e8244410f7a1ddd99ce"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classG4APrime.html">G4APrime</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classG4APrime.html#a1836c6a175d89e8244410f7a1ddd99ce">APrime</a> ()</td></tr>
+<tr class="memdesc:a1836c6a175d89e8244410f7a1ddd99ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Accessor for APrime definition.  <a href="classG4APrime.html#a1836c6a175d89e8244410f7a1ddd99ce">More...</a><br /></td></tr>
+<tr class="separator:a1836c6a175d89e8244410f7a1ddd99ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adb10dbe58988db0e95fa1ace25d0fb54"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classG4APrime.html#adb10dbe58988db0e95fa1ace25d0fb54">Initialize</a> (double mass, int id=62)</td></tr>
+<tr class="memdesc:adb10dbe58988db0e95fa1ace25d0fb54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the APrime particle with the passed configuration.  <a href="classG4APrime.html#adb10dbe58988db0e95fa1ace25d0fb54">More...</a><br /></td></tr>
+<tr class="separator:adb10dbe58988db0e95fa1ace25d0fb54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
 Private Member Functions</h2></td></tr>
@@ -275,8 +278,8 @@ static <a class="el" href="classG4APrime.html">G4APrime</a> *&#160;</td><td clas
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a59297ef0d3ddd6030019ac62f1d02e2a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a59297ef0d3ddd6030019ac62f1d02e2a">&#9670;&nbsp;</a></span>APrime()</h2>
+<a id="a1836c6a175d89e8244410f7a1ddd99ce"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1836c6a175d89e8244410f7a1ddd99ce">&#9670;&nbsp;</a></span>APrime()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -287,8 +290,7 @@ static <a class="el" href="classG4APrime.html">G4APrime</a> *&#160;</td><td clas
         <tr>
           <td class="memname"><a class="el" href="classG4APrime.html">G4APrime</a> * G4APrime::APrime </td>
           <td>(</td>
-          <td class="paramtype">G4double&#160;</td>
-          <td class="paramname"><em>theMass</em> = <code>-1&#160;*&#160;MeV</code></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -300,13 +302,104 @@ static <a class="el" href="classG4APrime.html">G4APrime</a> *&#160;</td><td clas
 </div><div class="memdoc">
 
 <p>Accessor for APrime definition. </p>
-<p>The first call to this function defines the mass and then later calls can call it without an argument because we will just return the single instance of the A' definition.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">theMass</td><td>mass of the A' in MeV </td></tr>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>if the APrime is not initialized yet.</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classG4APrime.html#adb10dbe58988db0e95fa1ace25d0fb54" title="Initialize the APrime particle with the passed configuration.">Initialize</a> for configuring and constructing the <a class="el" href="classG4APrime.html#a1836c6a175d89e8244410f7a1ddd99ce" title="Accessor for APrime definition.">APrime</a> at the start of a run. </dd></dl>
+
+</div>
+</div>
+<a id="adb10dbe58988db0e95fa1ace25d0fb54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adb10dbe58988db0e95fa1ace25d0fb54">&#9670;&nbsp;</a></span>Initialize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void G4APrime::Initialize </td>
+          <td>(</td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>mass</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>id</em> = <code>62</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialize the APrime particle with the passed configuration. </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">std::runtime_error</td><td>if the APrime has already been initialized</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mass</td><td>The mass of the APrime in MeV </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>The PDG ID number to use for the APrime particle</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>The default value for the PDG ID is set to 62 and has been arbitrarily chosen from the range defined by 11(c) in the <a href="https://pdg.lbl.gov/2007/reviews/montecarlorpp.pdf">PDG ID numbering scheme</a>, avoiding the already-defined "one-of-a-kind" particles using 39, 41, and 42. </p>
+<p>Here are the properties of the formal Geant4 dark photon we define.</p>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Property </th><th class="markdownTableHeadNone">Value  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">short name </td><td class="markdownTableBodyNone">A^1  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">mass </td><td class="markdownTableBodyNone"><b>configured</b>  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">mass width </td><td class="markdownTableBodyNone">0  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">electric charge </td><td class="markdownTableBodyNone">0  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">spin </td><td class="markdownTableBodyNone">0  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">parity </td><td class="markdownTableBodyNone">0  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">conjugation </td><td class="markdownTableBodyNone">0  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">isospin </td><td class="markdownTableBodyNone">0  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">isospin3 </td><td class="markdownTableBodyNone">0  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">Gparity </td><td class="markdownTableBodyNone">0  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">long name </td><td class="markdownTableBodyNone">APrime  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">lepton number </td><td class="markdownTableBodyNone">0  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">baryon number </td><td class="markdownTableBodyNone">0  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">PDG ID encoding </td><td class="markdownTableBodyNone"><b>configured</b>  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">is stable (no decay) </td><td class="markdownTableBodyNone">true  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone">lifetime </td><td class="markdownTableBodyNone">-1 (i.e. no decay)  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone">decay table </td><td class="markdownTableBodyNone">nullptr (i.e. no decay)  </td></tr>
+</table>
 
 </div>
 </div>

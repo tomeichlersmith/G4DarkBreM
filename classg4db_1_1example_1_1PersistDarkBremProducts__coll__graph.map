@@ -1,0 +1,9 @@
+<map id="g4db::example::PersistDarkBremProducts" name="g4db::example::PersistDarkBremProducts">
+<area shape="rect" id="node1" title="event action used to store the OutgoingKinematics if a dark brem occurred" alt="" coords="5,428,208,469"/>
+<area shape="rect" id="node2" title=" " alt="" coords="11,339,159,365"/>
+<area shape="rect" id="node3" title="STL class." alt="" coords="184,339,293,365"/>
+<area shape="rect" id="node4" title="STL class." alt="" coords="163,248,314,289"/>
+<area shape="rect" id="node5" title="STL class." alt="" coords="166,157,311,199"/>
+<area shape="rect" id="node6" title="STL class." alt="" coords="153,81,324,108"/>
+<area shape="rect" id="node7" title="STL class." alt="" coords="185,5,292,32"/>
+</map>

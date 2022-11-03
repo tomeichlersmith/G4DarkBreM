@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['leptonbeam_105',['LeptonBeam',['../classLeptonBeam.html',1,'']]]
+  ['leptonbeam_120',['LeptonBeam',['../classg4db_1_1example_1_1LeptonBeam.html',1,'g4db::example']]]
 ];

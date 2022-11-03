@@ -34,7 +34,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">G4DarkBreM
-   &#160;<span id="projectnumber">v1.0.1</span>
+   &#160;<span id="projectnumber">v1.1.0</span>
    </div>
    <div id="projectbrief">Geant4 Dark Bremmstrahlung from MadGraph</div>
   </td>
@@ -123,15 +123,18 @@ $(document).ready(function(){initNavTree('G4APrime_8h_source.html',''); initResi
 <div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="classG4APrime.html#af96b38539151420ab0d4a3067914c9c4">   56</a></span>&#160;  <span class="keyword">virtual</span> <a class="code" href="classG4APrime.html#af96b38539151420ab0d4a3067914c9c4">~G4APrime</a>() {}</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;  <span class="keyword">static</span> <a class="code" href="classG4APrime.html">G4APrime</a>* <a class="code" href="classG4APrime.html#a59297ef0d3ddd6030019ac62f1d02e2a">APrime</a>(G4double theMass = -1 * MeV);</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;};</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="preprocessor">#endif  // SIMCORE_DARKBREM_G4APRIME_H_</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;  <span class="keyword">static</span> <a class="code" href="classG4APrime.html">G4APrime</a>* <a class="code" href="classG4APrime.html#a1836c6a175d89e8244410f7a1ddd99ce">APrime</a>();</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160; </div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;  <span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="classG4APrime.html#adb10dbe58988db0e95fa1ace25d0fb54">Initialize</a>(<span class="keywordtype">double</span> mass, <span class="keywordtype">int</span> <span class="keywordtype">id</span> = 62);</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;};</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160; </div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;<span class="preprocessor">#endif  // SIMCORE_DARKBREM_G4APRIME_H_</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aclassG4APrime_html_a59297ef0d3ddd6030019ac62f1d02e2a"><div class="ttname"><a href="classG4APrime.html#a59297ef0d3ddd6030019ac62f1d02e2a">G4APrime::APrime</a></div><div class="ttdeci">static G4APrime * APrime(G4double theMass=-1 *MeV)</div><div class="ttdoc">Accessor for APrime definition.</div><div class="ttdef"><b>Definition:</b> G4APrime.cxx:15</div></div>
 <div class="ttc" id="aclassG4APrime_html_a5b7a1230fcdc24b8bcb3d3803876d134"><div class="ttname"><a href="classG4APrime.html#a5b7a1230fcdc24b8bcb3d3803876d134">G4APrime::theAPrime</a></div><div class="ttdeci">static G4APrime * theAPrime</div><div class="ttdoc">Reference to single particle definition of A'.</div><div class="ttdef"><b>Definition:</b> G4APrime.h:33</div></div>
+<div class="ttc" id="aclassG4APrime_html_a1836c6a175d89e8244410f7a1ddd99ce"><div class="ttname"><a href="classG4APrime.html#a1836c6a175d89e8244410f7a1ddd99ce">G4APrime::APrime</a></div><div class="ttdeci">static G4APrime * APrime()</div><div class="ttdoc">Accessor for APrime definition.</div><div class="ttdef"><b>Definition:</b> G4APrime.cxx:15</div></div>
 <div class="ttc" id="aclassG4APrime_html"><div class="ttname"><a href="classG4APrime.html">G4APrime</a></div><div class="ttdoc">Formal class representing the A' (a dark photon)</div><div class="ttdef"><b>Definition:</b> G4APrime.h:30</div></div>
+<div class="ttc" id="aclassG4APrime_html_adb10dbe58988db0e95fa1ace25d0fb54"><div class="ttname"><a href="classG4APrime.html#adb10dbe58988db0e95fa1ace25d0fb54">G4APrime::Initialize</a></div><div class="ttdeci">static void Initialize(double mass, int id=62)</div><div class="ttdoc">Initialize the APrime particle with the passed configuration.</div><div class="ttdef"><b>Definition:</b> G4APrime.cxx:23</div></div>
 <div class="ttc" id="aclassG4APrime_html_af96b38539151420ab0d4a3067914c9c4"><div class="ttname"><a href="classG4APrime.html#af96b38539151420ab0d4a3067914c9c4">G4APrime::~G4APrime</a></div><div class="ttdeci">virtual ~G4APrime()</div><div class="ttdoc">Destructor.</div><div class="ttdef"><b>Definition:</b> G4APrime.h:56</div></div>
 <div class="ttc" id="aclassG4APrime_html_ae372cd69bd9ed13c8940c2b3107a95fd"><div class="ttname"><a href="classG4APrime.html#ae372cd69bd9ed13c8940c2b3107a95fd">G4APrime::G4APrime</a></div><div class="ttdeci">G4APrime(const G4String &amp;Name, G4double mass, G4double width, G4double charge, G4int iSpin, G4int iParity, G4int iConjugation, G4int iIsospin, G4int iIsospin3, G4int gParity, const G4String &amp;pType, G4int lepton, G4int baryon, G4int encoding, G4bool stable, G4double lifetime, G4DecayTable *decaytable)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> G4APrime.h:41</div></div>
 <!-- start footer part -->

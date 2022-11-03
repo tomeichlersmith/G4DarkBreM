@@ -34,7 +34,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">G4DarkBreM
-   &#160;<span id="projectnumber">v1.0.1</span>
+   &#160;<span id="projectnumber">v1.1.0</span>
    </div>
    <div id="projectbrief">Geant4 Dark Bremmstrahlung from MadGraph</div>
   </td>
@@ -119,12 +119,9 @@ Collaboration diagram for G4DarkBremsstrahlung:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9f723c5a6bacbe1b0c7c03c52023bc7c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classG4DarkBremsstrahlung.html#a9f723c5a6bacbe1b0c7c03c52023bc7c">G4DarkBremsstrahlung</a> (bool muons, bool only_one_per_event=false, double global_bias=1., bool cache_xsec=true)</td></tr>
-<tr class="memdesc:a9f723c5a6bacbe1b0c7c03c52023bc7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classG4DarkBremsstrahlung.html#a9f723c5a6bacbe1b0c7c03c52023bc7c">More...</a><br /></td></tr>
-<tr class="separator:a9f723c5a6bacbe1b0c7c03c52023bc7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af39ff980444d1c24d2ce4974ca916741"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classG4DarkBremsstrahlung.html#af39ff980444d1c24d2ce4974ca916741">SetModel</a> (std::shared_ptr&lt; <a class="el" href="classg4db_1_1PrototypeModel.html">g4db::PrototypeModel</a> &gt; the_model)</td></tr>
-<tr class="memdesc:af39ff980444d1c24d2ce4974ca916741"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decide on the model for dark bremming.  <a href="classG4DarkBremsstrahlung.html#af39ff980444d1c24d2ce4974ca916741">More...</a><br /></td></tr>
-<tr class="separator:af39ff980444d1c24d2ce4974ca916741"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a379d07ede230c76e2e9fd8052b3be6e6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classG4DarkBremsstrahlung.html#a379d07ede230c76e2e9fd8052b3be6e6">G4DarkBremsstrahlung</a> (std::shared_ptr&lt; <a class="el" href="classg4db_1_1PrototypeModel.html">g4db::PrototypeModel</a> &gt; the_model, bool only_one_per_event=false, double global_bias=1., bool cache_xsec=true, int verbose_leve=0, int subtype=63)</td></tr>
+<tr class="memdesc:a379d07ede230c76e2e9fd8052b3be6e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classG4DarkBremsstrahlung.html#a379d07ede230c76e2e9fd8052b3be6e6">More...</a><br /></td></tr>
+<tr class="separator:a379d07ede230c76e2e9fd8052b3be6e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e21edafc6f4e408a8c24ba91ce037cb"><td class="memItemLeft" align="right" valign="top"><a id="a7e21edafc6f4e408a8c24ba91ce037cb"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classG4DarkBremsstrahlung.html#a7e21edafc6f4e408a8c24ba91ce037cb">~G4DarkBremsstrahlung</a> ()=default</td></tr>
 <tr class="memdesc:a7e21edafc6f4e408a8c24ba91ce037cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
@@ -179,10 +176,6 @@ double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classG4DarkBremsstrahlung.html#a4cea6b7ac951681575884e5365cf6302">cache_xsec_</a></td></tr>
 <tr class="memdesc:a4cea6b7ac951681575884e5365cf6302"><td class="mdescLeft">&#160;</td><td class="mdescRight">Should we have a cache for the computed cross sections? <br /></td></tr>
 <tr class="separator:a4cea6b7ac951681575884e5365cf6302"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a98028242ff7a5d51c0225ff02c4a4511"><td class="memItemLeft" align="right" valign="top"><a id="a98028242ff7a5d51c0225ff02c4a4511"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classG4DarkBremsstrahlung.html#a98028242ff7a5d51c0225ff02c4a4511">muons_</a></td></tr>
-<tr class="memdesc:a98028242ff7a5d51c0225ff02c4a4511"><td class="mdescLeft">&#160;</td><td class="mdescRight">Are we dark-brem off muons or electrons? <br /></td></tr>
-<tr class="separator:a98028242ff7a5d51c0225ff02c4a4511"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af075c1808429773ffc2f3789b54896b7"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classg4db_1_1PrototypeModel.html">g4db::PrototypeModel</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classG4DarkBremsstrahlung.html#af075c1808429773ffc2f3789b54896b7">model_</a></td></tr>
 <tr class="memdesc:af075c1808429773ffc2f3789b54896b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The model that we are using in this run.  <a href="classG4DarkBremsstrahlung.html#af075c1808429773ffc2f3789b54896b7">More...</a><br /></td></tr>
 <tr class="separator:af075c1808429773ffc2f3789b54896b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -194,8 +187,8 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Class that represents the dark brem process. A muon or electron is allowed to brem a dark photon </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a9f723c5a6bacbe1b0c7c03c52023bc7c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f723c5a6bacbe1b0c7c03c52023bc7c">&#9670;&nbsp;</a></span>G4DarkBremsstrahlung()</h2>
+<a id="a379d07ede230c76e2e9fd8052b3be6e6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a379d07ede230c76e2e9fd8052b3be6e6">&#9670;&nbsp;</a></span>G4DarkBremsstrahlung()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -203,8 +196,8 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
         <tr>
           <td class="memname">G4DarkBremsstrahlung::G4DarkBremsstrahlung </td>
           <td>(</td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>muons</em>, </td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="classg4db_1_1PrototypeModel.html">g4db::PrototypeModel</a> &gt;&#160;</td>
+          <td class="paramname"><em>the_model</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -222,7 +215,19 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>cache_xsec</em> = <code>true</code>&#160;</td>
+          <td class="paramname"><em>cache_xsec</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>verbose_leve</em> = <code>0</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>subtype</em> = <code>63</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -242,20 +247,25 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <li>Needed so we don't replace another EM process</li>
 </ul>
 </li>
-<li>Configures the process</li>
+<li>Decide on the model for dark bremming</li>
 </ol>
 <p>We add ourselves to the process table for muons (or electrons), so the caller <b>does not</b> need to do this. Normally, this is done in a physics constructor, but we have chosen to do this differently to avoid mistakenly adding the dark brem process configured for muons to the electron table (and vis-versa).</p>
-<dl class="section note"><dt>Note</dt><dd>Make sure to call SetModel immediately after constructing the process.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">the_model</td><td>model to use for dark brem simulation </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">muons</td><td>true if muons are dark bremming, false for electrons </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">only_one_per_event</td><td>true if de-activating process after first dark brem </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">global_bias</td><td>bias xsec globally by this factor </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">cache_xsec</td><td>true if we should cache xsecs at the MeV level of precision </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">verbose_level</td><td>level of verbosity to print for this process and model </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">subtype</td><td>subtype for this process distinct from other EM processes in use(detail below) </td></tr>
   </table>
   </dd>
 </dl>
-<p>have our custom dark brem process go first in any process ordering</p>
+<dl class="section note"><dt>Note</dt><dd>we need to pretend to be an electromagnetic process so that the biasing framework can recognize us. This introduces the extra complexity of needing to be a specific EM subtype that is different from the other EM subtypes since the process type and subtype are used to identify processes in the physics process tables.</dd></dl>
+<p>The Geant4 enum G4EmProcessSubType lists the standard subtypes; however, some physics lists introduce more EM subtypes than those listed there. You can use G4ProcessManager::GetProcessList in order to find out what EM subtypes are available in your specific physics list configuration. Deducing an available sub type from the current process list in code is dangerous since there may be more processes constructed after us.</p>
+<p>In G4 speak, a "discrete" process is one that only happens at the end of steps. We want the DB to be discrete because it is not a "slow braking" like ionization, the lepton suddenly has the interaction and loses a lot of its energy.</p>
+<p>We have our custom dark brem process go first in any process ordering so that we always have the opportunity to dark brem if the cross section allows it.</p>
 
 </div>
 </div>
@@ -329,8 +339,11 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </div><div class="memdoc">
 
 <p>Calculate the mean free path given the input conditions. </p>
-<p>We maintain a cache for the cross sections calculated by the model so that later in the run it is less likely that the model will need to be called to calculate the cross section. This is done in order to attempt to improve speed of simulation and avoid repetition of the same, deterministic calculations.</p>
-<p>If you want to turn off the cache-ing behavior, set 'cache_xsec' to false in the constructor.</p>
+<p>If the input track's particle definition does not align with how we are configured (checked via IsApplicable), then we return DBL_MAX to signal that this should never happen.</p>
+<p>We calculate the total cross section by calculating the total cross section for each element in the current material and weighting those cross sections by the number of atoms per volume in the material. This allows the process to handle the material dependence on the cross section, leaving the detailed elemental cross section calculation to the model.</p>
+<p>The <code>global_bias</code> parameter from the constructor is also used here after-the-calculation in order to allow rudimentary biasing. The use of <code>global_bias</code> is discouraged in favor of using Geant4's biasing infrastructure.</p>
+<p>We maintain a cache for the cross sections calculated by the model so that later in the run it is less likely that the model will need to be called to calculate the cross section. This is done in order to attempt to improve speed of simulation and avoid repetition of the same, deterministic calculations. If you want to turn off the cache-ing behavior, set <code>cache_xsec</code> to false in the constructor.</p>
+<p>If the total cross section is above DBL_MIN, then it is inverted to obtain the mean free path. Otherwise, DBL_MAX is returned.</p>
 <dl class="section see"><dt>See also</dt><dd>G4DarkBremsstrahlungModel::ComputeCrossSectionPerAtom </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -369,7 +382,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </div><div class="memdoc">
 
 <p>Checks if the passed particle should be able to do this process. </p>
-<dl class="section return"><dt>Returns</dt><dd>true if particle is electron </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true if particle is the configured lepton </dd></dl>
 
 </div>
 </div>
@@ -421,10 +434,9 @@ G4DarkBremsstrahlungModel::GenerateChange </dd></dl>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>G4VParticleChange detailing how this process changes the track </dd></dl>
-<p>Deactivate the process after one dark brem if we restrict ourselves to only one per event. If this is in the stepping action instead, more than one brem can occur within each step. Reactivated in RunManager::TerminateOneEvent</p>
-<p>Both biased and unbiased process could be in the run (but not at the same time), so we turn off both while silencing the warnings from the process table. std::cout &lt;&lt; "Deactivating dark brem process" &lt;&lt; std::endl;</p>
-<p>std::cout &lt;&lt; "Initializing track" &lt;&lt; std::endl;</p>
-<p>std::cout &lt;&lt; "Calling model's GenerateChange" &lt;&lt; std::endl;</p>
+<p>If configured to do so, we deactivate the process after one dark brem. If this is in the stepping action instead, more than one brem can occur within each step.</p>
+<dl class="section note"><dt>Note</dt><dd>In order to use this feature, one must re-activate the DB process at the end of each event. This could be done in RunManager::TerminateOneEvent or G4UserEventAction::EndOfEventAction.</dd></dl>
+<p>Both biased and unbiased process could be in the run (but not at the same time), so we turn off both while silencing the warnings from the process table. Reactivating the process is essentially the same code as here except using <code>true</code> intead of <code>false</code> in SetProcessActivation.</p>
 
 </div>
 </div>
@@ -453,33 +465,6 @@ G4DarkBremsstrahlungModel::GenerateChange </dd></dl>
 
 <p>Reports the parameters to G4cout. </p>
 <dl class="section see"><dt>See also</dt><dd>G4DarkBremsstrahlungModel::PrintInfo </dd></dl>
-
-</div>
-</div>
-<a id="af39ff980444d1c24d2ce4974ca916741"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af39ff980444d1c24d2ce4974ca916741">&#9670;&nbsp;</a></span>SetModel()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void G4DarkBremsstrahlung::SetModel </td>
-          <td>(</td>
-          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="classg4db_1_1PrototypeModel.html">g4db::PrototypeModel</a> &gt;&#160;</td>
-          <td class="paramname"><em>the_model</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Decide on the model for dark bremming. </p>
-<p>This can only be called once per run and must be called <b>immediately</b> after construction so that the process is configured properly.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">the_model</td><td>model to use for dark brem simulation </td></tr>
-  </table>
-  </dd>
-</dl>
 
 </div>
 </div>
@@ -531,7 +516,7 @@ G4DarkBremsstrahlungModel::GenerateChange </dd></dl>
 
 <p>Only allow the dark brem to happen once per event. </p>
 <p>This allows for the dark brem process to be de-activated when SampleSecondaries is called.</p>
-<dl class="section note"><dt>Note</dt><dd>If a user wants to use this option, the dark brem process should be <em>always</em> re-activated in the RunManager::TerminateOneEvent method. This reactivation has no effect when the process is already active. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>If a user wants to use this option, the dark brem process should be <em>always</em> re-activated at the end of each event. This reactivation has no effect when the process is already active. </dd></dl>
 
 </div>
 </div>

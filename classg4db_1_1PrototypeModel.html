@@ -34,7 +34,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">G4DarkBreM
-   &#160;<span id="projectnumber">v1.0.1</span>
+   &#160;<span id="projectnumber">v1.1.0</span>
    </div>
    <div id="projectbrief">Geant4 Dark Bremmstrahlung from MadGraph</div>
   </td>
@@ -120,12 +120,21 @@ Public Member Functions</h2></td></tr>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classg4db_1_1PrototypeModel.html#ae11ef65b539948079f2ccd0607bd3fe6">~PrototypeModel</a> ()=default</td></tr>
 <tr class="memdesc:ae11ef65b539948079f2ccd0607bd3fe6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor, nothing on purpose. <br /></td></tr>
 <tr class="separator:ae11ef65b539948079f2ccd0607bd3fe6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a05293e494288dec73e465fe0d30695eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classg4db_1_1PrototypeModel.html#a05293e494288dec73e465fe0d30695eb">SetVerboseLevel</a> (int l)</td></tr>
+<tr class="memdesc:a05293e494288dec73e465fe0d30695eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define the verbose level.  <a href="classg4db_1_1PrototypeModel.html#a05293e494288dec73e465fe0d30695eb">More...</a><br /></td></tr>
+<tr class="separator:a05293e494288dec73e465fe0d30695eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae36ab543a94d5b8477022a82d05dba47"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classg4db_1_1PrototypeModel.html#ae36ab543a94d5b8477022a82d05dba47">GetVerboseLevel</a> () const</td></tr>
+<tr class="memdesc:ae36ab543a94d5b8477022a82d05dba47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the verbose level of the model.  <a href="classg4db_1_1PrototypeModel.html#ae36ab543a94d5b8477022a82d05dba47">More...</a><br /></td></tr>
+<tr class="separator:ae36ab543a94d5b8477022a82d05dba47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6eb0ae8e1eeab01ac45f6a469919e422"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classg4db_1_1PrototypeModel.html#a6eb0ae8e1eeab01ac45f6a469919e422">DarkBremOffMuons</a> () const</td></tr>
+<tr class="memdesc:a6eb0ae8e1eeab01ac45f6a469919e422"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if we are bremming off muons.  <a href="classg4db_1_1PrototypeModel.html#a6eb0ae8e1eeab01ac45f6a469919e422">More...</a><br /></td></tr>
+<tr class="separator:a6eb0ae8e1eeab01ac45f6a469919e422"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ceaa69cebb5968017b2a7c7e031e444"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classg4db_1_1PrototypeModel.html#a5ceaa69cebb5968017b2a7c7e031e444">PrintInfo</a> () const =0</td></tr>
 <tr class="memdesc:a5ceaa69cebb5968017b2a7c7e031e444"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the configuration of this model.  <a href="classg4db_1_1PrototypeModel.html#a5ceaa69cebb5968017b2a7c7e031e444">More...</a><br /></td></tr>
 <tr class="separator:a5ceaa69cebb5968017b2a7c7e031e444"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10064d2beb6c3fb0e2a521ca42a850ea"><td class="memItemLeft" align="right" valign="top">virtual G4double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classg4db_1_1PrototypeModel.html#a10064d2beb6c3fb0e2a521ca42a850ea">ComputeCrossSectionPerAtom</a> (G4double electronKE, G4double atomicA, G4double atomicZ)=0</td></tr>
-<tr class="memdesc:a10064d2beb6c3fb0e2a521ca42a850ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the cross section given the input parameters.  <a href="classg4db_1_1PrototypeModel.html#a10064d2beb6c3fb0e2a521ca42a850ea">More...</a><br /></td></tr>
-<tr class="separator:a10064d2beb6c3fb0e2a521ca42a850ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae99722026388d768ba95bff9938fdf00"><td class="memItemLeft" align="right" valign="top">virtual G4double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classg4db_1_1PrototypeModel.html#ae99722026388d768ba95bff9938fdf00">ComputeCrossSectionPerAtom</a> (G4double leptonKE, G4double atomicA, G4double atomicZ)=0</td></tr>
+<tr class="memdesc:ae99722026388d768ba95bff9938fdf00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the cross section given the input parameters.  <a href="classg4db_1_1PrototypeModel.html#ae99722026388d768ba95bff9938fdf00">More...</a><br /></td></tr>
+<tr class="separator:ae99722026388d768ba95bff9938fdf00"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5023399bd69f3b9bc2ba611766ed069e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classg4db_1_1PrototypeModel.html#a5023399bd69f3b9bc2ba611766ed069e">GenerateChange</a> (G4ParticleChange &amp;particleChange, const G4Track &amp;track, const G4Step &amp;step)=0</td></tr>
 <tr class="memdesc:a5023399bd69f3b9bc2ba611766ed069e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the change in the particle now that we can assume the interaction is occuring.  <a href="classg4db_1_1PrototypeModel.html#a5023399bd69f3b9bc2ba611766ed069e">More...</a><br /></td></tr>
 <tr class="separator:a5023399bd69f3b9bc2ba611766ed069e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -136,6 +145,10 @@ Protected Attributes</h2></td></tr>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classg4db_1_1PrototypeModel.html#a1b3c9e9bb255805a434ba7cf99edd961">muons_</a></td></tr>
 <tr class="memdesc:a1b3c9e9bb255805a434ba7cf99edd961"><td class="mdescLeft">&#160;</td><td class="mdescRight">whether muons (true) or electrons (false) are dark bremming <br /></td></tr>
 <tr class="separator:a1b3c9e9bb255805a434ba7cf99edd961"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a730ea81c1402e907fba494da8ac5581b"><td class="memItemLeft" align="right" valign="top"><a id="a730ea81c1402e907fba494da8ac5581b"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classg4db_1_1PrototypeModel.html#a730ea81c1402e907fba494da8ac5581b">verbose_level_</a> {0}</td></tr>
+<tr class="memdesc:a730ea81c1402e907fba494da8ac5581b"><td class="mdescLeft">&#160;</td><td class="mdescRight">verbose level for this model <br /></td></tr>
+<tr class="separator:a730ea81c1402e907fba494da8ac5581b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Abstract class representing a model for dark brem. </p>
@@ -176,8 +189,8 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a10064d2beb6c3fb0e2a521ca42a850ea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a10064d2beb6c3fb0e2a521ca42a850ea">&#9670;&nbsp;</a></span>ComputeCrossSectionPerAtom()</h2>
+<a id="ae99722026388d768ba95bff9938fdf00"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae99722026388d768ba95bff9938fdf00">&#9670;&nbsp;</a></span>ComputeCrossSectionPerAtom()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -189,7 +202,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
           <td class="memname">virtual G4double g4db::PrototypeModel::ComputeCrossSectionPerAtom </td>
           <td>(</td>
           <td class="paramtype">G4double&#160;</td>
-          <td class="paramname"><em>electronKE</em>, </td>
+          <td class="paramname"><em>leptonKE</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -220,15 +233,44 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <dl class="section see"><dt>See also</dt><dd>G4DarkBremmstrahlung::GetMeanFreePath </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">electronKE</td><td>current electron kinetic energy </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">atomicA</td><td>atomic-mass number for the element the electron is in </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">atomicZ</td><td>atomic-number for the element the electron is in </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">leptonKE</td><td>current lepton kinetic energy </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">atomicA</td><td>atomic-mass number for the element the lepton is in </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">atomicZ</td><td>atomic-number for the element the lepton is in </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>cross section with units incorporated as a G4double </dd></dl>
 
 <p>Implemented in <a class="el" href="classg4db_1_1G4DarkBreMModel.html#aeb47b4204cc4536334d9ccf9f8cb845f">g4db::G4DarkBreMModel</a>.</p>
+
+</div>
+</div>
+<a id="a6eb0ae8e1eeab01ac45f6a469919e422"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6eb0ae8e1eeab01ac45f6a469919e422">&#9670;&nbsp;</a></span>DarkBremOffMuons()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool g4db::PrototypeModel::DarkBremOffMuons </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Check if we are bremming off muons. </p>
+<p>If false, assume we are bremming off electrons.</p>
+<dl class="section return"><dt>Returns</dt><dd>true if dark bremming of muons </dd></dl>
 
 </div>
 </div>
@@ -288,6 +330,35 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
+<a id="ae36ab543a94d5b8477022a82d05dba47"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae36ab543a94d5b8477022a82d05dba47">&#9670;&nbsp;</a></span>GetVerboseLevel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int g4db::PrototypeModel::GetVerboseLevel </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the verbose level of the model. </p>
+<p>Use this in model functions to decide if a printout should be done or not.</p>
+<dl class="section return"><dt>Returns</dt><dd>integer level (higher means more detail) </dd></dl>
+
+</div>
+</div>
 <a id="a5ceaa69cebb5968017b2a7c7e031e444"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5ceaa69cebb5968017b2a7c7e031e444">&#9670;&nbsp;</a></span>PrintInfo()</h2>
 
@@ -318,6 +389,41 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 
 </div>
 </div>
+<a id="a05293e494288dec73e465fe0d30695eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a05293e494288dec73e465fe0d30695eb">&#9670;&nbsp;</a></span>SetVerboseLevel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void g4db::PrototypeModel::SetVerboseLevel </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>l</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Define the verbose level. </p>
+<p>This is called after the model is passed into the process so that the model and the process have the same verbose level. Only call this if you wish the model and the process to not have the same verbose level.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">l</td><td>verbose leve </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/G4DarkBreM/<a class="el" href="PrototypeModel_8h_source.html">PrototypeModel.h</a></li>
 </ul>
@@ -326,7 +432,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><b>g4db</b></li><li class="navelem"><a class="el" href="classg4db_1_1PrototypeModel.html">PrototypeModel</a></li>
+    <li class="navelem"><a class="el" href="namespaceg4db.html">g4db</a></li><li class="navelem"><a class="el" href="classg4db_1_1PrototypeModel.html">PrototypeModel</a></li>
     <li class="footer">Generated by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>

@@ -34,7 +34,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">G4DarkBreM
-   &#160;<span id="projectnumber">v1.0.1</span>
+   &#160;<span id="projectnumber">v1.1.0</span>
    </div>
    <div id="projectbrief">Geant4 Dark Bremmstrahlung from MadGraph</div>
   </td>
@@ -92,13 +92,13 @@ $(document).ready(function(){initNavTree('md_app_README.html',''); initResizable
 
 <div class="PageDoc"><div class="header">
   <div class="headertitle">
-<div class="title">g4db executables </div>  </div>
+<div class="title"><a class="el" href="namespaceg4db.html" title="G4DarkBreM internal namespace.">g4db</a> executables </div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p>G4DarkBreM comes with three executables that are helpful for studying its behavior.</p>
 <p>All of these executables output CSV text files for easier analysis.</p>
 <h1><a class="anchor" id="autotoc_md9"></a>
-g4db-scample</h1>
+g4db-scale</h1>
 <p>This executable calls the sample and scale procedure <em>directly</em>, allowing the user to study how the procedure affects the outgoing kinematic distributions without having to wait for an entire Geant4 simulation to progress.</p>
 <h1><a class="anchor" id="autotoc_md10"></a>
 g4db-xsec-calc</h1>
@@ -106,7 +106,29 @@ g4db-xsec-calc</h1>
 <h1><a class="anchor" id="autotoc_md11"></a>
 g4db-simulate</h1>
 <p>This is a full Geant4 simulation focused on a simple prism of material limited to electrons or muons shot directly into it. This is not G4DarkBreM's only use case, but it is a good one for testing that it is functioning properly.</p>
-<p>This simulation is over simplified and <b>should not</b> be used for production-level studies. Among other simplifications, it does not implement a biasing procedure for the dark brem process and does not alter the random number seed. </p>
+<p>This simulation is over simplified and <b>should not</b> be used for production-level studies. Among other simplifications, it does not implement a biasing procedure for the dark brem process and does not alter the random number seed. Nevertheless, it does hold several helpful example classes in the <a class="el" href="namespaceg4db_1_1example.html" title="example simulation application required classes">g4db::example</a> namespace that can be a good starting point for developing a more thorough simulation.</p>
+<p>To view the results of an example simulation that match similar criteria as the simulation used in the paper, you can run this executable with the provided dark brem event libraries stored in the <a href="../data/">data</a> subdirectory.</p>
+<p>For electrons </p><div class="fragment"><div class="line">g4db-simulate \</div>
+<div class="line">  --ap-mass 0.1 \</div>
+<div class="line">  --depth 18 \</div>
+<div class="line">  --target G4_W \</div>
+<div class="line">  --output electrons_thick_target.csv \</div>
+<div class="line">  --beam 4 \</div>
+<div class="line">  data/electron_tungsten_MaxE_4.0_MinE_0.2_RelEStep_0.1_UndecayedAP_mA_0.1_run_3000.csv.gz \</div>
+<div class="line">  50000 </div>
+</div><!-- fragment --><p>and similarly for muons </p><div class="fragment"><div class="line">g4db-simulate \</div>
+<div class="line">  --muons \</div>
+<div class="line">  --ap-mass 1.0 \</div>
+<div class="line">  --depth 2000 \</div>
+<div class="line">  --target G4_Cu \</div>
+<div class="line">  --output muons_thick_target.csv \</div>
+<div class="line">  --beam 100 \</div>
+<div class="line">  data/muon_copper_MaxE_100.0_MinE_2.0_RelEStep_0.1_UndecayedAP_mA_1.0_run_3000.csv.gz \</div>
+<div class="line">  50000 </div>
+</div><!-- fragment --><p><b>Note</b>: For muons, the simulation will take significantly longer. This is because the cross section calculation for muons is significantly more complex and requires more time to calculate.</p>
+<h1><a class="anchor" id="autotoc_md12"></a>
+g4db-extract-library</h1>
+<p>This helps test the library parsing procedure by reading in LHE (or <code>gzip</code> compressed LHE) into memory and then dumping the resulting library to a CSV text file. The output CSV can then be used by the model if the user so wishes and/or used for easier analysis of the raw library kinematics. See <a class="el" href="namespaceg4db_1_1parse.html#aba8cb24b1a0261829307b5eb82a4fe04" title="parse the input stream as a CSV file, filling the input library">g4db::parse::csv</a> for an explanation of the columns of the CSV. </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 </div><!-- doc-content -->

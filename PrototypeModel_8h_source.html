@@ -34,7 +34,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">G4DarkBreM
-   &#160;<span id="projectnumber">v1.0.1</span>
+   &#160;<span id="projectnumber">v1.1.0</span>
    </div>
    <div id="projectbrief">Geant4 Dark Bremmstrahlung from MadGraph</div>
   </td>
@@ -103,39 +103,57 @@ $(document).ready(function(){initNavTree('PrototypeModel_8h_source.html',''); in
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;G4Step.hh&quot;</span></div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;G4ParticleChange.hh&quot;</span></div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160; </div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">namespace </span>g4db {</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160; </div>
-<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="classg4db_1_1PrototypeModel.html">   27</a></span>&#160;<span class="keyword">class </span><a class="code" href="classg4db_1_1PrototypeModel.html">PrototypeModel</a> {</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160; <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00036"></a><span class="lineno"><a class="line" href="classg4db_1_1PrototypeModel.html#ae2308897ed541c06804cab2a0a5049b6">   36</a></span>&#160;  <a class="code" href="classg4db_1_1PrototypeModel.html#ae2308897ed541c06804cab2a0a5049b6">PrototypeModel</a>(<span class="keywordtype">bool</span> muons) : <a class="code" href="classg4db_1_1PrototypeModel.html#a1b3c9e9bb255805a434ba7cf99edd961">muons_</a>{muons} {}</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;  <span class="keyword">virtual</span> <a class="code" href="classg4db_1_1PrototypeModel.html#ae11ef65b539948079f2ccd0607bd3fe6">~PrototypeModel</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespaceg4db.html">g4db</a> {</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160; </div>
+<div class="line"><a name="l00030"></a><span class="lineno"><a class="line" href="classg4db_1_1PrototypeModel.html">   30</a></span>&#160;<span class="keyword">class </span><a class="code" href="classg4db_1_1PrototypeModel.html">PrototypeModel</a> {</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00039"></a><span class="lineno"><a class="line" href="classg4db_1_1PrototypeModel.html#ae2308897ed541c06804cab2a0a5049b6">   39</a></span>&#160;  <a class="code" href="classg4db_1_1PrototypeModel.html#ae2308897ed541c06804cab2a0a5049b6">PrototypeModel</a>(<span class="keywordtype">bool</span> muons) : <a class="code" href="classg4db_1_1PrototypeModel.html#a1b3c9e9bb255805a434ba7cf99edd961">muons_</a>{muons} {}</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160; </div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classg4db_1_1PrototypeModel.html#a5ceaa69cebb5968017b2a7c7e031e444">PrintInfo</a>() <span class="keyword">const</span> = 0;</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160; </div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;  <span class="keyword">virtual</span> G4double <a class="code" href="classg4db_1_1PrototypeModel.html#a10064d2beb6c3fb0e2a521ca42a850ea">ComputeCrossSectionPerAtom</a>(G4double electronKE,</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;                                              G4double atomicA,</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;                                              G4double atomicZ) = 0;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classg4db_1_1PrototypeModel.html#a5023399bd69f3b9bc2ba611766ed069e">GenerateChange</a>(G4ParticleChange&amp; particleChange,</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;                              <span class="keyword">const</span> G4Track&amp; track, <span class="keyword">const</span> G4Step&amp; step) = 0;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160; </div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00079"></a><span class="lineno"><a class="line" href="classg4db_1_1PrototypeModel.html#a1b3c9e9bb255805a434ba7cf99edd961">   79</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classg4db_1_1PrototypeModel.html#a1b3c9e9bb255805a434ba7cf99edd961">muons_</a>;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;};  <span class="comment">// PrototypeModel</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;} <span class="comment">// namespace g4db</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160; </div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;  <span class="keyword">virtual</span> <a class="code" href="classg4db_1_1PrototypeModel.html#ae11ef65b539948079f2ccd0607bd3fe6">~PrototypeModel</a>() = <span class="keywordflow">default</span>;</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno"><a class="line" href="classg4db_1_1PrototypeModel.html#a05293e494288dec73e465fe0d30695eb">   54</a></span>&#160;  <span class="keywordtype">void</span> <a class="code" href="classg4db_1_1PrototypeModel.html#a05293e494288dec73e465fe0d30695eb">SetVerboseLevel</a>(<span class="keywordtype">int</span> l) {</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <a class="code" href="classg4db_1_1PrototypeModel.html#a730ea81c1402e907fba494da8ac5581b">verbose_level_</a> = l;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;  }</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
+<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="classg4db_1_1PrototypeModel.html#ae36ab543a94d5b8477022a82d05dba47">   66</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classg4db_1_1PrototypeModel.html#ae36ab543a94d5b8477022a82d05dba47">GetVerboseLevel</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classg4db_1_1PrototypeModel.html#a730ea81c1402e907fba494da8ac5581b">verbose_level_</a>;</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;  }</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="classg4db_1_1PrototypeModel.html#a6eb0ae8e1eeab01ac45f6a469919e422">   77</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classg4db_1_1PrototypeModel.html#a6eb0ae8e1eeab01ac45f6a469919e422">DarkBremOffMuons</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="classg4db_1_1PrototypeModel.html#a1b3c9e9bb255805a434ba7cf99edd961">muons_</a>;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;  }</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classg4db_1_1PrototypeModel.html#a5ceaa69cebb5968017b2a7c7e031e444">PrintInfo</a>() <span class="keyword">const</span> = 0;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="keyword">virtual</span> G4double <a class="code" href="classg4db_1_1PrototypeModel.html#ae99722026388d768ba95bff9938fdf00">ComputeCrossSectionPerAtom</a>(G4double leptonKE,</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;                                              G4double atomicA,</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;                                              G4double atomicZ) = 0;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;  <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classg4db_1_1PrototypeModel.html#a5023399bd69f3b9bc2ba611766ed069e">GenerateChange</a>(G4ParticleChange&amp; particleChange,</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;                              <span class="keyword">const</span> G4Track&amp; track, <span class="keyword">const</span> G4Step&amp; step) = 0;</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; <span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00119"></a><span class="lineno"><a class="line" href="classg4db_1_1PrototypeModel.html#a1b3c9e9bb255805a434ba7cf99edd961">  119</a></span>&#160;  <span class="keywordtype">bool</span> <a class="code" href="classg4db_1_1PrototypeModel.html#a1b3c9e9bb255805a434ba7cf99edd961">muons_</a>;</div>
+<div class="line"><a name="l00121"></a><span class="lineno"><a class="line" href="classg4db_1_1PrototypeModel.html#a730ea81c1402e907fba494da8ac5581b">  121</a></span>&#160;  <span class="keywordtype">int</span> <a class="code" href="classg4db_1_1PrototypeModel.html#a730ea81c1402e907fba494da8ac5581b">verbose_level_</a>{0};</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;};  <span class="comment">// PrototypeModel</span></div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;} <span class="comment">// namespace g4db</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160; </div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="aclassg4db_1_1PrototypeModel_html_a5ceaa69cebb5968017b2a7c7e031e444"><div class="ttname"><a href="classg4db_1_1PrototypeModel.html#a5ceaa69cebb5968017b2a7c7e031e444">g4db::PrototypeModel::PrintInfo</a></div><div class="ttdeci">virtual void PrintInfo() const =0</div><div class="ttdoc">Print the configuration of this model.</div></div>
+<div class="ttc" id="aclassg4db_1_1PrototypeModel_html_ae99722026388d768ba95bff9938fdf00"><div class="ttname"><a href="classg4db_1_1PrototypeModel.html#ae99722026388d768ba95bff9938fdf00">g4db::PrototypeModel::ComputeCrossSectionPerAtom</a></div><div class="ttdeci">virtual G4double ComputeCrossSectionPerAtom(G4double leptonKE, G4double atomicA, G4double atomicZ)=0</div><div class="ttdoc">Calculate the cross section given the input parameters.</div></div>
 <div class="ttc" id="aclassg4db_1_1PrototypeModel_html_ae11ef65b539948079f2ccd0607bd3fe6"><div class="ttname"><a href="classg4db_1_1PrototypeModel.html#ae11ef65b539948079f2ccd0607bd3fe6">g4db::PrototypeModel::~PrototypeModel</a></div><div class="ttdeci">virtual ~PrototypeModel()=default</div><div class="ttdoc">Destructor, nothing on purpose.</div></div>
-<div class="ttc" id="aclassg4db_1_1PrototypeModel_html"><div class="ttname"><a href="classg4db_1_1PrototypeModel.html">g4db::PrototypeModel</a></div><div class="ttdoc">Abstract class representing a model for dark brem.</div><div class="ttdef"><b>Definition:</b> PrototypeModel.h:27</div></div>
-<div class="ttc" id="aclassg4db_1_1PrototypeModel_html_ae2308897ed541c06804cab2a0a5049b6"><div class="ttname"><a href="classg4db_1_1PrototypeModel.html#ae2308897ed541c06804cab2a0a5049b6">g4db::PrototypeModel::PrototypeModel</a></div><div class="ttdeci">PrototypeModel(bool muons)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> PrototypeModel.h:36</div></div>
+<div class="ttc" id="aclassg4db_1_1PrototypeModel_html"><div class="ttname"><a href="classg4db_1_1PrototypeModel.html">g4db::PrototypeModel</a></div><div class="ttdoc">Abstract class representing a model for dark brem.</div><div class="ttdef"><b>Definition:</b> PrototypeModel.h:30</div></div>
+<div class="ttc" id="aclassg4db_1_1PrototypeModel_html_a6eb0ae8e1eeab01ac45f6a469919e422"><div class="ttname"><a href="classg4db_1_1PrototypeModel.html#a6eb0ae8e1eeab01ac45f6a469919e422">g4db::PrototypeModel::DarkBremOffMuons</a></div><div class="ttdeci">bool DarkBremOffMuons() const</div><div class="ttdoc">Check if we are bremming off muons.</div><div class="ttdef"><b>Definition:</b> PrototypeModel.h:77</div></div>
+<div class="ttc" id="anamespaceg4db_html"><div class="ttname"><a href="namespaceg4db.html">g4db</a></div><div class="ttdoc">G4DarkBreM internal namespace.</div><div class="ttdef"><b>Definition:</b> ElementXsecCache.cxx:3</div></div>
+<div class="ttc" id="aclassg4db_1_1PrototypeModel_html_ae2308897ed541c06804cab2a0a5049b6"><div class="ttname"><a href="classg4db_1_1PrototypeModel.html#ae2308897ed541c06804cab2a0a5049b6">g4db::PrototypeModel::PrototypeModel</a></div><div class="ttdeci">PrototypeModel(bool muons)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> PrototypeModel.h:39</div></div>
 <div class="ttc" id="aclassg4db_1_1PrototypeModel_html_a5023399bd69f3b9bc2ba611766ed069e"><div class="ttname"><a href="classg4db_1_1PrototypeModel.html#a5023399bd69f3b9bc2ba611766ed069e">g4db::PrototypeModel::GenerateChange</a></div><div class="ttdeci">virtual void GenerateChange(G4ParticleChange &amp;particleChange, const G4Track &amp;track, const G4Step &amp;step)=0</div><div class="ttdoc">Generate the change in the particle now that we can assume the interaction is occuring.</div></div>
-<div class="ttc" id="aclassg4db_1_1PrototypeModel_html_a10064d2beb6c3fb0e2a521ca42a850ea"><div class="ttname"><a href="classg4db_1_1PrototypeModel.html#a10064d2beb6c3fb0e2a521ca42a850ea">g4db::PrototypeModel::ComputeCrossSectionPerAtom</a></div><div class="ttdeci">virtual G4double ComputeCrossSectionPerAtom(G4double electronKE, G4double atomicA, G4double atomicZ)=0</div><div class="ttdoc">Calculate the cross section given the input parameters.</div></div>
-<div class="ttc" id="aclassg4db_1_1PrototypeModel_html_a1b3c9e9bb255805a434ba7cf99edd961"><div class="ttname"><a href="classg4db_1_1PrototypeModel.html#a1b3c9e9bb255805a434ba7cf99edd961">g4db::PrototypeModel::muons_</a></div><div class="ttdeci">bool muons_</div><div class="ttdoc">whether muons (true) or electrons (false) are dark bremming</div><div class="ttdef"><b>Definition:</b> PrototypeModel.h:79</div></div>
+<div class="ttc" id="aclassg4db_1_1PrototypeModel_html_ae36ab543a94d5b8477022a82d05dba47"><div class="ttname"><a href="classg4db_1_1PrototypeModel.html#ae36ab543a94d5b8477022a82d05dba47">g4db::PrototypeModel::GetVerboseLevel</a></div><div class="ttdeci">int GetVerboseLevel() const</div><div class="ttdoc">Get the verbose level of the model.</div><div class="ttdef"><b>Definition:</b> PrototypeModel.h:66</div></div>
+<div class="ttc" id="aclassg4db_1_1PrototypeModel_html_a1b3c9e9bb255805a434ba7cf99edd961"><div class="ttname"><a href="classg4db_1_1PrototypeModel.html#a1b3c9e9bb255805a434ba7cf99edd961">g4db::PrototypeModel::muons_</a></div><div class="ttdeci">bool muons_</div><div class="ttdoc">whether muons (true) or electrons (false) are dark bremming</div><div class="ttdef"><b>Definition:</b> PrototypeModel.h:119</div></div>
+<div class="ttc" id="aclassg4db_1_1PrototypeModel_html_a05293e494288dec73e465fe0d30695eb"><div class="ttname"><a href="classg4db_1_1PrototypeModel.html#a05293e494288dec73e465fe0d30695eb">g4db::PrototypeModel::SetVerboseLevel</a></div><div class="ttdeci">void SetVerboseLevel(int l)</div><div class="ttdoc">Define the verbose level.</div><div class="ttdef"><b>Definition:</b> PrototypeModel.h:54</div></div>
+<div class="ttc" id="aclassg4db_1_1PrototypeModel_html_a730ea81c1402e907fba494da8ac5581b"><div class="ttname"><a href="classg4db_1_1PrototypeModel.html#a730ea81c1402e907fba494da8ac5581b">g4db::PrototypeModel::verbose_level_</a></div><div class="ttdeci">int verbose_level_</div><div class="ttdoc">verbose level for this model</div><div class="ttdef"><b>Definition:</b> PrototypeModel.h:121</div></div>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>

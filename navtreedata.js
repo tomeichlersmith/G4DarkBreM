@@ -26,9 +26,18 @@ var NAVTREE =
     [ "Installation", "index.html#autotoc_md1", null ],
     [ "Validation", "index.html#autotoc_md2", null ],
     [ "g4db executables", "md_app_README.html", [
-      [ "g4db-scample", "md_app_README.html#autotoc_md9", null ],
+      [ "g4db-scale", "md_app_README.html#autotoc_md9", null ],
       [ "g4db-xsec-calc", "md_app_README.html#autotoc_md10", null ],
-      [ "g4db-simulate", "md_app_README.html#autotoc_md11", null ]
+      [ "g4db-simulate", "md_app_README.html#autotoc_md11", null ],
+      [ "g4db-extract-library", "md_app_README.html#autotoc_md12", null ]
+    ] ],
+    [ "Namespaces", "namespaces.html", [
+      [ "Namespace List", "namespaces.html", "namespaces_dup" ],
+      [ "Namespace Members", "namespacemembers.html", [
+        [ "All", "namespacemembers.html", null ],
+        [ "Functions", "namespacemembers_func.html", null ],
+        [ "Typedefs", "namespacemembers_type.html", null ]
+      ] ]
     ] ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
@@ -56,7 +65,7 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-".html"
+"ElementXsecCache_8h_source.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

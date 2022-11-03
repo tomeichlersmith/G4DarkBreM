@@ -1,0 +1,6 @@
+<map id="g4db::example::Hunk" name="g4db::example::Hunk">
+<area shape="rect" id="node1" title="basic &#39;hunk&#39; of material in air, the material and its thickness is configurable" alt="" coords="88,185,249,212"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,96,223,123"/>
+<area shape="rect" id="node3" title="STL class." alt="" coords="247,96,333,123"/>
+<area shape="rect" id="node4" title="STL class." alt="" coords="221,5,359,47"/>
+</map>

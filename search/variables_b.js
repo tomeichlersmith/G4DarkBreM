@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['recoil_5f_191',['recoil_',['../classOutgoingKinematics.html#ab4df10082f46417abc418fa67411570e',1,'OutgoingKinematics']]]
+  ['recoil_5f_220',['recoil_',['../classg4db_1_1example_1_1OutgoingKinematics.html#a5f809bd4a9ee277d03bfcea9165cf419',1,'g4db::example::OutgoingKinematics']]]
 ];

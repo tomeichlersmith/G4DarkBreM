@@ -1,0 +1,4 @@
+<map id="g4db::example::LeptonBeam" name="g4db::example::LeptonBeam">
+<area shape="rect" id="node1" title="the primary generator, a simple particle gun restricted to electrons or muons along the z axis" alt="" coords="19,80,228,107"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,5,241,32"/>
+</map>
