@@ -14,6 +14,9 @@ Geant4 Dark Bremmstrahlung from MadGraph
   </a>
 </p>
 
+The version submitted in 2022 to Computer Physics Communications is [release v1.1.1](https://github.com/tomeichlersmith/G4DarkBreM/releases/tag/v1.1.1).
+Ongoing development of this package is maintained at on GitHub [tomeichlersmith/G4DarkBreM](https://github.com/tomeichlersmith/G4DarkBreM).
+
 ## Installation
 The only dependencies of G4DarkBreM are Geant4 which has [an extensive installation guide](http://cern.ch/geant4-userdoc/UsersGuides/InstallationGuide/html/)
 and Boost which can be installed [from the website](https://www.boost.org/doc/libs/1_80_0/more/getting_started/unix-variants.html)
