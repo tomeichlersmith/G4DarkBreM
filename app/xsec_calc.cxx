@@ -27,7 +27,7 @@ void usage() {
     "  --muons      : pass to set lepton to muons (otherwise electrons)\n"
     "  --energy     : python-like arange for input energies in GeV (stop, start stop, start stop step)\n"
     "                 default start is 0 and default step is 0.1 GeV\n"
-    "  --target     : define target material with three parameters DENSITY, Z, A\n"
+    "  --target     : define target material with two parameters (atomic units): Z A\n"
     << std::flush;
 }
 
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) try {
       ap_mass = std::stod(argv[++i_arg]);
     } else if (arg == "--energy") {
       std::vector<std::string> args;
-      while (i_arg < argc and argv[i_arg][0] != '-') {
+      while (i_arg+1 < argc and argv[i_arg+1][0] != '-') {
         args.push_back(argv[++i_arg]);
       }
       if (args.size() == 0) {
@@ -77,22 +77,22 @@ int main(int argc, char* argv[]) try {
       } else if (args.size() == 2) {
         min_energy = std::stod(args[0]);
         max_energy = std::stod(args[1]);
-      } else if (args.size() == 2) {
+      } else if (args.size() == 3) {
         min_energy = std::stod(args[0]);
         max_energy = std::stod(args[1]);
         energy_step = std::stod(args[2]);
       }
     } else if (arg == "--target") {
       std::vector<std::string> args;
-      while (i_arg < argc and argv[i_arg][0] != '-') {
+      while (i_arg+1 < argc and argv[i_arg+1][0] != '-') {
         args.push_back(argv[++i_arg]);
       }
-      if (args.size() != 3) {
-        std::cerr << arg << " requires three arguments: DENSITY Z A" << std::endl;
+      if (args.size() != 2) {
+        std::cerr << arg << " requires two arguments: Z A" << std::endl;
         return 1;
       }
-      target_Z       = std::stod(args[1]);
-      target_A       = std::stod(args[2]);
+      target_Z       = std::stod(args[0]);
+      target_A       = std::stod(args[1]);
     } else {
       std::cout << arg << " is an unrecognized option" << std::endl;
       return 1;
@@ -110,19 +110,17 @@ int main(int argc, char* argv[]) try {
   max_energy *= GeV;
 
   // the process accesses the A' mass from the G4 particle
-  G4APrime::Initialize(ap_mass/GeV);
-  // create the process to do proper initializations
-  //    this holds the xsec cache as well so we don't have to
-  //    repeat all that code
-  G4DarkBremsstrahlung db_process(
-      std::make_shared<g4db::G4DarkBreMModel>("forward_only",
-        0.0, 1.0, "NOT NEEDED", muons, 622, false),
-      false, 1.0, true);
+  G4APrime::Initialize(ap_mass*GeV);
+  auto model = std::make_shared<g4db::G4DarkBreMModel>("forward_only",
+        0.0, 1.0, "NOT NEEDED", muons, 622, false);
+  // wrap the created model in the cache so we can use it
+  // to hold the xsec table and write out the CSV later
+  g4db::ElementXsecCache cache(model);
 
   int bar_width = 80;
   int pos = 0;
   while (current_energy < max_energy + energy_step) {
-    db_process.getCache().get(current_energy, target_A, target_Z);
+    cache.get(current_energy, target_A, target_Z);
     current_energy += energy_step;
     int old_pos{pos};
     pos = bar_width * current_energy / max_energy;
@@ -138,11 +136,9 @@ int main(int argc, char* argv[]) try {
   }
   std::cout << std::endl;
 
-  table_file << db_process.getCache();
+  table_file << cache;
 
   table_file.close();
-
-  db_process.PrintInfo();
 
   return 0;
 } catch (const std::exception& e) {
