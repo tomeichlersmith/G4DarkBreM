@@ -7,7 +7,7 @@ Geant4 Dark Bremmstrahlung from MadGraph
     <img src="https://img.shields.io/badge/license-Apache%202-blue" />
   </a>
   <a href="https://github.com/tomeichlersmith/G4DarkBreM/actions" alt="Actions">
-    <img src="https://img.shields.io/github/workflow/status/tomeichlersmith/G4DarkBreM/Test" />
+    <img src="https://img.shields.io/github/workflow/status/tomeichlersmith/G4DarkBreM/test.yml?branch=main" />
   </a>
   <a href="https://github.com/tomeichlersmith/G4DarkBreM/releases" alt="Releases">
     <img src="https://img.shields.io/github/v/release/tomeichlersmith/G4DarkBreM" />
