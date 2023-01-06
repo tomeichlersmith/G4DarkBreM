@@ -7,9 +7,14 @@ and then extracted to a CSV and compressed (process below).
 They are merely here to help test run the simulation and be an example.
 They should not be used for any production-level physics studies.
 
+#### Note
+dark-brem-lib-gen v4.3 (and earlier) contained a bug that affected how the total cross section
+for muons was calculated. The outgoing kinematics (and therefore the libraries generated) can still
+be used, but use v4.4 (or later) if you wish to obtain a physical total cross section for muons.
+
 ## Generation Process
 Follow [Quick Start](https://github.com/tomeichlersmith/dark-brem-lib-gen#quick-start)
-to setup dark brem library generation environment making sure to use `v4.2`.
+to setup dark brem library generation environment making sure to use `v4.3`.
 
 Generate the electron library.
 ```
