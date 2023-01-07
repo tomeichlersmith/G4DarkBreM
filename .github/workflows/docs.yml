@@ -21,7 +21,7 @@ jobs:
         name: install doxygen 1.9.2
         run: |
           sudo apt-get update
-          sudo apt-get install -y doxygen graphviz libclang-cpp1-9 libclang1-9
+          sudo apt-get install -y doxygen graphviz
       - 
         name: set version
         run: |
