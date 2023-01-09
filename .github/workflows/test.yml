@@ -51,6 +51,9 @@ jobs:
           mkdir dep-src
           wget -q -O - https://github.com/geant4/geant4/archive/refs/tags/v${{matrix.geant4}}.tar.gz |\
             tar -xz --strip-components=1 --directory dep-src
+          # old versions of Geant4 clash with newer GCC 11 compiler
+          #   luckily the fix is only in one file and is internal to Geant4
+          sed -i 's|fsqrt|g4fsqrt|g' dep-src/source/persistency/ascii/src/G4tgrEvaluator.cc
           cmake \
             -DGEANT4_INSTALL_EXAMPLES=OFF \
             -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
