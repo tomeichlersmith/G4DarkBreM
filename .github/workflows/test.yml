@@ -4,7 +4,7 @@ name: Test
 on:
   push:
     branches:
-      - main
+      - '**' #main
     tags:
       - '**'
     paths-ignore:
@@ -13,7 +13,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         boost: [1.80.0, 1.71.0, 1.68.0]
@@ -30,7 +30,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{env.INSTALL_PREFIX}}
-          key: boost-${{matrix.boost}}-geant4-${{matrix.geant4}}
+          key: new-boost-${{matrix.boost}}-geant4-${{matrix.geant4}}
       -
         name: install boost
         if: ${{ steps.cache-deps.outputs.cache-hit != 'true' }}
@@ -40,7 +40,7 @@ jobs:
           wget -q -O - https://boostorg.jfrog.io/artifactory/main/release/${boost_version}/source/boost_${boost_version//./_}.tar.gz |\
             tar -xz --strip-components=1 --directory dep-src
           cd dep-src
-          ./bootstrap.sh
+          ./bootstrap.sh --with-libraries=iostreams,math,regex
           ./b2 install --prefix=${INSTALL_PREFIX}
           cd ..
           rm -rf dep-src
@@ -51,6 +51,9 @@ jobs:
           mkdir dep-src
           wget -q -O - https://github.com/geant4/geant4/archive/refs/tags/v${{matrix.geant4}}.tar.gz |\
             tar -xz --strip-components=1 --directory dep-src
+          # old versions of Geant4 clash with newer GCC 11 compiler
+          #   luckily the fix is only in one file and is internal to Geant4
+          sed -i 's|fsqrt|g4fsqrt|g' dep-src/source/persistency/ascii/src/G4tgrEvaluator.cc
           cmake \
             -DGEANT4_INSTALL_EXAMPLES=OFF \
             -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} \
