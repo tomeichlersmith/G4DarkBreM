@@ -40,7 +40,7 @@ jobs:
           wget -q -O - https://boostorg.jfrog.io/artifactory/main/release/${boost_version}/source/boost_${boost_version//./_}.tar.gz |\
             tar -xz --strip-components=1 --directory dep-src
           cd dep-src
-          ./bootstrap.sh --with-libraries=iostreams,math
+          ./bootstrap.sh --with-libraries=iostreams,math,regex
           ./b2 install --prefix=${INSTALL_PREFIX}
           cd ..
           rm -rf dep-src
